@@ -6,6 +6,6 @@ describe('n7zip', () => {
     expect(typeof n7zip.DEBUG).toBe('boolean')
 
     expect(n7zip).toHaveProperty('ARCH')
-    expect(n7zip.ARCH).toBe(process.arch === 'x64' ? 64 : 32)
+    expect(n7zip.ARCH).toBe(['ia32', 'x32'].includes(process.arch) ? 32 : 64)
   })
 })
