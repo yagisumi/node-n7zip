@@ -1,0 +1,15 @@
+.*
+jest.config.js
+tslint.json
+typedoc.js
+typedoc.json
+yarn.lock
+yarn-error.log
+package-lock.json
+rollup.config.js
+rollup.config.umd.js
+*.tgz
+/test/
+/docs/
+/coverage/
+tsconfig.json

@@ -1,0 +1,10 @@
+node_modules/
+.rpt2_cache/
+*.tgz
+/coverage/
+/umd/
+/lib/
+/src/*.js
+/src/*.map
+/src/test/*.map
+/src/test/*.d.ts
