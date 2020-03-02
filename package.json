@@ -1,20 +1,24 @@
 {
   "name": "@yagisumi/n7zip",
   "version": "0.1.0",
-  "description": "",
-  "keywords": [],
+  "description": "A Node.js wrapper of 7zip with 7z.dll(7z.so)",
+  "keywords": [
+    "7zip"
+  ],
   "engines": {
-    "node": ">= 6.0.0"
+    "node": ">= 8.16.0"
   },
   "private": true,
   "main": "lib/n7zip",
   "module": "lib/n7zip.mjs",
   "types": "lib/n7zip.d.ts",
   "scripts": {
-    "test": "run-s prettier:fix eslint jest",
+    "test": "run-s test:build prettier:fix eslint jest",
+    "test:build": "node-gyp rebuild --debug",
     "jest": "jest",
-    "doc": "typedoc --json ./docs/typedoc.json --tsconfig ./tsconfig.json ./src",
+    "install": "node-gyp rebuild --debug",
     "build": "run-s clean build:*",
+    "build_extension": "node-gyp rebuild --debug",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache",
     "build:cjs": "rollup -c -f cjs -o ./lib/n7zip.js",
     "build:d_ts": "tsc -p src -d --emitDeclarationOnly --outDir ./lib",
@@ -44,5 +48,9 @@
     "rollup-plugin-typescript2": "^0.26.0",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^2.0.0"
   }
 }
