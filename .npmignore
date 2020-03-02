@@ -13,3 +13,5 @@ rollup.config.umd.js
 /docs/
 /coverage/
 tsconfig.json
+/build
+/ext/7z

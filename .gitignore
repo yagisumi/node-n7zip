@@ -8,3 +8,5 @@ node_modules/
 /src/*.map
 /src/test/*.map
 /src/test/*.d.ts
+/ext/7z
+/build

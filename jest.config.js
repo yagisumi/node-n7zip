@@ -13,8 +13,6 @@ module.exports = {
       tsConfig: './tsconfig.json',
     },
   },
-  globalSetup: './test/setup.js',
-  setupFiles: ['./test/fix-instanceof.js'],
   moduleNameMapper: {
     '^@/(.+)': '<rootDir>/src/$1',
   },
