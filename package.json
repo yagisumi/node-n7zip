@@ -10,7 +10,6 @@
   "main": "lib/n7zip",
   "module": "lib/n7zip.mjs",
   "types": "lib/n7zip.d.ts",
-  "unpkg": "umd/n7zip.js",
   "scripts": {
     "test": "run-s prettier:fix eslint jest",
     "jest": "jest",
@@ -18,8 +17,6 @@
     "build": "run-s clean build:*",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache",
     "build:cjs": "rollup -c -f cjs -o ./lib/n7zip.js",
-    "build:mjs": "rollup -c -f es -o ./lib/n7zip.mjs",
-    "build:umd": "rollup -c rollup.config.umd.js",
     "build:d_ts": "tsc -p src -d --emitDeclarationOnly --outDir ./lib",
     "prettier:fix": "prettier --write **/*.{ts,js,json}",
     "eslint": "eslint **/*.{js,ts}",
@@ -46,7 +43,6 @@
     "rollup-plugin-terser": "^5.2.0",
     "rollup-plugin-typescript2": "^0.26.0",
     "ts-jest": "^25.2.1",
-    "typedoc": "^0.16.11",
     "typescript": "^3.8.3"
   }
 }
