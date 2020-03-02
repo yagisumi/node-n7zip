@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Node.js ${{ matrix.node }}
+    name: Node.js ${{ matrix.os }} ${{ matrix.node }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
