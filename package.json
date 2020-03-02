@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "description": "A Node.js wrapper of 7zip with 7z.dll(7z.so)",
   "keywords": [
-    "7zip"
+    "7zip",
+    "zip",
+    "rar"
   ],
   "engines": {
     "node": ">= 8.16.0"
   },
   "private": true,
   "main": "lib/n7zip",
-  "module": "lib/n7zip.mjs",
   "types": "lib/n7zip.d.ts",
   "scripts": {
     "test": "run-s test:build prettier:fix eslint jest",
@@ -18,7 +19,6 @@
     "jest": "jest",
     "install": "node-gyp rebuild --debug",
     "build": "run-s clean build:*",
-    "build_extension": "node-gyp rebuild --debug",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache",
     "build:cjs": "rollup -c -f cjs -o ./lib/n7zip.js",
     "build:d_ts": "tsc -p src -d --emitDeclarationOnly --outDir ./lib",
