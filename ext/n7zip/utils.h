@@ -3,7 +3,6 @@
 #include "common.h"
 
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
-#define FAILED(hr) (((HRESULT)(hr)) < 0)
 
 namespace n7zip {
 
