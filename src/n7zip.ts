@@ -1,13 +1,19 @@
-import { toNamespacedPath, resolve } from 'path'
+import PATH from 'path'
 import { n7zipNativeType, Format, Codec } from './n7zip_native'
 const n7zipNative = require('bindings')('n7zip') as n7zipNativeType
 
 let formats: Array<Format> = []
 let codecs: Array<Codec> = []
 
+if (!('toNamespacedpath' in PATH)) {
+  PATH.toNamespacedPath = function(path: string) {
+    return path
+  }
+}
+
 namespace Silent {
   export function loadLibrary(path: string) {
-    const path2 = toNamespacedPath(path)
+    const path2 = PATH.toNamespacedPath(path)
     let r = n7zipNative.loadLibrary(path2)
 
     if (r.error) {
@@ -15,7 +21,9 @@ namespace Silent {
       const asar = '/app.asar/'
       const idx = path3.lastIndexOf(asar)
       if (idx >= 0) {
-        const path4 = toNamespacedPath(path3.slice(0, idx) + '/app.asar.unpacked/' + path3.slice(idx + asar.length))
+        const path4 = PATH.toNamespacedPath(
+          path3.slice(0, idx) + '/app.asar.unpacked/' + path3.slice(idx + asar.length)
+        )
         r = n7zipNative.loadLibrary(path4)
       }
     }
@@ -70,9 +78,9 @@ function init() {
   const dir = __dirname
   let lib = ''
   if (process.platform === 'win32') {
-    lib = resolve(dir, `../ext/files/7z${n7zipNative.ARCH}/7z.dll`)
+    lib = PATH.resolve(dir, `../ext/files/7z${n7zipNative.ARCH}/7z.dll`)
   } else {
-    lib = resolve(dir, `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/7z.so`)
+    lib = PATH.resolve(dir, `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/7z.so`)
   }
   const r = Silent.loadLibrary(lib)
 
@@ -81,7 +89,7 @@ function init() {
   }
 
   if (process.platform !== 'win32') {
-    const rar = resolve(dir, `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/Codecs/Rar.so`)
+    const rar = PATH.resolve(dir, `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/Codecs/Rar.so`)
     Silent.loadLibrary(rar)
   }
 }
