@@ -7,5 +7,8 @@ describe('n7zip', () => {
 
     expect(n7zip).toHaveProperty('ARCH')
     expect(n7zip.ARCH).toBe(['ia32', 'x32'].includes(process.arch) ? 32 : 64)
+
+    console.log(n7zip.getFormats())
+    console.log(n7zip.getCodecs())
   })
 })
