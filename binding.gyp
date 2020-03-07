@@ -78,8 +78,10 @@
                 'MACOSX_DEPLOYMENT_TARGET': '10.7',
             },
             'msvs_settings': {
-                'WarningLevel': '4',
-                'VCCLCompilerTool': {'ExceptionHandling': 1},
+                'VCCLCompilerTool': {
+                    'WarningLevel': '4',
+                    'ExceptionHandling': 1
+                },
             },
             "conditions": [
                 [
