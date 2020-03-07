@@ -57,7 +57,7 @@ ERR(Napi::Env env, const char* message, ErrorType type = kError)
 inline bool
 operator<(REFGUID g1, REFGUID g2)
 {
-  for (int i = 0; i < (sizeof(g1) / sizeof(int)); i++)
+  for (size_t i = 0; i < (sizeof(g1) / sizeof(int)); i++)
     if (((unsigned int*)&g1)[i] != ((unsigned int*)&g2)[i])
       return ((unsigned int*)&g1)[i] < ((unsigned int*)&g2)[i];
   return false;
