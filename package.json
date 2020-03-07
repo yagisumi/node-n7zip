@@ -14,7 +14,7 @@
   "main": "lib/n7zip",
   "types": "lib/n7zip.d.ts",
   "scripts": {
-    "test": "run-s test:build prettier:fix eslint jest",
+    "test": "run-s prettier:fix eslint jest",
     "test:build": "node-gyp rebuild --debug",
     "jest": "jest",
     "install": "node-gyp rebuild --debug",
