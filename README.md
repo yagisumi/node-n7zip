@@ -16,7 +16,7 @@ $ npm i @yagisumi/n7zip
 ## Usage
 
 ```ts
-import { @yagisumi/n7zip } from '@yagisumi/n7zip';
+import { n7zip } from '@yagisumi/n7zip'
 ```
 
 ## License
