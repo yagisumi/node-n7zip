@@ -54,6 +54,10 @@
             'dependencies': ['extract_src'],
             "sources": [
                 "ext/n7zip.cpp",
+                "ext/n7zip/debug.c",
+                "ext/n7zip/utils.cpp",
+                "ext/n7zip/guid.cpp",
+                "ext/n7zip/library.cpp",
                 "ext/7z/CPP/Common/IntToString.cpp",
                 "ext/7z/CPP/Common/MyString.cpp",
                 "ext/7z/CPP/Common/StringConvert.cpp",
