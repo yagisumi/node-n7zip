@@ -88,6 +88,9 @@
                             "ext/7z/CPP/myWindows",
                             "ext/7z/CPP/include_windows",
                         ],
+                        "sources": [
+                            "ext/7z/CPP/Common/MyWindows.cpp",
+                        ],
                     }
                 ],
                 [
