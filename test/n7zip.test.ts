@@ -15,12 +15,11 @@ describe('n7zip', () => {
       .map((fmt) => fmt.name)
       .sort()
 
-    const defaultFormats = [
+    let defaultFormats = [
       '7z',
       'APM',
       'Ar',
       'Arj',
-      'COFF',
       'Cab',
       'Chm',
       'Compound',
@@ -71,6 +70,10 @@ describe('n7zip', () => {
       'xz',
       'zip',
     ]
+    if (process.platform === 'win32') {
+      defaultFormats.push('COFF') // since 7zip 18.00
+      defaultFormats = defaultFormats.sort()
+    }
     expect(formats).toEqual(defaultFormats)
 
     const codecs = n7zip
