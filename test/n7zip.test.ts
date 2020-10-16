@@ -107,9 +107,7 @@ describe('n7zip', () => {
     ]
     expect(codecs).toEqual(defaultCodecs)
 
-    n7zip.loadLibrary(`G:\\data\\download\\2020.02\\Asar\\Asar.${n7zip.ARCH}.dll`)
-    // n7zip.loadLibrary(`G:\\data\\download\\2020.03\\Iso7z\\Iso7z.${n7zip.ARCH}.dll`)
-    console.log(n7zip.getFormats())
-    console.log(n7zip.getCodecs())
+    // console.log(n7zip.getFormats())
+    // console.log(n7zip.getCodecs())
   })
 })
