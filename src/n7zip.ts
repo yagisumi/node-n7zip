@@ -1,17 +1,19 @@
 import PATH from 'path'
 import { n7zipNativeType, Format, Codec } from './n7zip_native'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const n7zipNative = require('bindings')('n7zip') as n7zipNativeType
 
 let formats: Readonly<Array<Readonly<Format>>> = []
 let codecs: Readonly<Array<Readonly<Codec>>> = []
 
 if (!('toNamespacedpath' in PATH)) {
-  PATH.toNamespacedPath = function(path: string) {
+  PATH.toNamespacedPath = function (path: string) {
     return path
   }
 }
 
 namespace Silent {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   export function loadLibrary(path: string) {
     const path2 = PATH.toNamespacedPath(path)
     let r = n7zipNative.loadLibrary(path2)
@@ -89,7 +91,10 @@ function init() {
   }
 
   if (process.platform !== 'win32') {
-    const rar = PATH.resolve(dir, `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/Codecs/Rar.so`)
+    const rar = PATH.resolve(
+      dir,
+      `../build/${n7zipNative.DEBUG ? 'Debug' : 'Release'}/Codecs/Rar.so`
+    )
     Silent.loadLibrary(rar)
   }
 }
