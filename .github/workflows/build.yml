@@ -28,7 +28,7 @@ jobs:
         run: |
           node -v
           npm -v
-      - run: npm ci
+      - run: npm install
       - run: npm test
       - name: Coveralls
         if: matrix.os == 'ubuntu-latest' && matrix.node == 14
