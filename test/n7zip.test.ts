@@ -15,7 +15,7 @@ describe('n7zip', () => {
       .map((fmt) => fmt.name)
       .sort()
 
-    let defaultFormats = [
+    const defaultFormats = [
       '7z',
       'APM',
       'Ar',
@@ -72,7 +72,7 @@ describe('n7zip', () => {
     ]
     if (process.platform === 'win32') {
       defaultFormats.push('COFF') // since 7zip 18.00
-      defaultFormats = defaultFormats.sort()
+      defaultFormats.sort()
     }
     expect(formats).toEqual(defaultFormats)
 
@@ -106,5 +106,10 @@ describe('n7zip', () => {
       'Swap4',
     ]
     expect(codecs).toEqual(defaultCodecs)
+
+    n7zip.loadLibrary(`G:\\data\\download\\2020.02\\Asar\\Asar.${n7zip.ARCH}.dll`)
+    // n7zip.loadLibrary(`G:\\data\\download\\2020.03\\Iso7z\\Iso7z.${n7zip.ARCH}.dll`)
+    console.log(n7zip.getFormats())
+    console.log(n7zip.getCodecs())
   })
 })

@@ -2,8 +2,8 @@ import PATH from 'path'
 import { n7zipNativeType, Format, Codec } from './n7zip_native'
 const n7zipNative = require('bindings')('n7zip') as n7zipNativeType
 
-let formats: Array<Format> = []
-let codecs: Array<Codec> = []
+let formats: Readonly<Array<Readonly<Format>>> = []
+let codecs: Readonly<Array<Readonly<Codec>>> = []
 
 if (!('toNamespacedpath' in PATH)) {
   PATH.toNamespacedPath = function(path: string) {

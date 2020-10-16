@@ -61,6 +61,8 @@ public:
   UInt32 Flags = 0;
   GUID ClassId;
   std::string Name;
+  std::string Extension;
+  std::string AddExtension;
   bool CanUpdate = false;
   bool KeepName() const { return (Flags & NArcInfoFlags::kKeepName) != 0; }
   bool FindSignature() const { return (Flags & NArcInfoFlags::kFindSignature) != 0; }

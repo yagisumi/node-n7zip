@@ -117,11 +117,29 @@ LibraryInfo::LoadFormats(std::unique_ptr<Library>& library)
 
     prop.Clear();
     auto r_name = library->GetHandlerProperty2(i, NArchive::NHandlerPropID::kName, &prop);
-    if (r_name == S_OK && prop.vt == VT_BSTR) {
+    if (r_name == S_OK && prop.vt == VT_BSTR && prop.bstrVal) {
       UString ustr(prop.bstrVal);
       AString astr;
       ConvertUnicodeToUTF8(ustr, astr);
       format->Name.append(astr.Ptr());
+    }
+
+    prop.Clear();
+    auto r_ext = library->GetHandlerProperty2(i, NArchive::NHandlerPropID::kExtension, &prop);
+    if (r_ext == S_OK && prop.vt == VT_BSTR) {
+      UString ustr(prop.bstrVal);
+      AString astr;
+      ConvertUnicodeToUTF8(ustr, astr);
+      format->Extension.append(astr.Ptr());
+    }
+
+    prop.Clear();
+    auto r_addext = library->GetHandlerProperty2(i, NArchive::NHandlerPropID::kAddExtension, &prop);
+    if (r_addext == S_OK && prop.vt == VT_BSTR) {
+      UString ustr(prop.bstrVal);
+      AString astr;
+      ConvertUnicodeToUTF8(ustr, astr);
+      format->AddExtension.append(astr.Ptr());
     }
 
     prop.Clear();
@@ -251,6 +269,8 @@ LibraryInfo::GetFormats(const Napi::CallbackInfo& info)
     auto obj = Napi::Object::New(env);
     auto& format = m_formats.at(i);
     obj.Set("name", format->Name.c_str());
+    obj.Set("extension", format->Extension.c_str());
+    obj.Set("addExtension", format->AddExtension.c_str());
     obj.Set("index", format->Index);
     obj.Set("canUpdate", format->CanUpdate);
 
