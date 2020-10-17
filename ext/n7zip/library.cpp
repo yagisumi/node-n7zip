@@ -46,6 +46,18 @@ Library::~Library()
 
 CMyComPtr<LibraryInfo> g_library_info(new LibraryInfo);
 
+std::shared_lock<std::shared_timed_mutex>
+LibraryInfo::GetSharedLock()
+{
+  return std::shared_lock<std::shared_timed_mutex>(m_external_mutex);
+}
+
+std::unique_lock<std::shared_timed_mutex>
+LibraryInfo::GetDeferredUniqueLock()
+{
+  return std::unique_lock<std::shared_timed_mutex>(m_external_mutex, std::defer_lock);
+}
+
 HRESULT
 LibraryInfo::AddLibrary(Napi::String& path)
 {
@@ -320,24 +332,42 @@ loadLibrary(const Napi::CallbackInfo& info)
     return ERR(env, "loadLibrary() argument must be a string", kTypeError);
   }
 
+  auto lock = g_library_info->GetDeferredUniqueLock();
+  if (!lock.try_lock()) {
+    return ERR(env, "Failed to lock");
+  }
+
   auto path = info[0].As<Napi::String>();
   auto r = g_library_info->AddLibrary(path);
   if (SUCCEEDED(r)) {
     return OK(env, Napi::Boolean::New(env, r == S_OK));
   } else {
-    return ERR(env, "Failed to load Library");
+    return ERR(env, "Failed to load library");
   }
 }
 
 Napi::Array
 getFormats(const Napi::CallbackInfo& info)
 {
+  auto lock = g_library_info->GetSharedLock();
   return g_library_info->GetFormats(info);
 }
 
-Napi::Array
+static Napi::Array
 getCodecs(const Napi::CallbackInfo& info)
 {
+  auto lock = g_library_info->GetSharedLock();
   return g_library_info->GetCodecs(info);
 }
+
+Napi::Object
+InitLibrary(Napi::Env env, Napi::Object exports)
+{
+  exports.Set("loadLibrary", Napi::Function::New(env, loadLibrary));
+  exports.Set("getFormats", Napi::Function::New(env, getFormats));
+  exports.Set("getCodecs", Napi::Function::New(env, getCodecs));
+
+  return exports;
+}
+
 } // namespace n7zip

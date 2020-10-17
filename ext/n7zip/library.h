@@ -47,7 +47,10 @@ public:
   {
     return this->CreateObject && GetNumberOfFormats && GetHandlerProperty2 && m_num_formats > 0;
   }
-  inline bool HasMethods() { return GetNumberOfMethods && GetMethodProperty && CreateDecoder && m_num_methods > 0; }
+  inline bool HasMethods()
+  {
+    return GetNumberOfMethods && GetMethodProperty && CreateDecoder && m_num_methods > 0;
+  }
   inline UInt32 NumberOfFormats() { return m_num_formats; }
   inline UInt32 NumberOfMethods() { return m_num_methods; }
 };
@@ -113,20 +116,27 @@ public:
   Napi::Array GetFormats(const Napi::CallbackInfo& info);
   Napi::Array GetCodecs(const Napi::CallbackInfo& info);
 
+  std::shared_lock<std::shared_timed_mutex> GetSharedLock();
+  std::unique_lock<std::shared_timed_mutex> GetDeferredUniqueLock();
+
 private:
   void LoadFormats(std::unique_ptr<Library>& library);
   void LoadMethods(std::unique_ptr<Library>& library);
+  std::shared_timed_mutex m_external_mutex;
 };
 
 extern CMyComPtr<LibraryInfo> g_library_info;
 
+// Napi::Object
+// loadLibrary(const Napi::CallbackInfo& info);
+
+// Napi::Array
+// getFormats(const Napi::CallbackInfo& info);
+
+// Napi::Array
+// getCodecs(const Napi::CallbackInfo& info);
+
 Napi::Object
-loadLibrary(const Napi::CallbackInfo& info);
-
-Napi::Array
-getFormats(const Napi::CallbackInfo& info);
-
-Napi::Array
-getCodecs(const Napi::CallbackInfo& info);
+InitLibrary(Napi::Env env, Napi::Object exports);
 
 } // namespace n7zip
