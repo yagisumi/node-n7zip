@@ -2,7 +2,7 @@
   "require": ["mocha-ui-jest", "ts-node/register", "tsconfig-paths/register"],
   "ui": "jest",
   "reporter": "list",
-  "parallel": true,
+  "parallel": false,
   "retries": 3,
   "timeout": 30000
 }
