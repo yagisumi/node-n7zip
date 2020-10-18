@@ -64,11 +64,11 @@ SharedLocker::Run(const Napi::CallbackInfo& info)
     });
 
   m_context->native_thread = std::thread([this]() {
-    auto callback = [](Napi::Env env, Napi::Function jsCallback) { jsCallback.Call({}); };
+    auto callback = [](Napi::Env, Napi::Function jsCallback) { jsCallback.Call({}); };
 
     auto lock = g_library_info->GetSharedLock();
     std::this_thread::sleep_for(std::chrono::seconds(3));
-    auto status = this->m_context->tsfn.BlockingCall(callback);
+    this->m_context->tsfn.BlockingCall(callback);
 
     this->m_context->tsfn.Release();
   });
