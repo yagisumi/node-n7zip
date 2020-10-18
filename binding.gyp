@@ -103,6 +103,7 @@
                         ],
                         'xcode_settings': {
                             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
+                            # 'shared_timed_mutex' is unavailable: introduced in macOS 10.12
                             'MACOSX_DEPLOYMENT_TARGET': '10.12',
                         }
                     }
