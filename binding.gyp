@@ -98,9 +98,12 @@
                 ],
                 [
                     'OS == "mac"', {
-                        'cflags+': ['-fvisibility=hidden'],
+                        'cflags+': [
+                            '-fvisibility=hidden',
+                        ],
                         'xcode_settings': {
                             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
+                            'MACOSX_DEPLOYMENT_TARGET': '10.12',
                         }
                     }
                 ],
