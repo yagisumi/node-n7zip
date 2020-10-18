@@ -84,7 +84,7 @@ LibraryInfo::AddLibrary(Napi::String& path)
   LoadFormats(library);
   LoadMethods(library);
 
-  if (m_formats.size() > start_num_formats || m_methods.size() - start_num_methods) {
+  if (m_formats.size() > start_num_formats || m_methods.size() > start_num_methods) {
     m_libraries.push_back(std::move(library));
     if (m_libraries.size() > 1) {
       for (size_t i = 0; i < m_libraries.size(); i++) {
