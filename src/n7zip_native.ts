@@ -1,28 +1,9 @@
-import { Result } from './n7zip_types'
+import { Result, Format, Codec } from './n7zip_types'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+export const n7zip_native = require('bindings')('n7zip') as n7zipNativeType
 
-export type Format = {
-  name: string
-  index: number
-  canUpdate: boolean
-  flags: {
-    KeepName: boolean
-    FindSignature: boolean
-    AltStreams: boolean
-    NtSecure: boolean
-    SymLinks: boolean
-    HardLinks: boolean
-    UseGlobalOffset: boolean
-    StartOpen: boolean
-    BackwardOpen: boolean
-    PreArc: boolean
-    PureStartOpen: boolean
-  }
-}
-
-export type Codec = {
-  name: string
-  index: number
-  id: number
+declare class SharedLocker {
+  run(cb: () => void): Result
 }
 
 export interface n7zipNativeType {
@@ -31,4 +12,5 @@ export interface n7zipNativeType {
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
+  SharedLocker?: typeof SharedLocker
 }
