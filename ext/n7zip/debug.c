@@ -20,7 +20,7 @@ TRACE(const char* fmt, ...)
   va_list list;
   va_start(list, fmt);
   vfprintf(stderr, fmt, list);
-  fputs("", stderr);
+  fputs("\n", stderr);
   va_end(list);
 }
 
