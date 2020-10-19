@@ -102,6 +102,7 @@ describe('library', () => {
     expect(codecs).toEqual(defaultCodecs)
 
     // console.log({ length: n7zip.getFormats().length })
+    console.log(n7zip.getFormats())
     // console.log(n7zip.getFormats().filter((fmt) => fmt.canUpdate))
     // console.log(n7zip.getCodecs())
   })
@@ -117,12 +118,12 @@ describe('library', () => {
         ? path.resolve(__dirname, `../ext/files/7z${n7zip.ARCH}/7z.dll`)
         : path.resolve(__dirname, `../build/${n7zip.DEBUG ? 'Debug' : 'Release'}/7z.so`)
 
-    if (n7zip_native.SharedLocker != null) {
+    if (n7zip_native.tester != null) {
       const r1 = n7zip.loadLibrary(lib)
       expect(r1.error).toBeUndefined()
       expect(r1.ok).toBe(true)
 
-      const locker = new n7zip_native.SharedLocker()
+      const locker = new n7zip_native.tester.SharedLocker()
       const r2 = locker.run(() => {
         done()
       })

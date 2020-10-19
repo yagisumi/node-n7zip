@@ -1,13 +1,13 @@
-#include "test_object.h"
-
 #ifdef DEBUG
+
+  #include "shared_locker.h"
 
 namespace n7zip {
 
 Napi::FunctionReference SharedLocker::constructor;
 
 Napi::Object
-SharedLocker::Init(Napi::Env env, Napi::Object exports)
+SharedLocker::Init(Napi::Env env, Napi::Object tester)
 {
   Napi::Function func =
     DefineClass(env, "SharedLocker", { InstanceMethod("run", &SharedLocker::Run) });
@@ -15,8 +15,8 @@ SharedLocker::Init(Napi::Env env, Napi::Object exports)
   constructor = Napi::Persistent(func);
   constructor.SuppressDestruct();
 
-  exports.Set("SharedLocker", func);
-  return exports;
+  tester.Set("SharedLocker", func);
+  return tester;
 }
 
 SharedLocker::SharedLocker(const Napi::CallbackInfo& info)
@@ -80,11 +80,11 @@ SharedLocker::Run(const Napi::CallbackInfo& info)
 }
 
 Napi::Object
-InitTestObject(Napi::Env env, Napi::Object exports)
+InitSharedLocker(Napi::Env env, Napi::Object tester)
 {
-  SharedLocker::Init(env, exports);
+  SharedLocker::Init(env, tester);
 
-  return exports;
+  return tester;
 }
 
 } // namespace n7zip

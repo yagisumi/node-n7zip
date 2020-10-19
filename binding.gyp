@@ -58,7 +58,10 @@
                 "ext/n7zip/utils.cpp",
                 "ext/n7zip/guid.cpp",
                 "ext/n7zip/library.cpp",
-                "ext/n7zip/test_object.cpp",
+
+                "ext/n7zip/tester/index.cpp",
+                "ext/n7zip/tester/shared_locker.cpp",
+
                 "ext/7z/CPP/Common/IntToString.cpp",
                 "ext/7z/CPP/Common/MyString.cpp",
                 "ext/7z/CPP/Common/StringConvert.cpp",

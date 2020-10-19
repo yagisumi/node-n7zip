@@ -12,5 +12,8 @@ export interface n7zipNativeType {
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
-  SharedLocker?: typeof SharedLocker
+
+  tester?: {
+    SharedLocker: typeof SharedLocker
+  }
 }

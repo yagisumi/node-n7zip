@@ -1,7 +1,8 @@
 #pragma once
 
 #ifdef DEBUG
-  #include "common.h"
+
+  #include "n7zip/common.h"
   #include <chrono>
 
 namespace n7zip {
@@ -33,6 +34,7 @@ private:
 };
 
 Napi::Object
-InitTestObject(Napi::Env env, Napi::Object exports);
+InitSharedLocker(Napi::Env env, Napi::Object exports);
 } // namespace n7zip
+
 #endif
