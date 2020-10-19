@@ -147,6 +147,7 @@ describe('library', () => {
         expect(r4.error).toBeInstanceOf(Error)
         expect(r4.ok).toBe(false)
       } catch (err) {
+        console.log(err)
         e = err
       }
     } else {
