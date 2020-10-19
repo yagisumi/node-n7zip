@@ -102,7 +102,7 @@ describe('library', () => {
     expect(codecs).toEqual(defaultCodecs)
 
     // console.log({ length: n7zip.getFormats().length })
-    console.log(n7zip.getFormats())
+    // console.log(n7zip.getFormats())
     // console.log(n7zip.getFormats().filter((fmt) => fmt.canUpdate))
     // console.log(n7zip.getCodecs())
   })
@@ -119,25 +119,36 @@ describe('library', () => {
         : path.resolve(__dirname, `../build/${n7zip.DEBUG ? 'Debug' : 'Release'}/7z.so`)
 
     if (n7zip_native.tester != null) {
-      const r1 = n7zip.loadLibrary(lib)
-      expect(r1.error).toBeUndefined()
-      expect(r1.ok).toBe(true)
+      let e: any = undefined
+      setTimeout(() => {
+        if (e != null) {
+          throw e
+        } else {
+          done()
+        }
+      }, 3000)
 
-      const locker = new n7zip_native.tester.SharedLocker()
-      const r2 = locker.run(() => {
-        done()
-      })
-      expect(r2.error).toBeUndefined()
-      expect(r2.ok).toBe(true)
+      try {
+        const r1 = n7zip.loadLibrary(lib)
+        expect(r1.error).toBeUndefined()
+        expect(r1.ok).toBe(true)
 
-      // SharedLocker can't run at the same time.
-      const r3 = locker.run(() => {})
-      expect(r3.error).toBeInstanceOf(Error)
-      expect(r3.ok).toBe(false)
+        const locker = new n7zip_native.tester.SharedLocker()
+        const r2 = locker.run(() => {})
+        expect(r2.error).toBeUndefined()
+        expect(r2.ok).toBe(true)
 
-      const r4 = n7zip.loadLibrary(lib)
-      expect(r4.error).toBeInstanceOf(Error)
-      expect(r4.ok).toBe(false)
+        // SharedLocker can't run at the same time.
+        const r3 = locker.run(() => {})
+        expect(r3.error).toBeInstanceOf(Error)
+        expect(r3.ok).toBe(false)
+
+        const r4 = n7zip.loadLibrary(lib)
+        expect(r4.error).toBeInstanceOf(Error)
+        expect(r4.ok).toBe(false)
+      } catch (err) {
+        e = err
+      }
     } else {
       done()
     }
