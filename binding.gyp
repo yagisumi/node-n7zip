@@ -58,9 +58,11 @@
                 "ext/n7zip/utils.cpp",
                 "ext/n7zip/guid.cpp",
                 "ext/n7zip/library.cpp",
+                "ext/n7zip/streams/fd_in_stream.cpp",
 
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",
+                "ext/n7zip/tester/in_stream_wrap.cpp",
 
                 "ext/7z/CPP/Common/IntToString.cpp",
                 "ext/7z/CPP/Common/MyString.cpp",

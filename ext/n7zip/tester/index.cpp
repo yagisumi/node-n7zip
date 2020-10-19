@@ -11,6 +11,7 @@ InitTester(Napi::Env env, Napi::Object exports)
   exports.Set("tester", tester);
 
   InitSharedLocker(env, tester);
+  InitInStreamWrap(env, tester);
 
   return exports;
 }

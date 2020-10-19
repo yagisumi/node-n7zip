@@ -6,6 +6,17 @@ declare class SharedLocker {
   run(cb: () => void): Result
 }
 
+export enum SeekOrigin {
+  SEEK_SET,
+  SEEK_CUR,
+  SEEK_END,
+}
+
+declare class InStreamWrap {
+  read(size: number): Result<Buffer>
+  seek(offset: number, seekOrigin: SeekOrigin): Result<number>
+}
+
 export interface n7zipNativeType {
   DEBUG: boolean
   ARCH: 32 | 64
@@ -15,5 +26,6 @@ export interface n7zipNativeType {
 
   tester?: {
     SharedLocker: typeof SharedLocker
+    createInStream(fd: number, autoclose?: boolean): Result<InStreamWrap>
   }
 }

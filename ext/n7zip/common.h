@@ -28,10 +28,9 @@
 #include <napi.h>
 
 #include <n7zip/my_com.h>
-
 // #include <Common/MyCom.h>
 
 #include "debug.h"
-// #include "guid.h"
+#include "guid.h"
 #include "utils.h"
 #include "library.h"
