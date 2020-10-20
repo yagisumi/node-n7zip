@@ -107,6 +107,22 @@ createInStream(const Napi::CallbackInfo& info)
     in_stream_wrap->m_inStream.Attach(in_stream.Detach());
 
     return OK(env, in_stream_obj);
+  } else if (info[0].IsString()) {
+    auto str = info[0].ToString();
+    auto path = str.Utf8Value();
+    uv_fs_t open_req;
+    auto r = uv_fs_open(nullptr, &open_req, path.c_str(), UV_FS_O_RDONLY, 0666, nullptr);
+    // r == open_req.result
+    if (r < 0) {
+      return ERR(env, "file open error");
+    } else {
+      CMyComPtr<FdInStream> in_stream(new FdInStream(r, true));
+      auto in_stream_obj = InStreamWrap::constructor.New({});
+      auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
+      in_stream_wrap->m_inStream.Attach(in_stream.Detach());
+
+      return OK(env, in_stream_obj);
+    }
   } else {
     return ERR(env, "invalid argument");
   }

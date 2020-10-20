@@ -29,11 +29,25 @@ describe('InStream', () => {
     }
 
     const fd = fs.openSync(file, 'r')
-    const r_in_stream = n7zip_native.tester.createInStream(fd, true)
-    expect(r_in_stream.error).toBeUndefined()
-    expect(r_in_stream.ok).toBe(true)
-    if (r_in_stream.ok) {
-      const in_stream = r_in_stream.value
+    const r = n7zip_native.tester.createInStream(fd, true)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
+      testInStream(in_stream)
+    }
+  })
+
+  test('FdInStream (string path)', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    const r = n7zip_native.tester.createInStream(file)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
       testInStream(in_stream)
     }
   })

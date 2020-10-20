@@ -27,5 +27,6 @@ export interface n7zipNativeType {
   tester?: {
     SharedLocker: typeof SharedLocker
     createInStream(fd: number, autoclose?: boolean): Result<InStreamWrap>
+    createInStream(filePath: string): Result<InStreamWrap>
   }
 }
