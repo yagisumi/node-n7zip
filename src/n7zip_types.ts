@@ -7,6 +7,7 @@ export type OK<T = undefined> = {
 export type ERR = {
   ok: false
   error: Error
+  value: undefined
 }
 
 export type Result<T = undefined> = OK<T> | ERR

@@ -12,7 +12,7 @@ export enum SeekOrigin {
   SEEK_END,
 }
 
-declare class InStreamWrap {
+export declare class InStreamWrap {
   read(size: number): Result<Buffer>
   seek(offset: number, seekOrigin: SeekOrigin): Result<number>
 }
