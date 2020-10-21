@@ -104,7 +104,7 @@ createInStream(const Napi::CallbackInfo& info)
     CMyComPtr<FdInStream> in_stream(new FdInStream(fd, autoclose));
     auto in_stream_obj = InStreamWrap::constructor.New({});
     auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
-    in_stream_wrap->m_inStream.Attach(in_stream.Detach());
+    in_stream_wrap->m_inStream = in_stream;
 
     return OK(env, in_stream_obj);
   } else if (info[0].IsString()) {
@@ -119,7 +119,7 @@ createInStream(const Napi::CallbackInfo& info)
       CMyComPtr<FdInStream> in_stream(new FdInStream(r, true));
       auto in_stream_obj = InStreamWrap::constructor.New({});
       auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
-      in_stream_wrap->m_inStream.Attach(in_stream.Detach());
+      in_stream_wrap->m_inStream = in_stream;
 
       return OK(env, in_stream_obj);
     }
