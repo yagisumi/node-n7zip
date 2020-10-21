@@ -19,7 +19,6 @@ install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
-  - set PATH=C:\Program Files (x86)\MSBuild\12.0\Bin;%PATH%
   - npm install --loglevel error -g npm
   - npm install
 
@@ -28,8 +27,8 @@ test_script:
   # Output useful info for debugging.
   - node --version
   - npm --version
+  - msbuild /ver
   # run tests
-  - set PATH=C:\Program Files (x86)\MSBuild\12.0\Bin;%PATH%
   - npm test
 
 # No need to run `npm run build`
