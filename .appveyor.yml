@@ -1,3 +1,5 @@
+imamge: Visual Studio 2015
+
 # Test against the latest version of this Node.js version
 environment:
   matrix:
