@@ -3,7 +3,8 @@ skip_tags: true
 # Test against the latest version of this Node.js version
 environment:
   global:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+
   matrix:
     # node.js
     - nodejs_version: '10'
