@@ -38,7 +38,6 @@ FdInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
   auto r = lseek(m_fd, offset, seekOrigin);
   TRACE("lseek: %lu", r);
   if (r < 0) {
-    m_state = StreamState::SeekError;
     TRACE("[FdInStream::Read] SeekError");
     return E_ABORT;
   } else {
