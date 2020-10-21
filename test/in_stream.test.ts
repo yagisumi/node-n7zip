@@ -12,11 +12,14 @@ describe('InStream', () => {
       return
     }
 
-    const r1 = n7zip_native.tester.createInStream(0)
+    const fd = fs.openSync(file, 'r')
+    const r1 = n7zip_native.tester.createInStream(fd, true)
     expect(r1.error).toBeUndefined()
     expect(r1.ok).toBe(true)
     if (r1.ok) {
       const stream = r1.value
+
+      fs.closeSync(fd)
       const r2 = stream.seek(5, SeekOrigin.SEEK_CUR)
       expect(r2.error).toBeInstanceOf(Error)
       expect(r2.ok).toBe(false)
