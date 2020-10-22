@@ -37,7 +37,7 @@ private:
 };
 
 Napi::Object
-InitSharedLocker(Napi::Env env, Napi::Object exports);
+InitSharedLocker(Napi::Env env, Napi::Object tester);
 } // namespace n7zip
 
 #endif
