@@ -13,12 +13,9 @@ inspectUString(const Napi::CallbackInfo& info)
     return env.Undefined();
   }
 
-  auto str = info[0].ToString().Utf8Value();
-  AString astr;
-  astr.SetFrom(str.c_str(), str.length());
-  UString ustr;
-  ConvertUTF8ToUnicode(astr, ustr);
-  return Napi::Buffer<char>::Copy(env, (char*)ustr.Ptr(), ustr.Len() * sizeof(wchar_t));
+  auto str = info[0].ToString();
+  auto ustr = ConvertNapiStringToUString(str);
+  return Napi::Buffer<char>::Copy(env, (char*)ustr->Ptr(), ustr->Len() * sizeof(wchar_t));
 }
 
 Napi::Object
