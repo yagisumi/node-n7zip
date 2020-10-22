@@ -6,9 +6,6 @@
 
 namespace n7zip {
 
-Napi::String
-BStrToNString(Napi::Env env, BSTR bstr);
-
 inline Napi::Object
 OK(Napi::Env env)
 {
@@ -53,6 +50,12 @@ ERR(Napi::Env env, const char* message, ErrorType type = kError)
   }
   return obj;
 }
+
+Napi::String
+ConvertBStrToNapiString(Napi::Env env, BSTR bstr);
+
+std::unique_ptr<UString>
+ConvertNapiStringToUString(Napi::String str);
 
 } // namespace n7zip
 
