@@ -1,6 +1,6 @@
 #ifdef DEBUG
 
-  #include "utils.h"
+  #include "tester_utils.h"
 
 namespace n7zip {
 
