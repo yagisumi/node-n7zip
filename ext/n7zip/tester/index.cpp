@@ -12,7 +12,7 @@ InitTester(Napi::Env env, Napi::Object exports)
 
   InitSharedLocker(env, tester);
   InitInStreamWrap(env, tester);
-  InitTesterUtils(env, tester);
+  Init7zipInspector(env, tester);
 
   return exports;
 }

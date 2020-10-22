@@ -1,6 +1,6 @@
 #ifdef DEBUG
 
-  #include "tester_utils.h"
+  #include "7zip_inspector.h"
 
 namespace n7zip {
 
@@ -22,7 +22,7 @@ inspectUString(const Napi::CallbackInfo& info)
 }
 
 Napi::Object
-InitTesterUtils(Napi::Env env, Napi::Object tester)
+Init7zipInspector(Napi::Env env, Napi::Object tester)
 {
   tester.Set("inspectUString", Napi::Function::New(env, inspectUString));
 

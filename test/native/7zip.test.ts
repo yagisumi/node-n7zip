@@ -1,8 +1,8 @@
 import { n7zip_native } from '@/n7zip_native'
 import { Buffer } from 'buffer'
 
-describe('utils', () => {
-  test('inspectUString', () => {
+describe('7zip', () => {
+  test('UString is utf-16le encoding, regardless of the size of wchar_t.', () => {
     if (!n7zip_native.DEBUG || n7zip_native.tester == null) {
       return
     }
