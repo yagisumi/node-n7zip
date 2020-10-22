@@ -6,7 +6,7 @@ describe('utils', () => {
       return
     }
 
-    const r = n7zip_native.tester.inspectUString('𠮷')
+    const r = n7zip_native.tester.inspectUString('𡈽')
     console.log(r)
   })
 })
