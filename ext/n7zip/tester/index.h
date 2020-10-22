@@ -5,6 +5,7 @@
   #include "n7zip/common.h"
   #include "shared_locker.h"
   #include "in_stream_wrap.h"
+  #include "utils.h"
 
 namespace n7zip {
 
