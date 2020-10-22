@@ -115,8 +115,8 @@ describe('library', () => {
 
     const lib =
       process.platform === 'win32'
-        ? path.resolve(__dirname, `../ext/files/7z${n7zip.ARCH}/7z.dll`)
-        : path.resolve(__dirname, `../build/${n7zip.DEBUG ? 'Debug' : 'Release'}/7z.so`)
+        ? path.resolve(__dirname, `../../ext/files/7z${n7zip.ARCH}/7z.dll`)
+        : path.resolve(__dirname, `../../build/${n7zip.DEBUG ? 'Debug' : 'Release'}/7z.so`)
 
     if (n7zip_native.tester != null) {
       const r1 = n7zip.loadLibrary(lib)

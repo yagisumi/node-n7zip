@@ -3,7 +3,7 @@ import path from 'path'
 import { n7zip } from '@/n7zip'
 import { n7zip_native, SeekOrigin, InStreamWrap } from '@/n7zip_native'
 
-const file = path.join(__dirname, 'files/in_stream.txt')
+const file = path.resolve(__dirname, '../files/in_stream.txt')
 const stat = fs.statSync(file)
 
 describe('InStream', () => {
