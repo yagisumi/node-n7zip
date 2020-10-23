@@ -6,6 +6,13 @@
 
 namespace n7zip {
 
+template<typename... Args>
+std::string
+format(const std::string& fmt, Args... args);
+
+std::string
+GuidToString(const GUID* guid);
+
 inline Napi::Object
 OK(Napi::Env env)
 {
@@ -32,18 +39,18 @@ ERR(Napi::Env env, Napi::Error error)
   return obj;
 }
 
-enum ErrorType
+enum class ErrorType
 {
-  kError,
-  kTypeError,
+  Error,
+  TypeError,
 };
 
 inline Napi::Object
-ERR(Napi::Env env, const char* message, ErrorType type = kError)
+ERR(Napi::Env env, const char* message, ErrorType type = ErrorType::Error)
 {
   auto obj = Napi::Object::New(env);
   obj["ok"] = Napi::Boolean::New(env, false);
-  if (type == kTypeError) {
+  if (type == ErrorType::TypeError) {
     obj["error"] = Napi::TypeError::New(env, message).Value();
   } else {
     obj["error"] = Napi::Error::New(env, message).Value();

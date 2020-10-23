@@ -115,6 +115,9 @@ public:
   HRESULT AddLibrary(Napi::String& path);
   Napi::Array GetFormats(const Napi::CallbackInfo& info);
   Napi::Array GetCodecs(const Napi::CallbackInfo& info);
+  size_t GetFormatsLength();
+  const std::unique_ptr<Format>& GetFormat(size_t idx);
+  HRESULT create_object(size_t fmt_index, const GUID* iid, void** outObject);
 
   std::shared_lock<std::shared_timed_mutex> GetSharedLock();
   std::unique_lock<std::shared_timed_mutex> GetDeferredUniqueLock();

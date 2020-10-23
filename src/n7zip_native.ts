@@ -17,12 +17,15 @@ export declare class InStreamWrap {
   seek(offset: number, seekOrigin: SeekOrigin): Result<number>
 }
 
+export type StreamData = [string, string] | [string, number, boolean?]
+
 export interface n7zipNativeType {
   DEBUG: boolean
   ARCH: 32 | 64
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
+  createReader(streams: StreamData[], fmtIndices: number[]): Result<undefined>
 
   tester?: {
     SharedLocker: typeof SharedLocker

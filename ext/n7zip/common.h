@@ -24,6 +24,8 @@
 #include <thread>
 #include <utility>
 #include <set>
+#include <string>
+#include <cstdio>
 
 #define NAPI_VERSION 4
 #include <napi.h>
@@ -35,3 +37,4 @@
 #include "guid.h"
 #include "utils.h"
 #include "library.h"
+#include "reader.h"

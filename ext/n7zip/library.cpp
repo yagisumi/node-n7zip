@@ -324,12 +324,44 @@ LibraryInfo::GetCodecs(const Napi::CallbackInfo& info)
   return ary;
 }
 
+size_t
+LibraryInfo::GetFormatsLength()
+{
+  return m_formats.size();
+}
+
+const std::unique_ptr<Format>&
+LibraryInfo::GetFormat(size_t idx)
+{
+  static std::unique_ptr<Format> out_of_range;
+  if (idx < m_formats.size()) {
+    return m_formats.at(idx);
+  } else {
+    return out_of_range;
+  }
+}
+
+HRESULT
+LibraryInfo::create_object(size_t fmt_index, const GUID* iid, void** outObject)
+{
+  if (fmt_index < m_formats.size()) {
+    auto& fmt = m_formats.at(fmt_index);
+    auto& lib = m_libraries.at(fmt->LibIndex);
+
+    TRACE("fmt.ClassId: %s", GuidToString(&fmt->ClassId).c_str());
+
+    return lib->CreateObject(&fmt->ClassId, iid, outObject);
+  } else {
+    return E_INVALIDARG;
+  }
+}
+
 Napi::Object
 loadLibrary(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   if (info.Length() == 0 || !info[0].IsString()) {
-    return ERR(env, "loadLibrary() argument must be a string", kTypeError);
+    return ERR(env, "loadLibrary() argument must be a string", ErrorType::TypeError);
   }
 
   auto lock = g_library_info->GetDeferredUniqueLock();

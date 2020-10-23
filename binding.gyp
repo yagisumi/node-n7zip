@@ -58,6 +58,7 @@
                 "ext/n7zip/utils.cpp",
                 "ext/n7zip/guid.cpp",
                 "ext/n7zip/library.cpp",
+                "ext/n7zip/reader.cpp",
                 "ext/n7zip/streams/fd_in_stream.cpp",
 
                 "ext/n7zip/tester/index.cpp",

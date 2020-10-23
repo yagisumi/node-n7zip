@@ -17,6 +17,7 @@ Init(Napi::Env env, Napi::Object exports)
   exports.Set("ARCH", Napi::Number::New(env, sizeof(void*) * 8));
 
   n7zip::InitLibrary(env, exports);
+  n7zip::InitReader(env, exports);
 
   return exports;
 }
