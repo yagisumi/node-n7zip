@@ -13,8 +13,11 @@ export type ERR = {
 export type Result<T = undefined> = OK<T> | ERR
 
 export type Format = {
-  name: string
   index: number
+  name: string
+  extension: string
+  addExtension: string
+  classId: string
   canUpdate: boolean
   flags: {
     KeepName: boolean

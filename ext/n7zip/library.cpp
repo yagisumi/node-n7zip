@@ -280,11 +280,12 @@ LibraryInfo::get_formats(const Napi::CallbackInfo& info)
   for (size_t i = 0; i < m_formats.size(); i++) {
     auto obj = Napi::Object::New(env);
     auto& format = m_formats.at(i);
+    obj.Set("index", format->Index);
     obj.Set("name", format->Name.c_str());
     obj.Set("extension", format->Extension.c_str());
     obj.Set("addExtension", format->AddExtension.c_str());
-    obj.Set("index", format->Index);
     obj.Set("canUpdate", format->CanUpdate);
+    obj.Set("classId", GuidToString(&format->ClassId).c_str());
 
     auto flags = Napi::Object::New(env);
     flags.Set("KeepName", format->KeepName());
