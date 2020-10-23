@@ -5,7 +5,7 @@ namespace n7zip {
 Napi::Object
 createReader(const Napi::CallbackInfo& info)
 {
-  auto lock = g_library_info->GetSharedLock();
+  auto lock = g_library_info->get_shared_lock();
   auto env = info.Env();
 
   if ((info.Length() < 2 || !(info[0].IsArray())) || !(info[1].IsArray())) {
@@ -15,7 +15,7 @@ createReader(const Napi::CallbackInfo& info)
   auto fmt_index_ary = info[1].As<Napi::Array>();
   std::vector<int32_t> fmt_indices;
 
-  auto fmt_len = g_library_info->GetFormatsLength();
+  auto fmt_len = g_library_info->get_formats_length();
   for (uint32_t i = 0; i < fmt_index_ary.Length(); i++) {
     auto elem = fmt_index_ary.Get(i);
     if (elem.IsNumber()) {

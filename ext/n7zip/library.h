@@ -43,16 +43,16 @@ public:
 
   Library(TLIB lib);
   ~Library();
-  inline bool HasFormats()
+  inline bool has_formats()
   {
     return this->CreateObject && GetNumberOfFormats && GetHandlerProperty2 && m_num_formats > 0;
   }
-  inline bool HasMethods()
+  inline bool has_methods()
   {
     return GetNumberOfMethods && GetMethodProperty && CreateDecoder && m_num_methods > 0;
   }
-  inline UInt32 NumberOfFormats() { return m_num_formats; }
-  inline UInt32 NumberOfMethods() { return m_num_methods; }
+  inline UInt32 num_of_formats() { return m_num_formats; }
+  inline UInt32 num_of_methods() { return m_num_methods; }
 };
 
 class Format
@@ -112,19 +112,20 @@ public:
   STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT* value);
   STDMETHOD(CreateDecoder)(UInt32 index, const GUID* iid, void** coder);
   STDMETHOD(CreateEncoder)(UInt32 index, const GUID* iid, void** coder);
-  HRESULT AddLibrary(Napi::String& path);
-  Napi::Array GetFormats(const Napi::CallbackInfo& info);
-  Napi::Array GetCodecs(const Napi::CallbackInfo& info);
-  size_t GetFormatsLength();
-  const std::unique_ptr<Format>& GetFormat(size_t idx);
+
+  std::shared_lock<std::shared_timed_mutex> get_shared_lock();
+  std::unique_lock<std::shared_timed_mutex> get_deferred_unique_lock();
+
+  HRESULT add_library(Napi::String& path);
+  Napi::Array get_formats(const Napi::CallbackInfo& info);
+  Napi::Array get_codecs(const Napi::CallbackInfo& info);
+  size_t get_formats_length();
+  const std::unique_ptr<Format>& get_format(size_t idx);
   HRESULT create_object(size_t fmt_index, const GUID* iid, void** outObject);
 
-  std::shared_lock<std::shared_timed_mutex> GetSharedLock();
-  std::unique_lock<std::shared_timed_mutex> GetDeferredUniqueLock();
-
 private:
-  void LoadFormats(std::unique_ptr<Library>& library);
-  void LoadMethods(std::unique_ptr<Library>& library);
+  void load_formats(std::unique_ptr<Library>& library);
+  void load_methods(std::unique_ptr<Library>& library);
   std::shared_timed_mutex m_external_mutex;
 };
 

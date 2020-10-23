@@ -47,19 +47,19 @@ Library::~Library()
 CMyComPtr<LibraryInfo> g_library_info(new LibraryInfo);
 
 std::shared_lock<std::shared_timed_mutex>
-LibraryInfo::GetSharedLock()
+LibraryInfo::get_shared_lock()
 {
   return std::shared_lock<std::shared_timed_mutex>(m_external_mutex);
 }
 
 std::unique_lock<std::shared_timed_mutex>
-LibraryInfo::GetDeferredUniqueLock()
+LibraryInfo::get_deferred_unique_lock()
 {
   return std::unique_lock<std::shared_timed_mutex>(m_external_mutex, std::defer_lock);
 }
 
 HRESULT
-LibraryInfo::AddLibrary(Napi::String& path)
+LibraryInfo::add_library(Napi::String& path)
 {
   TLIB lib;
 #ifdef _WIN32
@@ -74,15 +74,15 @@ LibraryInfo::AddLibrary(Napi::String& path)
   }
 
   std::unique_ptr<Library> library(new Library(lib));
-  if (!library->HasFormats() && !library->HasMethods()) {
+  if (!library->has_formats() && !library->has_methods()) {
     return E_FAIL;
   }
 
   auto start_num_formats = m_formats.size();
   auto start_num_methods = m_methods.size();
 
-  LoadFormats(library);
-  LoadMethods(library);
+  load_formats(library);
+  load_methods(library);
 
   if (m_formats.size() > start_num_formats || m_methods.size() > start_num_methods) {
     m_libraries.push_back(std::move(library));
@@ -100,15 +100,15 @@ LibraryInfo::AddLibrary(Napi::String& path)
 }
 
 void
-LibraryInfo::LoadFormats(std::unique_ptr<Library>& library)
+LibraryInfo::load_formats(std::unique_ptr<Library>& library)
 {
-  if (!library->HasFormats()) {
+  if (!library->has_formats()) {
     return;
   }
 
   auto lib_index = m_libraries.size();
 
-  for (UInt32 i = 0; i < library->NumberOfFormats(); i++) {
+  for (UInt32 i = 0; i < library->num_of_formats(); i++) {
     NWindows::NCOM::CPropVariant prop;
     std::unique_ptr<Format> format(new Format);
 
@@ -175,15 +175,15 @@ LibraryInfo::LoadFormats(std::unique_ptr<Library>& library)
 }
 
 void
-LibraryInfo::LoadMethods(std::unique_ptr<Library>& library)
+LibraryInfo::load_methods(std::unique_ptr<Library>& library)
 {
-  if (!library->HasMethods()) {
+  if (!library->has_methods()) {
     return;
   }
 
   auto lib_index = m_libraries.size();
 
-  for (UInt32 i = 0; i < library->NumberOfMethods(); i++) {
+  for (UInt32 i = 0; i < library->num_of_methods(); i++) {
     NWindows::NCOM::CPropVariant prop;
     std::unique_ptr<Method> method(new Method);
 
@@ -272,7 +272,7 @@ LibraryInfo::CreateEncoder(UInt32 index, const GUID* iid, void** coder)
 }
 
 Napi::Array
-LibraryInfo::GetFormats(const Napi::CallbackInfo& info)
+LibraryInfo::get_formats(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   auto ary = Napi::Array::New(env, m_formats.size());
@@ -307,7 +307,7 @@ LibraryInfo::GetFormats(const Napi::CallbackInfo& info)
 }
 
 Napi::Array
-LibraryInfo::GetCodecs(const Napi::CallbackInfo& info)
+LibraryInfo::get_codecs(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   auto ary = Napi::Array::New(env, m_methods.size());
@@ -325,13 +325,13 @@ LibraryInfo::GetCodecs(const Napi::CallbackInfo& info)
 }
 
 size_t
-LibraryInfo::GetFormatsLength()
+LibraryInfo::get_formats_length()
 {
   return m_formats.size();
 }
 
 const std::unique_ptr<Format>&
-LibraryInfo::GetFormat(size_t idx)
+LibraryInfo::get_format(size_t idx)
 {
   static std::unique_ptr<Format> out_of_range;
   if (idx < m_formats.size()) {
@@ -356,7 +356,7 @@ LibraryInfo::create_object(size_t fmt_index, const GUID* iid, void** outObject)
   }
 }
 
-Napi::Object
+static Napi::Object
 loadLibrary(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
@@ -364,13 +364,13 @@ loadLibrary(const Napi::CallbackInfo& info)
     return ERR(env, "loadLibrary() argument must be a string", ErrorType::TypeError);
   }
 
-  auto lock = g_library_info->GetDeferredUniqueLock();
+  auto lock = g_library_info->get_deferred_unique_lock();
   if (!lock.try_lock()) {
     return ERR(env, "Failed to lock");
   }
 
   auto path = info[0].As<Napi::String>();
-  auto r = g_library_info->AddLibrary(path);
+  auto r = g_library_info->add_library(path);
   if (SUCCEEDED(r)) {
     return OK(env, Napi::Boolean::New(env, r == S_OK));
   } else {
@@ -378,18 +378,18 @@ loadLibrary(const Napi::CallbackInfo& info)
   }
 }
 
-Napi::Array
+static Napi::Array
 getFormats(const Napi::CallbackInfo& info)
 {
-  auto lock = g_library_info->GetSharedLock();
-  return g_library_info->GetFormats(info);
+  auto lock = g_library_info->get_shared_lock();
+  return g_library_info->get_formats(info);
 }
 
 static Napi::Array
 getCodecs(const Napi::CallbackInfo& info)
 {
-  auto lock = g_library_info->GetSharedLock();
-  return g_library_info->GetCodecs(info);
+  auto lock = g_library_info->get_shared_lock();
+  return g_library_info->get_codecs(info);
 }
 
 Napi::Object

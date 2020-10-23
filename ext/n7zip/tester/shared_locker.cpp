@@ -74,7 +74,7 @@ SharedLocker::Run(const Napi::CallbackInfo& info)
 
   m_self.Ref();
   m_lock = std::move(lock);
-  m_context->lock = g_library_info->GetSharedLock();
+  m_context->lock = g_library_info->get_shared_lock();
 
   return OK(env);
 }
