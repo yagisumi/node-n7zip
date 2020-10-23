@@ -130,15 +130,6 @@ private:
 
 extern CMyComPtr<LibraryInfo> g_library_info;
 
-// Napi::Object
-// loadLibrary(const Napi::CallbackInfo& info);
-
-// Napi::Array
-// getFormats(const Napi::CallbackInfo& info);
-
-// Napi::Array
-// getCodecs(const Napi::CallbackInfo& info);
-
 Napi::Object
 InitLibrary(Napi::Env env, Napi::Object exports);
 
