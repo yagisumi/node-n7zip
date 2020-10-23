@@ -7,9 +7,9 @@ namespace n7zip {
 
 struct StreamData
 {
-  StreamData(std::unique_ptr<UString> arg_name, CMyComPtr<IInStream> arg_stream)
-    : name(std::move(arg_name))
-    , stream(arg_stream)
+  StreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream> _stream)
+    : name(std::move(_name))
+    , stream(_stream)
   {}
   std::unique_ptr<UString> name;
   CMyComPtr<IInStream> stream;
