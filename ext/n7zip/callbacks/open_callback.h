@@ -20,9 +20,9 @@ class OpenCallback
   , public ICryptoGetTextPassword
   , public CMyUnknownImp
 {
+public:
   std::unique_ptr<std::vector<InStreamData>> m_streams;
 
-public:
   OpenCallback(std::unique_ptr<std::vector<InStreamData>>&& streams);
   ~OpenCallback();
 
