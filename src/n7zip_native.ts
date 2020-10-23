@@ -17,7 +17,7 @@ export declare class InStreamWrap {
   seek(offset: number, seekOrigin: SeekOrigin): Result<number>
 }
 
-export type StreamData = [string, string] | [string, number, boolean?]
+export type InStreamData = [string, string] | [string, number, boolean?]
 
 export interface n7zipNativeType {
   DEBUG: boolean
@@ -25,7 +25,7 @@ export interface n7zipNativeType {
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
-  createReader(streams: StreamData[], fmtIndices: number[]): Result<undefined>
+  createReader(streams: InStreamData[], fmtIndices: number[]): Result<undefined>
 
   tester?: {
     SharedLocker: typeof SharedLocker

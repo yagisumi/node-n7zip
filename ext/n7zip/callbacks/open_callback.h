@@ -4,13 +4,26 @@
 
 namespace n7zip {
 
+struct InStreamData
+{
+  InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream> _stream)
+    : name(std::move(_name))
+    , stream(_stream)
+  {}
+  std::unique_ptr<UString> name;
+  CMyComPtr<IInStream> stream;
+};
+
 class OpenCallback
   : public IArchiveOpenCallback
   , public IArchiveOpenVolumeCallback
   , public ICryptoGetTextPassword
   , public CMyUnknownImp
 {
-  OpenCallback();
+  std::unique_ptr<std::vector<InStreamData>> m_streams;
+
+public:
+  OpenCallback(std::unique_ptr<std::vector<InStreamData>>&& streams);
   ~OpenCallback();
 
   MY_UNKNOWN_IMP3( //

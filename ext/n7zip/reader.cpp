@@ -32,7 +32,7 @@ createReader(const Napi::CallbackInfo& info)
   }
 
   auto stream_ary = info[0].As<Napi::Array>();
-  auto streams = std::make_unique<std::vector<StreamData>>();
+  auto streams = std::make_unique<std::vector<InStreamData>>();
 
   for (uint32_t i = 0; i < stream_ary.Length(); i++) {
     auto stream_data = stream_ary.Get(i);
