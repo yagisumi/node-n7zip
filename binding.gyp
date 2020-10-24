@@ -61,6 +61,7 @@
                 "ext/n7zip/reader.cpp",
                 "ext/n7zip/callbacks/open_callback.cpp",
                 "ext/n7zip/streams/fd_in_stream.cpp",
+                "ext/n7zip/streams/buffer_in_stream.cpp",
 
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",
