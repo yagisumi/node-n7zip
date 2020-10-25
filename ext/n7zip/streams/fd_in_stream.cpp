@@ -41,7 +41,9 @@ FdInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
     TRACE("[FdInStream::Read] SeekError");
     return E_ABORT;
   } else {
-    *newPosition = r;
+    if (newPosition) {
+      *newPosition = r;
+    }
   }
 #endif
 
