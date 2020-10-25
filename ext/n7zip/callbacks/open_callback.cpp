@@ -74,7 +74,7 @@ STDMETHODIMP
 OpenCallback::GetStream(const wchar_t* name, IInStream** inStream)
 {
   TRACE("[OpenCallback::GetStream]");
-  OutputDebugStringW(name);
+  // OutputDebugStringW(name);
   for (size_t i = 0; i < m_streams->size(); i++) {
     auto sname = m_streams->at(i).name.get();
     if (*sname == name) {
