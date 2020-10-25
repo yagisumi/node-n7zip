@@ -19,6 +19,29 @@ export declare class InStreamWrap {
 
 export type InStreamData = [string, string] | [string, number, boolean?]
 
+export type FdInStreamArg = {
+  source: number
+  AutoClose?: boolean
+}
+
+export type FileInStreamArg = {
+  source: string
+}
+
+export type BufferInStreamArg = {
+  source: Buffer
+  ShareBuffer?: boolean
+}
+
+export type InStreamSubArg = FdInStreamArg | FileInStreamArg | BufferInStreamArg
+
+export type MultiInStreamArg = {
+  source: Array<InStreamSubArg>
+}
+
+export type WithName = { name: string }
+export type InStreamArg = (InStreamSubArg | MultiInStreamArg) & WithName
+
 export interface n7zipNativeType {
   DEBUG: boolean
   ARCH: 32 | 64
@@ -29,8 +52,7 @@ export interface n7zipNativeType {
 
   tester?: {
     SharedLocker: typeof SharedLocker
-    createInStream(fd: number, autoclose?: boolean): Result<InStreamWrap>
-    createInStream(filePath: string): Result<InStreamWrap>
+    createInStream(stream: InStreamArg): Result<InStreamWrap>
     inspectUString(str: string): Buffer | undefined
   }
 }

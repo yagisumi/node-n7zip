@@ -78,8 +78,96 @@ InStreamWrap::Read(const Napi::CallbackInfo& info)
   }
 }
 
+static FdInStream*
+createFdInStream(Napi::Object arg)
+{
+  auto fd = arg.Get("source").ToNumber();
+  auto AutoClose = true;
+  auto auto_close = arg.Get("AutoClose");
+  if (auto_close.IsBoolean()) {
+    AutoClose = auto_close.ToBoolean().Value();
+  }
+
+  return new FdInStream(fd, AutoClose);
+}
+
+static FdInStream*
+createFdInStreamFromPath(Napi::Object arg)
+{
+  auto path = arg.Get("source").ToString().Utf8Value();
+  auto AutoClose = true;
+
+  uv_fs_t open_req;
+  auto r = uv_fs_open(nullptr, &open_req, path.c_str(), UV_FS_O_RDONLY, 0666, nullptr);
+  if (r < 0) {
+    return nullptr;
+  }
+
+  return new FdInStream(r, AutoClose);
+}
+
+static BufferInStream*
+createBufferInStream(Napi::Object arg)
+{
+  auto buf = arg.Get("source").As<Napi::Buffer<char>>();
+  auto ShareBuffer = false;
+  auto share_buffer = arg.Get("ShareBuffer");
+  if (share_buffer.IsBoolean()) {
+    ShareBuffer = share_buffer.ToBoolean().Value();
+  }
+
+  return new BufferInStream(buf, ShareBuffer);
+}
+
 static Napi::Value
 createInStream(const Napi::CallbackInfo& info)
+{
+  auto env = info.Env();
+  if (info.Length() < 1 || !(info[0].IsObject())) {
+    return ERR(env, "InvalidArgument");
+  }
+
+  auto arg = info[0].ToObject();
+  auto source = arg.Get("source");
+  auto name = arg.Get("name");
+  if (!(name.IsString())) {
+    return ERR(env, "InvalidArgument");
+  }
+
+  CMyComPtr<IInStream> stream;
+
+  if (source.IsArray()) {
+    // MultiInStream
+    return ERR(env, "NotImplemented");
+  } else if (source.IsNumber()) {
+    // FdInStream
+    stream = createFdInStream(arg);
+  } else if (source.IsString()) {
+    // FdInStream
+    stream = createFdInStreamFromPath(arg);
+    if (!stream) {
+      return ERR(env, "FailedToOpenFile");
+    }
+  } else if (source.IsBuffer()) {
+    // BufferInStream
+    stream = createBufferInStream(arg);
+  } else {
+    return ERR(env, "InvalidArgument");
+  }
+
+  if (!stream) {
+    return ERR(env, "UnexpectedError");
+  }
+
+  auto in_stream_obj = InStreamWrap::constructor.New({});
+  auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
+  in_stream_wrap->m_inStream = stream;
+
+  return OK(env, in_stream_obj);
+}
+
+static Napi::Value
+createInStream_(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   if (info.Length() < 1) {

@@ -4,6 +4,7 @@
 
   #include "n7zip/common.h"
   #include "n7zip/streams/fd_in_stream.h"
+  #include "n7zip/streams/buffer_in_stream.h"
 
 namespace n7zip {
 
@@ -16,7 +17,7 @@ public:
 
   Napi::Value Seek(const Napi::CallbackInfo& info);
   Napi::Value Read(const Napi::CallbackInfo& info);
-  CMyComPtr<FdInStream> m_inStream;
+  CMyComPtr<IInStream> m_inStream;
 };
 
 Napi::Object

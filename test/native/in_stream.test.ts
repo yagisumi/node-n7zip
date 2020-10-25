@@ -6,14 +6,14 @@ import { n7zip_native, SeekOrigin, InStreamWrap } from '@/n7zip_native'
 const file = path.resolve(__dirname, '../files/in_stream.txt')
 const stat = fs.statSync(file)
 
-describe('InStream', () => {
+describe.only('InStream', () => {
   test('FdInStream Seek Error', () => {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
 
     const fd = fs.openSync(file, 'r')
-    const r1 = n7zip_native.tester.createInStream(fd, true)
+    const r1 = n7zip_native.tester.createInStream({ source: fd, name: 'in_stream.txt' })
     expect(r1.error).toBeUndefined()
     expect(r1.ok).toBe(true)
     if (r1.ok) {
@@ -32,7 +32,7 @@ describe('InStream', () => {
     }
 
     const fd = fs.openSync(file, 'r')
-    const r = n7zip_native.tester.createInStream(fd, true)
+    const r = n7zip_native.tester.createInStream({ source: fd, name: 'in_stream.txt' })
     expect(r.error).toBeUndefined()
     expect(r.ok).toBe(true)
     if (r.ok) {
@@ -46,12 +46,76 @@ describe('InStream', () => {
       return
     }
 
-    const r = n7zip_native.tester.createInStream(file)
+    const r = n7zip_native.tester.createInStream({ source: file, name: 'in_stream.txt' })
     expect(r.error).toBeUndefined()
     expect(r.ok).toBe(true)
     if (r.ok) {
       const in_stream = r.value
       testInStream(in_stream)
+    }
+  })
+
+  test('BufferInStream (ShareBuffer: false)', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    const buf = fs.readFileSync(file)
+
+    const r = n7zip_native.tester.createInStream({
+      source: buf,
+      name: 'in_stream.txt',
+      ShareBuffer: false,
+    })
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
+      testInStream(in_stream)
+
+      buf.write('00000', 0, 'utf-8')
+      in_stream.seek(0, SeekOrigin.SEEK_SET)
+
+      {
+        const r2 = in_stream.read(5)
+        expect(r2.error).toBeUndefined()
+        expect(r2.ok).toBe(true)
+        if (r2.ok) {
+          expect(r2.value.toString('utf-8')).toBe('AAAAA')
+        }
+      }
+    }
+  })
+
+  test('BufferInStream (ShareBuffer: true)', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    const buf = fs.readFileSync(file)
+
+    const r = n7zip_native.tester.createInStream({
+      source: buf,
+      name: 'in_stream.txt',
+      ShareBuffer: true,
+    })
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
+      testInStream(in_stream)
+
+      buf.write('00000', 0, 'utf-8')
+      in_stream.seek(0, SeekOrigin.SEEK_SET)
+
+      {
+        const r2 = in_stream.read(5)
+        expect(r2.error).toBeUndefined()
+        expect(r2.ok).toBe(true)
+        if (r2.ok) {
+          expect(r2.value.toString('utf-8')).toBe('00000')
+        }
+      }
     }
   })
 })
@@ -94,5 +158,20 @@ function testInStream(stream: InStreamWrap) {
     if (r.ok) {
       expect(r.value.toString('utf-8')).toBe('CCCCC')
     }
+  }
+
+  {
+    const r = stream.seek(100, SeekOrigin.SEEK_END)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(r.value).toBe(stat.size + 100)
+    }
+  }
+
+  {
+    const r = stream.seek(-100, SeekOrigin.SEEK_SET)
+    expect(r.error).toBeInstanceOf(Error)
+    expect(r.ok).toBe(false)
   }
 }
