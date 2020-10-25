@@ -143,7 +143,7 @@ describe('InStream', () => {
     }
   })
 
-  test('MultiInStream (Buffer, file)', () => {
+  test.only('MultiInStream (Buffer, file)', () => {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
@@ -154,7 +154,6 @@ describe('InStream', () => {
     const r = n7zip_native.tester.createInStream({
       source: [{ source: buf1 }, { source: buf2 }, { source: file_c }],
       name: 'in_stream.txt',
-      ShareBuffer: true,
     })
     // console.log(r)
     expect(r.error).toBeUndefined()
