@@ -6,7 +6,7 @@ FdInStream::FdInStream(uv_file fd, bool autoclose)
 {
   TRACE("+ FdInStream %p", this);
   m_fd = fd;
-  m_autoclose = autoclose;
+  m_AutoClose = autoclose;
 #ifdef _WIN32
   m_handle = reinterpret_cast<HANDLE>(uv_get_osfhandle(fd));
 #endif
@@ -14,7 +14,7 @@ FdInStream::FdInStream(uv_file fd, bool autoclose)
 FdInStream::~FdInStream()
 {
   TRACE("- FdInStream %p", this);
-  if (m_autoclose) {
+  if (m_AutoClose) {
     TRACE("[FdInStream::~FdInStream] autoclose");
     uv_fs_t req;
     uv_fs_close(nullptr, &req, m_fd, nullptr);

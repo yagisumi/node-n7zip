@@ -28,7 +28,7 @@ public:
 
 private:
   uv_file m_fd;
-  bool m_autoclose = false;
+  bool m_AutoClose = false;
 #ifdef _WIN32
   HANDLE m_handle;
 #endif
