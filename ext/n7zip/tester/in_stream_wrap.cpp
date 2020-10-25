@@ -119,6 +119,38 @@ createBufferInStream(Napi::Object arg)
   return new BufferInStream(buf, ShareBuffer);
 }
 
+static MultiInStream*
+createMultiInStream(Napi::Object arg)
+{
+  auto streams = std::make_unique<std::vector<CMyComPtr<IInStream>>>();
+  auto ary = arg.Get("source").As<Napi::Array>();
+  for (uint32_t i = 0; i < ary.Length(); i++) {
+    auto v = ary.Get(i);
+    if (v.IsObject()) {
+      auto obj = v.ToObject();
+      auto source = obj.Get("source");
+      CMyComPtr<IInStream> stream;
+      if (source.IsNumber()) {
+        stream = createFdInStream(obj);
+      } else if (source.IsString()) {
+        stream = createFdInStreamFromPath(obj);
+      } else if (source.IsBuffer()) {
+        stream = createBufferInStream(obj);
+      }
+
+      if (stream) {
+        streams->push_back(stream);
+      }
+    }
+  }
+
+  if (streams->size() > 0) {
+    return new MultiInStream(std::move(streams));
+  } else {
+    return nullptr;
+  }
+}
+
 static Napi::Value
 createInStream(const Napi::CallbackInfo& info)
 {
@@ -137,8 +169,10 @@ createInStream(const Napi::CallbackInfo& info)
   CMyComPtr<IInStream> stream;
 
   if (source.IsArray()) {
-    // MultiInStream
-    return ERR(env, "NotImplemented");
+    stream = createMultiInStream(arg);
+    if (!stream) {
+      return ERR(env, "InvalidArgument");
+    }
   } else if (source.IsNumber()) {
     // FdInStream
     stream = createFdInStream(arg);

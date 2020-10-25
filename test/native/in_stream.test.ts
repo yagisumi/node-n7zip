@@ -4,9 +4,10 @@ import { n7zip } from '@/n7zip'
 import { n7zip_native, SeekOrigin, InStreamWrap } from '@/n7zip_native'
 
 const file = path.resolve(__dirname, '../files/in_stream.txt')
+const file_c = path.resolve(__dirname, '../files/in_stream_C.txt')
 const stat = fs.statSync(file)
 
-describe.only('InStream', () => {
+describe('InStream', () => {
   test('FdInStream Seek Error', () => {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
@@ -118,6 +119,51 @@ describe.only('InStream', () => {
       }
     }
   })
+
+  test('MultiInStream (Buffer)', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    const buf1 = Buffer.alloc(5, 'A', 'utf-8')
+    const buf2 = Buffer.alloc(5, 'B', 'utf-8')
+    const buf3 = Buffer.alloc(6, 'C', 'utf-8')
+
+    const r = n7zip_native.tester.createInStream({
+      source: [{ source: buf1 }, { source: buf2 }, { source: buf3 }],
+      name: 'in_stream.txt',
+      ShareBuffer: true,
+    })
+    // console.log(r)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
+      testInStream(in_stream)
+    }
+  })
+
+  test('MultiInStream (Buffer, file)', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    const buf1 = Buffer.alloc(5, 'A', 'utf-8')
+    const buf2 = Buffer.alloc(5, 'B', 'utf-8')
+
+    const r = n7zip_native.tester.createInStream({
+      source: [{ source: buf1 }, { source: buf2 }, { source: file_c }],
+      name: 'in_stream.txt',
+      ShareBuffer: true,
+    })
+    // console.log(r)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      const in_stream = r.value
+      testInStream(in_stream)
+    }
+  })
 })
 
 function testInStream(stream: InStreamWrap) {
@@ -126,6 +172,22 @@ function testInStream(stream: InStreamWrap) {
     expect(r.error).toBeUndefined()
     expect(r.ok).toBe(true)
     expect(r.value).toBe(stat.size)
+  }
+
+  {
+    const r = stream.seek(0, SeekOrigin.SEEK_SET)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    expect(r.value).toBe(0)
+  }
+
+  {
+    const r = stream.read(15)
+    expect(r.error).toBeUndefined()
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(r.value.toString('utf-8')).toBe('AAAAABBBBBCCCCC')
+    }
   }
 
   {

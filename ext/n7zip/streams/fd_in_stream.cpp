@@ -67,16 +67,24 @@ FdInStream::Read(void* data, UInt32 size, UInt32* processedSize)
 }
 
 FdInStream*
-FdInStream::New(uv_file fd, bool autoclose)
+FdInStream::New(uv_file fd, bool AutoClose)
 {
   uv_fs_t req;
   uv_buf_t buf = uv_buf_init(nullptr, 0);
 
-  auto r = uv_fs_read(nullptr, &req, fd, &buf, 1, 0, nullptr);
-  if (r < 0) {
+  auto r_read = uv_fs_read(nullptr, &req, fd, &buf, 1, 0, nullptr);
+  if (r_read < 0) {
     return nullptr;
   } else {
-    return new FdInStream(fd, autoclose);
+    auto stream = new FdInStream(fd, AutoClose);
+    UInt64 pos;
+    auto r_seek = stream->Seek(0, STREAM_SEEK_SET, &pos);
+    if (r_seek != S_OK) {
+      delete stream;
+      return nullptr;
+    } else {
+      return stream;
+    }
   }
 }
 
