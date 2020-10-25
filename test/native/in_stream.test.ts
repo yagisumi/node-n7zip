@@ -143,7 +143,7 @@ describe('InStream', () => {
     }
   })
 
-  test.only('MultiInStream (Buffer, file)', () => {
+  test('MultiInStream (Buffer, file)', () => {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
