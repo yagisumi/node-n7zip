@@ -4,7 +4,7 @@ import path from 'path'
 const file = path.resolve(__dirname, '../files/archive.zip')
 
 describe('Reader', () => {
-  test('createReader', () => {
+  test.skip('createReader', () => {
     const formats = n7zip_native.getFormats()
     console.log(formats.filter((fmt) => ['zip', '7z', '7zip'].includes(fmt.name)))
     // console.log(formats)
