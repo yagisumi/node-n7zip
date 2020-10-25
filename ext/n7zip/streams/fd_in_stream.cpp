@@ -25,7 +25,7 @@ FdInStream::~FdInStream()
 STDMETHODIMP
 FdInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 {
-  TRACE("[FdInStream::Seek] offset: %llu, seekOrigin: %u", offset, seekOrigin);
+  TRACE("[FdInStream::Seek] offset: %lld, seekOrigin: %u", offset, seekOrigin);
 #ifdef _WIN32
   auto r =
     SetFilePointerEx(m_handle, *(LARGE_INTEGER*)(&offset), (PLARGE_INTEGER)newPosition, seekOrigin);
