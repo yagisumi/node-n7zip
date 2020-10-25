@@ -17,7 +17,7 @@ class MultiInStream
   UInt64 m_length;
   UInt64 m_position = 0;
   std::vector<Range> m_ranges;
-  boolean m_is_invalid = false;
+  bool m_is_invalid = false;
 
 public:
   MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&& streams);

@@ -12,10 +12,10 @@ class BufferInStream
   char* m_buffer;
   UInt64 m_length;
   UInt64 m_position = 0;
-  boolean m_ShareBuffer = false;
+  bool m_ShareBuffer = false;
 
 public:
-  BufferInStream(Napi::Buffer<char> buf, boolean ShareBuffer);
+  BufferInStream(Napi::Buffer<char> buf, bool ShareBuffer);
   virtual ~BufferInStream();
 
   MY_UNKNOWN_IMP1(IInStream)

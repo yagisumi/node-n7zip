@@ -2,7 +2,7 @@
 
 namespace n7zip {
 
-BufferInStream::BufferInStream(Napi::Buffer<char> buf, boolean ShareBuffer)
+BufferInStream::BufferInStream(Napi::Buffer<char> buf, bool ShareBuffer)
 {
   TRACE("+ BufferInStream %p", this);
 
