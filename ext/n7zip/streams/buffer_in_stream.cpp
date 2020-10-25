@@ -87,7 +87,7 @@ BufferInStream::Read(void* data, UInt32 size, UInt32* processedSize)
     size = (UInt32)rem;
   }
 
-  std::memcpy(data, static_cast<void*>(&m_buffer[m_position]), size);
+  std::memcpy(data, m_buffer + m_position, size);
   m_position += size;
 
   if (processedSize) {
