@@ -12,6 +12,10 @@ class MultiInStream
   {
     UInt64 begin;
     UInt64 end;
+    Range(UInt64 _begin, UInt64 _end)
+      : begin(_begin)
+      , end(_end)
+    {}
   };
   std::unique_ptr<std::vector<CMyComPtr<IInStream>>> m_streams;
   UInt64 m_length;

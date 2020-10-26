@@ -8,6 +8,8 @@ MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&
   TRACE("+ MultiInStream %p", this);
 
   UInt64 offset = 0;
+  m_ranges.reserve(m_streams->size());
+
   for (const auto& stream : *m_streams.get()) {
     UInt64 len;
     auto r = stream->Seek(0, STREAM_SEEK_END, &len);
@@ -15,7 +17,7 @@ MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&
       m_is_invalid = true;
       return;
     }
-    m_ranges.push_back({ offset, offset + len });
+    m_ranges.emplace_back(offset, offset + len);
     offset += len;
     stream->Seek(0, STREAM_SEEK_SET, nullptr);
   }
