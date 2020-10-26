@@ -54,5 +54,6 @@ export interface n7zipNativeType {
     SharedLocker: typeof SharedLocker
     createInStream(stream: InStreamArg): Result<InStreamWrap>
     inspectUString(str: string): Buffer | undefined
+    convertUStringToAString(str: string): Buffer | undefined
   }
 }
