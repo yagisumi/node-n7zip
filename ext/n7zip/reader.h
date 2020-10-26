@@ -10,8 +10,8 @@ class Reader
 {
 public:
   Reader(int fmt_index,
-         CMyComPtr<IInArchive> archive,
-         CMyComPtr<IArchiveOpenCallback> open_callback)
+         CMyComPtr<IInArchive>& archive,
+         CMyComPtr<IArchiveOpenCallback>& open_callback)
     : m_fmt_index(fmt_index)
     , m_archive(archive)
     , m_open_callback(open_callback)
