@@ -90,4 +90,16 @@ FdInStream::New(uv_file fd, bool AutoClose)
   }
 }
 
+FdInStream*
+FdInStream::New(const char* path)
+{
+  uv_fs_t open_req;
+  auto r = uv_fs_open(nullptr, &open_req, path, UV_FS_O_RDONLY, 0666, nullptr);
+  if (r < 0) {
+    return nullptr;
+  }
+
+  return new FdInStream(r, true);
+}
+
 } // namespace n7zip
