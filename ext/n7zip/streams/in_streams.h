@@ -7,18 +7,18 @@
 
 namespace n7zip {
 
-struct InStreamData
-{
-  InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream>& _stream)
-    : name(std::move(_name))
-    , stream(_stream)
-  {}
-  std::unique_ptr<UString> name;
-  CMyComPtr<IInStream> stream;
-};
-
 class InStreams
 {
+  struct InStreamData
+  {
+    InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream>& _stream)
+      : name(std::move(_name))
+      , stream(_stream)
+    {}
+    std::unique_ptr<UString> name;
+    CMyComPtr<IInStream> stream;
+  };
+
   std::unique_ptr<UString> m_base_dir;
   std::vector<InStreamData> m_streams;
 
