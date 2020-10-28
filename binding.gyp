@@ -64,6 +64,7 @@
                 "ext/n7zip/streams/buffer_in_stream.cpp",
                 "ext/n7zip/streams/multi_in_stream.cpp",
                 "ext/n7zip/streams/in_streams.cpp",
+                "ext/n7zip/streams/create_in_stream.cpp",
 
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",

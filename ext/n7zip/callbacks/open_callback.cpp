@@ -2,8 +2,10 @@
 
 namespace n7zip {
 
-OpenCallback::OpenCallback(std::unique_ptr<std::vector<InStreamData>>&& streams)
+OpenCallback::OpenCallback(std::unique_ptr<InStreams>&& streams,
+                           std::unique_ptr<UString>&& password)
   : m_streams(std::move(streams))
+  , m_password(std::move(password))
 {
   TRACE("+ OpenCallback %p", this);
 }
@@ -57,9 +59,11 @@ OpenCallback::GetProperty(PROPID propID, PROPVARIANT* value)
   }
 
   NWindows::NCOM::PropVariant_Clear(value);
-  value->vt = VT_BSTR;
-  auto& name = m_streams->at(0).name;
-  value->bstrVal = ::SysAllocStringLen(name->Ptr(), name->Len());
+  auto& name = m_streams->get_name(0);
+  if (name) {
+    value->vt = VT_BSTR;
+    value->bstrVal = ::SysAllocStringLen(name->Ptr(), name->Len());
+  }
 
   if (value->bstrVal) {
     TRACE("S_OK");
@@ -75,17 +79,12 @@ OpenCallback::GetStream(const wchar_t* name, IInStream** inStream)
 {
   TRACE("[OpenCallback::GetStream]");
 
-  for (size_t i = 0; i < m_streams->size(); i++) {
-    auto sname = m_streams->at(i).name.get();
-    if (*sname == name) {
-      TRACE("matched: %u", i);
-      // m_streams->at(i).stream->AddRef();
-      CMyComPtr<IInStream> tmp = m_streams->at(i).stream;
-      // *inStream = m_streams->at(i).stream;
-      *inStream = tmp.Detach();
-      return S_OK;
-    }
+  auto stream = m_streams->get_stream(name);
+  if (stream) {
+    *inStream = stream.Detach();
+    return S_OK;
   }
+
   return S_FALSE;
 }
 
@@ -93,7 +92,13 @@ STDMETHODIMP
 OpenCallback::CryptoGetTextPassword(BSTR* password)
 {
   TRACE("[OpenCallback::CryptoGetTextPassword]");
-  return E_NOTIMPL;
+
+  if (m_password) {
+    *password = SysAllocStringLen(m_password->Ptr(), m_password->Len());
+    return S_OK;
+  }
+
+  return E_ABORT;
 }
 
 } // namespace n7zip

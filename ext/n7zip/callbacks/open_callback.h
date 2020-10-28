@@ -1,18 +1,11 @@
 #pragma once
 
 #include "n7zip/common.h"
+#include "n7zip/streams/in_streams.h"
 
 namespace n7zip {
 
-struct InStreamData
-{
-  InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream>& _stream)
-    : name(std::move(_name))
-    , stream(_stream)
-  {}
-  std::unique_ptr<UString> name;
-  CMyComPtr<IInStream> stream;
-};
+class InStreams;
 
 class OpenCallback
   : public IArchiveOpenCallback
@@ -21,9 +14,10 @@ class OpenCallback
   , public CMyUnknownImp
 {
 public:
-  std::unique_ptr<std::vector<InStreamData>> m_streams;
+  std::unique_ptr<InStreams> m_streams;
+  std::unique_ptr<UString> m_password;
 
-  OpenCallback(std::unique_ptr<std::vector<InStreamData>>&& streams);
+  OpenCallback(std::unique_ptr<InStreams>&& streams, std::unique_ptr<UString>&& password);
   ~OpenCallback();
 
   MY_UNKNOWN_IMP3( //

@@ -25,90 +25,60 @@ getFormatIndices(Napi::Array fmt_index_ary)
 static Napi::Object
 createReader(const Napi::CallbackInfo& info)
 {
+  TRACE("createReader");
   auto lock = g_library_info->get_shared_lock();
   auto env = info.Env();
 
-  if ((info.Length() < 2 || !(info[0].IsArray())) || !(info[1].IsArray())) {
+  if ((info.Length() == 0) || !(info[0].IsObject())) {
     return ERR(env, "invalid arguments", ErrorType::TypeError);
   }
 
-  auto fmt_index_ary = info[1].As<Napi::Array>();
-  auto fmt_indices = getFormatIndices(fmt_index_ary);
+  auto arg = info[0].ToObject();
 
-  if (fmt_indices.size() == 0) {
-    return ERR(env, "invalid format index array", ErrorType::TypeError);
+  auto v_formats = arg.Get("formats");
+  if (!v_formats.IsArray()) {
+    return ERR(env, "invalid arguments", ErrorType::TypeError);
+  }
+  auto fmt_indices = getFormatIndices(v_formats.As<Napi::Array>());
+
+  auto v_streams = arg.Get("streams");
+
+  if (!v_streams.IsArray()) {
+    return ERR(env, "invalid arguments", ErrorType::TypeError);
   }
 
-  auto stream_ary = info[0].As<Napi::Array>();
-  auto streams = std::make_unique<std::vector<InStreamData>>();
-  // std::unique_ptr<std::vector<InStreamData>> streams(new std::vector<InStreamData>());
-
-  for (uint32_t i = 0; i < stream_ary.Length(); i++) {
-    auto stream_data = stream_ary.Get(i);
-    if (stream_data.IsArray()) {
-      auto stream_data_ary = stream_data.As<Napi::Array>();
-      if (stream_data_ary.Length() < 2) {
-        return ERR(env, "invalid stream data", ErrorType::TypeError);
-      }
-
-      auto v_name = stream_data_ary.Get((uint32_t)0);
-      if (!(v_name.IsString())) {
-        return ERR(env, "invalid stream data", ErrorType::TypeError);
-      }
-      auto name = ConvertNapiStringToUString(v_name.ToString());
-
-      auto data = stream_data_ary.Get((uint32_t)1);
-      if (data.IsNumber()) {
-        auto num = data.ToNumber();
-#ifdef _WIN32
-        auto fd = num.Int32Value();
-#else
-        auto fd = num.Int64Value();
-#endif
-        if (fd < 0) {
-          return ERR(env, "invalid file descriptor", ErrorType::TypeError);
-        }
-
-        auto autoclose = true;
-        if (stream_data_ary.Length() > 2) {
-          auto v_autoclose = stream_data_ary.Get((uint32_t)2);
-          if (v_autoclose.IsBoolean()) {
-            autoclose = v_autoclose.ToBoolean().Value();
-          }
-        }
-
-        CMyComPtr<IInStream> stream(new FdInStream(fd, autoclose));
-        streams->emplace_back(std::move(name), stream);
-      } else if (data.IsString()) {
-        auto str = data.ToString();
-        auto path = str.Utf8Value();
-        uv_fs_t open_req;
-        auto fd = uv_fs_open(nullptr, &open_req, path.c_str(), UV_FS_O_RDONLY, 0666, nullptr);
-        if (fd < 0) {
-          return ERR(env, "failed to open file");
-        }
-
-        CMyComPtr<IInStream> stream(new FdInStream(fd, true));
-        streams->emplace_back(std::move(name), stream);
-      } else {
-        return ERR(env, "unexpected strea", ErrorType::TypeError);
-      }
-    }
+  std::unique_ptr<UString> base_dir;
+  auto v_base_dir = arg.Get("baseDir");
+  if (v_base_dir.IsString()) {
+    base_dir = ConvertNapiStringToUString(v_base_dir.ToString());
   }
 
-  if (streams->empty()) {
-    return ERR(env, "empty stream data", ErrorType::TypeError);
+  auto streams = std::make_unique<InStreams>(std::move(base_dir));
+  auto r_append = streams->append_streams(v_streams.As<Napi::Array>());
+  if (!r_append) {
+    return ERR(env, "failed to create streams");
   }
 
-  CMyComPtr<OpenCallback> open_callback(new OpenCallback(std::move(streams)));
-  GUID interface_guid = IID_IInArchive;
+  auto first_stream = streams->get_stream_by_index(0);
+  if (!first_stream) {
+    return ERR(env, "unexpected error");
+  }
+
+  std::unique_ptr<UString> password;
+  auto v_password = arg.Get("password");
+  if (v_password.IsString()) {
+    password = ConvertNapiStringToUString(v_password.ToString());
+  }
+
+  CMyComPtr<OpenCallback> open_callback(new OpenCallback(std::move(streams), std::move(password)));
 
   for (auto i : fmt_indices) {
     CMyComPtr<IInArchive> archive;
-    auto r = g_library_info->create_object(i, &interface_guid, (void**)&archive);
+    auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
     TRACE("fmt: %d, r: %d", i, r);
     if (r == S_OK) {
-      auto r_open = archive->Open(open_callback->m_streams->at(0).stream, 0, open_callback);
+      auto tmp = first_stream;
+      auto r_open = archive->Open(tmp.Detach(), 0, open_callback);
       TRACE("r_open: %d", r_open);
       if (r_open == S_OK) {
         archive->Close();

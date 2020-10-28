@@ -48,7 +48,12 @@ export interface n7zipNativeType {
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
-  createReader(streams: InStreamData[], fmtIndices: number[]): Result<undefined>
+  createReader(arg: {
+    streams: InStreamArg[]
+    formats: number[]
+    baseDir?: string
+    password?: string
+  }): Result<undefined>
 
   tester?: {
     SharedLocker: typeof SharedLocker

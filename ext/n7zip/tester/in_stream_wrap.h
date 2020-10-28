@@ -3,10 +3,7 @@
 #ifdef DEBUG
 
   #include "n7zip/common.h"
-  // #include "n7zip/streams/fd_in_stream.h"
-  // #include "n7zip/streams/buffer_in_stream.h"
-  // #include "n7zip/streams/multi_in_stream.h"
-  #include "n7zip/streams/in_streams.h"
+  #include "n7zip/streams/create_in_stream.h"
 
 namespace n7zip {
 

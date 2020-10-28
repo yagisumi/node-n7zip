@@ -114,7 +114,7 @@ MultiInStream::Read(void* data, UInt32 size, UInt32* processedSize)
       UInt32 processed_size = 0;
       auto& stream = m_streams->at(i);
 
-      auto r_seek = stream->Seek(STREAM_SEEK_SET, m_position - range.begin, nullptr);
+      auto r_seek = stream->Seek(m_position - range.begin, STREAM_SEEK_SET, nullptr);
       if (r_seek != S_OK) {
         m_is_invalid = true;
         return E_FAIL;
