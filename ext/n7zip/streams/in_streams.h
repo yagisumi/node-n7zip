@@ -1,6 +1,6 @@
 #pragma once
 
-#include "n7zip/common.h"
+#include "../common.h"
 #include "fd_in_stream.h"
 #include "buffer_in_stream.h"
 #include "multi_in_stream.h"

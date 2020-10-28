@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "n7zip/callbacks/open_callback.h"
+#include "callbacks/open_callback.h"
 
 namespace n7zip {
 

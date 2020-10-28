@@ -1,7 +1,7 @@
 #pragma once
 
-#include <n7zip/common.h>
-#include <n7zip/streams/in_streams.h>
+#include "../common.h"
+#include "../streams/in_streams.h"
 
 namespace n7zip {
 

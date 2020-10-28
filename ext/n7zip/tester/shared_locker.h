@@ -2,7 +2,7 @@
 
 #ifdef DEBUG
 
-  #include "n7zip/common.h"
+  #include "../common.h"
   #include <chrono>
 
 namespace n7zip {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "n7zip/common.h"
+#include "../common.h"
 
 namespace n7zip {
 

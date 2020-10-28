@@ -1,6 +1,6 @@
 #pragma once
 
-#include "n7zip/common.h"
+#include "../common.h"
 #include <uv.h>
 
 #ifdef _WIN32

@@ -2,7 +2,7 @@
 
 #ifdef DEBUG
 
-  #include "n7zip/common.h"
+  #include "../common.h"
   #include "shared_locker.h"
   #include "in_stream_wrap.h"
   #include "7zip_inspector.h"
