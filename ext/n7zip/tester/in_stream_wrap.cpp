@@ -127,56 +127,6 @@ createInStream(const Napi::CallbackInfo& info)
   return OK(env, in_stream_obj);
 }
 
-static Napi::Value
-createInStream_(const Napi::CallbackInfo& info)
-{
-  auto env = info.Env();
-  if (info.Length() < 1) {
-    return ERR(env, "invalid argument");
-  }
-
-  if (info[0].IsNumber()) {
-#ifdef _WIN32
-    auto fd = info[0].ToNumber().Int32Value();
-#else
-    auto fd = info[0].ToNumber().Int64Value();
-#endif
-    if (fd < 0) {
-      return ERR(env, "invalid file descriptor");
-    }
-
-    bool autoclose = true;
-    if (info.Length() > 1 && info[1].IsBoolean()) {
-      autoclose = info[1].ToBoolean().Value();
-    }
-
-    CMyComPtr<FdInStream> in_stream(new FdInStream(fd, autoclose));
-    auto in_stream_obj = InStreamWrap::constructor.New({});
-    auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
-    in_stream_wrap->m_inStream = in_stream;
-
-    return OK(env, in_stream_obj);
-  } else if (info[0].IsString()) {
-    auto str = info[0].ToString();
-    auto path = str.Utf8Value();
-    uv_fs_t open_req;
-    auto r = uv_fs_open(nullptr, &open_req, path.c_str(), UV_FS_O_RDONLY, 0666, nullptr);
-    // r == open_req.result
-    if (r < 0) {
-      return ERR(env, "file open error");
-    } else {
-      CMyComPtr<FdInStream> in_stream(new FdInStream(r, true));
-      auto in_stream_obj = InStreamWrap::constructor.New({});
-      auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);
-      in_stream_wrap->m_inStream = in_stream;
-
-      return OK(env, in_stream_obj);
-    }
-  } else {
-    return ERR(env, "invalid argument");
-  }
-}
-
 Napi::Object
 InitInStreamWrap(Napi::Env env, Napi::Object tester)
 {
