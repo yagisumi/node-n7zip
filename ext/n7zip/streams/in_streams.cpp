@@ -16,8 +16,6 @@ InStreams::~InStreams()
 bool
 InStreams::append_streams(Napi::Array ary)
 {
-  // m_streams.reserve(ary.Length());
-
   for (uint32_t i = 0; i < ary.Length(); i++) {
     auto v = ary.Get(i);
     if (!v.IsObject()) {
@@ -84,6 +82,7 @@ InStreams::append(std::unique_ptr<UString>&& name, CMyComPtr<IInStream>& stream)
 CMyComPtr<IInStream>
 InStreams::get_stream(const wchar_t* name)
 {
+  TRACE("[InStreams::get_stream]");
   CMyComPtr<IInStream> ret;
   for (auto& stream : m_streams) {
     if (stream.name && *stream.name == name) {
@@ -94,6 +93,7 @@ InStreams::get_stream(const wchar_t* name)
 
   ret = load_stream(name);
   if (ret) {
+    TRACE("loaded");
     append(std::make_unique<UString>(name), ret);
   }
 
@@ -103,6 +103,7 @@ InStreams::get_stream(const wchar_t* name)
 CMyComPtr<IInStream>
 InStreams::get_stream_by_index(size_t index)
 {
+  TRACE("[InStreams::get_stream_by_index]");
   CMyComPtr<IInStream> stream;
 
   if (index < m_streams.size()) {
@@ -115,12 +116,18 @@ InStreams::get_stream_by_index(size_t index)
 const std::unique_ptr<UString>&
 InStreams::get_name(size_t index)
 {
-  return m_streams[0].name;
+  static const std::unique_ptr<UString> empty;
+  if (index < m_streams.size()) {
+    return m_streams[index].name;
+  } else {
+    return empty;
+  }
 }
 
 IInStream*
 InStreams::load_stream(const wchar_t* name)
 {
+  TRACE("[InStreams::load_stream]");
   UString ustr;
   if (m_base_dir) {
     ustr += *m_base_dir;
