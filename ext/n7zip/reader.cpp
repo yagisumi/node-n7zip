@@ -77,14 +77,16 @@ createReader(const Napi::CallbackInfo& info)
     auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
     TRACE("fmt: %d, r: %d", i, r);
     if (r == S_OK) {
-      auto tmp = first_stream;
-      auto r_open = archive->Open(tmp.Detach(), 0, open_callback);
+      auto r_open = archive->Open(first_stream, 0, open_callback);
       TRACE("r_open: %d", r_open);
       if (r_open == S_OK) {
         archive->Close();
+        TRACE("after Close()");
       }
     }
   }
+
+  TRACE("end createReader");
 
   return OK(env);
 }
