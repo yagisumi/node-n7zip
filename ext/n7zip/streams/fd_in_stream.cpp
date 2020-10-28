@@ -112,22 +112,14 @@ createFdInStream(Napi::Object arg)
     AutoClose = auto_close.ToBoolean().Value();
   }
 
-  return new FdInStream(fd, AutoClose);
+  return FdInStream::New(fd, AutoClose);
 }
 
 FdInStream*
 createFdInStreamFromPath(Napi::Object arg)
 {
   auto path = arg.Get("source").ToString().Utf8Value();
-  auto AutoClose = true;
-
-  uv_fs_t open_req;
-  auto r = uv_fs_open(nullptr, &open_req, path.c_str(), UV_FS_O_RDONLY, 0666, nullptr);
-  if (r < 0) {
-    return nullptr;
-  }
-
-  return new FdInStream(r, AutoClose);
+  return FdInStream::New(path.c_str());
 }
 
 } // namespace n7zip
