@@ -20,15 +20,18 @@ export declare class InStreamWrap {
 export type InStreamData = [string, string] | [string, number, boolean?]
 
 export type FdInStreamArg = {
+  type: 'fd'
   source: number
   AutoClose?: boolean
 }
 
 export type FileInStreamArg = {
+  type: 'path'
   source: string
 }
 
 export type BufferInStreamArg = {
+  type: 'buffer'
   source: Buffer
   ShareBuffer?: boolean
 }
@@ -36,6 +39,7 @@ export type BufferInStreamArg = {
 export type InStreamSubArg = FdInStreamArg | FileInStreamArg | BufferInStreamArg
 
 export type MultiInStreamArg = {
+  type: 'multi'
   source: Array<InStreamSubArg>
 }
 

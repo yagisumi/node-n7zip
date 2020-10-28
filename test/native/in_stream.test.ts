@@ -14,7 +14,7 @@ describe('InStream', () => {
     }
 
     const fd = fs.openSync(file, 'r')
-    const r1 = n7zip_native.tester.createInStream({ source: fd, name: 'in_stream.txt' })
+    const r1 = n7zip_native.tester.createInStream({ type: 'fd', source: fd, name: 'in_stream.txt' })
     expect(r1.error).toBeUndefined()
     expect(r1.ok).toBe(true)
     if (r1.ok) {
@@ -33,7 +33,7 @@ describe('InStream', () => {
     }
 
     const fd = fs.openSync(file, 'r')
-    const r = n7zip_native.tester.createInStream({ source: fd, name: 'in_stream.txt' })
+    const r = n7zip_native.tester.createInStream({ type: 'fd', source: fd, name: 'in_stream.txt' })
     expect(r.error).toBeUndefined()
     expect(r.ok).toBe(true)
     if (r.ok) {
@@ -47,7 +47,11 @@ describe('InStream', () => {
       return
     }
 
-    const r = n7zip_native.tester.createInStream({ source: file, name: 'in_stream.txt' })
+    const r = n7zip_native.tester.createInStream({
+      type: 'path',
+      source: file,
+      name: 'in_stream.txt',
+    })
     expect(r.error).toBeUndefined()
     expect(r.ok).toBe(true)
     if (r.ok) {
@@ -64,6 +68,7 @@ describe('InStream', () => {
     const buf = fs.readFileSync(file)
 
     const r = n7zip_native.tester.createInStream({
+      type: 'buffer',
       source: buf,
       name: 'in_stream.txt',
       ShareBuffer: false,
@@ -96,6 +101,7 @@ describe('InStream', () => {
     const buf = fs.readFileSync(file)
 
     const r = n7zip_native.tester.createInStream({
+      type: 'buffer',
       source: buf,
       name: 'in_stream.txt',
       ShareBuffer: true,
@@ -130,9 +136,13 @@ describe('InStream', () => {
     const buf3 = Buffer.alloc(6, 'C', 'utf-8')
 
     const r = n7zip_native.tester.createInStream({
-      source: [{ source: buf1 }, { source: buf2 }, { source: buf3 }],
+      type: 'multi',
+      source: [
+        { type: 'buffer', source: buf1, ShareBuffer: true },
+        { type: 'buffer', source: buf2, ShareBuffer: true },
+        { type: 'buffer', source: buf3, ShareBuffer: true },
+      ],
       name: 'in_stream.txt',
-      ShareBuffer: true,
     })
     // console.log(r)
     expect(r.error).toBeUndefined()
@@ -152,7 +162,12 @@ describe('InStream', () => {
     const buf2 = Buffer.alloc(5, 'B', 'utf-8')
 
     const r = n7zip_native.tester.createInStream({
-      source: [{ source: buf1 }, { source: buf2 }, { source: file_c }],
+      type: 'multi',
+      source: [
+        { type: 'buffer', source: buf1 },
+        { type: 'buffer', source: buf2 },
+        { type: 'path', source: file_c },
+      ],
       name: 'in_stream.txt',
     })
     // console.log(r)
