@@ -1,24 +1,25 @@
 #pragma once
 
 #include "n7zip/common.h"
-#include "create_in_stream.h"
+#include "fd_in_stream.h"
+#include "buffer_in_stream.h"
+#include "multi_in_stream.h"
 
 namespace n7zip {
 
+struct InStreamData
+{
+  std::unique_ptr<UString> name;
+  CMyComPtr<IInStream> stream;
+
+  InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream>& _stream)
+    : name(std::move(_name))
+    , stream(_stream)
+  {}
+};
+
 class InStreams
 {
-
-  struct InStreamData
-  {
-    std::unique_ptr<UString> name;
-    CMyComPtr<IInStream> stream;
-
-    InStreamData(std::unique_ptr<UString>&& _name, CMyComPtr<IInStream>& _stream)
-      : name(std::move(_name))
-      , stream(_stream)
-    {}
-  };
-
   std::unique_ptr<UString> m_base_dir;
   std::vector<InStreamData> m_streams;
 

@@ -24,4 +24,7 @@ public:
   STDMETHOD(Read)(void* data, UInt32 size, UInt32* processedSize);
 };
 
+BufferInStream*
+createBufferInStream(Napi::Object arg);
+
 } // namespace n7zip

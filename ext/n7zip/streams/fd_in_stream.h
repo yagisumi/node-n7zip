@@ -35,4 +35,10 @@ private:
 #endif
 };
 
+FdInStream*
+createFdInStream(Napi::Object arg);
+
+FdInStream*
+createFdInStreamFromPath(Napi::Object arg);
+
 } // namespace n7zip

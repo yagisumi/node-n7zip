@@ -38,4 +38,3 @@
 #include "guid.h"
 #include "utils.h"
 #include "library.h"
-#include "reader.h"

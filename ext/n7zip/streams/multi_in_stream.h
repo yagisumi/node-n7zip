@@ -1,6 +1,8 @@
 #pragma once
 
 #include "n7zip/common.h"
+#include "fd_in_stream.h"
+#include "buffer_in_stream.h"
 
 namespace n7zip {
 
@@ -32,5 +34,8 @@ public:
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64* newPosition);
   STDMETHOD(Read)(void* data, UInt32 size, UInt32* processedSize);
 };
+
+MultiInStream*
+createMultiInStream(Napi::Object arg);
 
 } // namespace n7zip

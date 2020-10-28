@@ -1,4 +1,5 @@
 #include "n7zip/common.h"
+#include "n7zip/reader.h"
 #ifdef DEBUG
   #include "n7zip/tester/index.h"
 #endif

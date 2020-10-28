@@ -97,4 +97,17 @@ BufferInStream::Read(void* data, UInt32 size, UInt32* processedSize)
   return S_OK;
 }
 
+BufferInStream*
+createBufferInStream(Napi::Object arg)
+{
+  auto buf = arg.Get("source").As<Napi::Buffer<char>>();
+  auto ShareBuffer = false;
+  auto share_buffer = arg.Get("ShareBuffer");
+  if (share_buffer.IsBoolean()) {
+    ShareBuffer = share_buffer.ToBoolean().Value();
+  }
+
+  return new BufferInStream(buf, ShareBuffer);
+}
+
 } // namespace n7zip
