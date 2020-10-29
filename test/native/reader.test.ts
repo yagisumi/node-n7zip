@@ -33,7 +33,11 @@ describe('Reader', () => {
       const reader = r_reader.value
 
       expect(reader.getNumberOfItems()).toBe(29)
-      expect(reader.getNumberOfArchiveProperties()).toBe(8)
+      if (process.platform === 'win32') {
+        expect(reader.getNumberOfArchiveProperties()).toBe(8)
+      } else {
+        expect(reader.getNumberOfArchiveProperties()).toBe(7)
+      }
       expect(reader.getNumberOfProperties()).toBe(17)
 
       expect(reader.isClosed()).toBe(false)
