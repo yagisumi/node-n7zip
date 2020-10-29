@@ -13,6 +13,9 @@ class Reader
   std::recursive_mutex m_mutex;
 
 public:
+  UInt32 m_num_of_items;
+  UInt32 m_num_of_arc_props;
+  UInt32 m_num_of_props;
   std::atomic<bool> m_closed;
   Napi::ObjectReference m_wrap;
 

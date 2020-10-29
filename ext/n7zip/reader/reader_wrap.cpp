@@ -11,6 +11,9 @@ ReaderWrap::Init(Napi::Env env, Napi::Object exports)
     env,
     "Reader",
     {
+      InstanceMethod("getNumberOfItems", &ReaderWrap::getNumberOfItems),
+      InstanceMethod("getNumberOfArchiveProperties", &ReaderWrap::getNumberOfArchiveProperties),
+      InstanceMethod("getNumberOfProperties", &ReaderWrap::getNumberOfProperties),
       InstanceMethod("isClosed", &ReaderWrap::isClosed),
       InstanceMethod("close", &ReaderWrap::close),
     });
@@ -30,6 +33,42 @@ ReaderWrap::ReaderWrap(const Napi::CallbackInfo& info)
 ReaderWrap::~ReaderWrap()
 {
   TRACE("- ReaderWrap %p", this);
+}
+
+Napi::Value
+ReaderWrap::getNumberOfItems(const Napi::CallbackInfo& info)
+{
+  TRACE("[ReaderWrap::getNumberOfItems]");
+  auto env = info.Env();
+  if (m_reader) {
+    return Napi::Number::New(env, m_reader->m_num_of_items);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
+  }
+}
+
+Napi::Value
+ReaderWrap::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
+{
+  TRACE("[ReaderWrap::getNumberOfArchiveProperties]");
+  auto env = info.Env();
+  if (m_reader) {
+    return Napi::Number::New(env, m_reader->m_num_of_arc_props);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
+  }
+}
+
+Napi::Value
+ReaderWrap::getNumberOfProperties(const Napi::CallbackInfo& info)
+{
+  TRACE("[ReaderWrap::getNumberOfProperties]");
+  auto env = info.Env();
+  if (m_reader) {
+    return Napi::Number::New(env, m_reader->m_num_of_props);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
+  }
 }
 
 Napi::Value

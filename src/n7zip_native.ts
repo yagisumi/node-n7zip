@@ -47,6 +47,9 @@ export type WithName = { name: string }
 export type InStreamArg = (InStreamSubArg | MultiInStreamArg) & WithName
 
 declare class Reader {
+  getNumberOfItems(): number
+  getNumberOfArchiveProperties(): number
+  getNumberOfProperties(): number
   close(cb: (r: Result) => void): Result
   isClosed(): boolean
 }

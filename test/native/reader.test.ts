@@ -31,7 +31,13 @@ describe('Reader', () => {
     expect(r_reader.ok).toBe(true)
     if (r_reader.ok) {
       const reader = r_reader.value
+
+      expect(reader.getNumberOfItems()).toBe(29)
+      expect(reader.getNumberOfArchiveProperties()).toBe(8)
+      expect(reader.getNumberOfProperties()).toBe(17)
+
       expect(reader.isClosed()).toBe(false)
+
       const r_close1 = reader.close((r) => {
         expect(r.error).toBeUndefined()
         expect(r.ok).toBe(true)

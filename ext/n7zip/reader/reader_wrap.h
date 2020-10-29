@@ -19,6 +19,9 @@ public:
 
   Napi::Value isClosed(const Napi::CallbackInfo& info);
   Napi::Value close(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfItems(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfArchiveProperties(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfProperties(const Napi::CallbackInfo& info);
 };
 
 } // namespace n7zip
