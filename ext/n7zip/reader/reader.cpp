@@ -78,7 +78,9 @@ ReaderWrap::isClosed(const Napi::CallbackInfo& info)
 
 Napi::Value
 ReaderWrap::close(const Napi::CallbackInfo& info)
-{}
+{
+  return info.Env().Undefined();
+}
 
 static std::vector<int32_t>
 getFormatIndices(Napi::Array fmt_index_ary)
