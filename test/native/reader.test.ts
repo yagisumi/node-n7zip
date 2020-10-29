@@ -1,10 +1,15 @@
 import { n7zip_native, InStreamArg } from '@/n7zip_native'
+import { n7zip } from '@/n7zip'
 import path from 'path'
 
-const file = path.resolve(__dirname, '../files/archive.zip')
+// const file = path.resolve(__dirname, '../files/archive.zip')
 
 describe('Reader', () => {
   test('createReader', () => {
+    if (!n7zip.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
     const formats = n7zip_native.getFormats()
     // console.log(formats.filter((fmt) => ['zip', '7z', '7zip'].includes(fmt.name)))
     // console.log(formats)

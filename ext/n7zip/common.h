@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <atomic>
 #include <thread>
 #include <utility>
 #include <set>

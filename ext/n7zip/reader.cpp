@@ -2,6 +2,84 @@
 
 namespace n7zip {
 
+Reader::Reader(int fmt_index,
+               CMyComPtr<IInArchive>& archive,
+               CMyComPtr<IArchiveOpenCallback>& open_callback)
+  : m_fmt_index(fmt_index)
+  , m_archive(archive)
+  , m_open_callback(open_callback)
+{
+  TRACE("+ Reader %p", this);
+  m_closed.store(false);
+}
+
+Reader::~Reader()
+{
+  TRACE("- Reader %p", this);
+}
+
+bool
+Reader::close()
+{
+  if (!m_closed) {
+    auto locked = lock();
+    auto r = m_archive->Close();
+    if (r == S_OK) {
+      m_closed.store(true);
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+Napi::FunctionReference ReaderWrap::constructor;
+
+Napi::Object
+ReaderWrap::Init(Napi::Env env, Napi::Object exports)
+{
+  auto func = DefineClass( //
+    env,
+    "Reader",
+    {
+      InstanceMethod("isClosed", &ReaderWrap::isClosed),
+      InstanceMethod("close", &ReaderWrap::close),
+    });
+
+  constructor = Napi::Persistent(func);
+  constructor.SuppressDestruct();
+
+  return exports;
+}
+
+ReaderWrap::ReaderWrap(const Napi::CallbackInfo& info)
+  : Napi::ObjectWrap<ReaderWrap>(info)
+{
+  TRACE("- ReaderWrap %p", this);
+}
+
+ReaderWrap::~ReaderWrap()
+{
+  TRACE("- ReaderWrap %p", this);
+}
+
+Napi::Value
+ReaderWrap::isClosed(const Napi::CallbackInfo& info)
+{
+  auto env = info.Env();
+
+  if (m_reader) {
+    return Napi::Boolean::New(env, m_reader->m_closed.load());
+  } else {
+    return Napi::Boolean::New(env, true);
+  }
+}
+
+Napi::Value
+ReaderWrap::close(const Napi::CallbackInfo& info)
+{}
+
 static std::vector<int32_t>
 getFormatIndices(Napi::Array fmt_index_ary)
 {
