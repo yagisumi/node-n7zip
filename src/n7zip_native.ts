@@ -46,6 +46,11 @@ export type MultiInStreamArg = {
 export type WithName = { name: string }
 export type InStreamArg = (InStreamSubArg | MultiInStreamArg) & WithName
 
+declare class Reader {
+  close(cb: (r: Result) => void): Result
+  isClosed(): boolean
+}
+
 export interface n7zipNativeType {
   DEBUG: boolean
   ARCH: 32 | 64
@@ -57,7 +62,7 @@ export interface n7zipNativeType {
     formats: number[]
     baseDir?: string
     password?: string
-  }): Result<undefined>
+  }): Result<Reader>
 
   tester?: {
     SharedLocker: typeof SharedLocker
