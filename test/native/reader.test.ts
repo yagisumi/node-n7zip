@@ -7,7 +7,7 @@ import path from 'path'
 describe('Reader', () => {
   const formats = n7zip_native.getFormats()
 
-  test.only('createReader and close', (done) => {
+  test('createReader and close', (done) => {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
@@ -64,7 +64,7 @@ describe('Reader', () => {
       return
     }
 
-    // console.log(formats.filter((fmt) => ['zip', '7z', '7zip'].includes(fmt.name)))
+    console.log(formats.filter((fmt) => ['zip', '7z', '7zip'].includes(fmt.name)))
     // console.log(formats)
     const fmtIndices = formats
       .filter((fmt) => ['zip', '7z'].includes(fmt.name))
