@@ -22,7 +22,7 @@ std::string
 GuidToString(const GUID* guid)
 {
   return format( //
-    "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
+    "%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
     guid->Data1,
     guid->Data2,
     guid->Data3,
