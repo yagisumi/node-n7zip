@@ -1,15 +1,20 @@
-#include "utils.h"
+#include "string_utils.h"
 
 namespace n7zip {
 
-template<typename... Args>
 std::string
-format(const std::string& fmt, Args... args)
+format(const char* fmt, ...)
 {
-  size_t len = std::snprintf(nullptr, 0, fmt.c_str(), args...);
+  std::va_list list;
+  va_start(list, fmt);
   std::string buf;
-  buf.reserve(len);
-  std::snprintf(&buf[0], len + 1, fmt.c_str(), args...);
+  auto len = std::vsnprintf(nullptr, 0, fmt, list);
+  if (len > 0) {
+    buf.reserve(len);
+    std::vsnprintf(&buf[0], len + 1, fmt, list);
+  }
+  va_end(list);
+
   return buf;
 }
 

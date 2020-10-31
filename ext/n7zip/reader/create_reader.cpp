@@ -30,21 +30,21 @@ createReader(const Napi::CallbackInfo& info)
   auto env = info.Env();
 
   if ((info.Length() == 0) || !(info[0].IsObject())) {
-    return ERR(env, "invalid arguments", ErrorType::TypeError);
+    return ERR(env, "invalid arguments");
   }
 
   auto arg = info[0].ToObject();
 
   auto v_formats = arg.Get("formats");
   if (!v_formats.IsArray()) {
-    return ERR(env, "invalid arguments", ErrorType::TypeError);
+    return ERR(env, "invalid arguments");
   }
   auto fmt_indices = getFormatIndices(v_formats.As<Napi::Array>());
 
   auto v_streams = arg.Get("streams");
 
   if (!v_streams.IsArray()) {
-    return ERR(env, "invalid arguments", ErrorType::TypeError);
+    return ERR(env, "invalid arguments");
   }
 
   std::unique_ptr<UString> base_dir;

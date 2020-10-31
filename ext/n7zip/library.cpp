@@ -362,7 +362,7 @@ loadLibrary(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   if (info.Length() == 0 || !info[0].IsString()) {
-    return ERR(env, "loadLibrary() argument must be a string", ErrorType::TypeError);
+    return ERR(env, "loadLibrary() argument must be a string");
   }
 
   auto lock = g_library_info->get_deferred_unique_lock();
