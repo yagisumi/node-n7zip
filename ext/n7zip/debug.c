@@ -5,11 +5,20 @@
 void
 TRACE(const char* fmt, ...)
 {
-  char buf[256] = { 0 };
   va_list list;
+  va_list list2;
   va_start(list, fmt);
-  _vsnprintf(buf, 127, fmt, list);
-  OutputDebugStringA(buf);
+  va_copy(list2, list);
+
+  int len = vsnprintf(NULL, 0, fmt, list);
+  if (len > 0) {
+    char* buf = (char*)malloc((len + 1) * sizeof(char));
+    vsnprintf(buf, len + 1, fmt, list2);
+    OutputDebugStringA(buf);
+    free(buf);
+  }
+
+  va_end(list2);
   va_end(list);
 }
 
