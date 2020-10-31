@@ -4,7 +4,7 @@ import path from 'path'
 
 describe('library', () => {
   test('original formats and codecs', () => {
-    const formats = n7zip
+    const formats = n7zip_native
       .getFormats()
       .map((fmt) => fmt.name)
       .sort()
@@ -141,5 +141,14 @@ describe('library', () => {
     } else {
       done()
     }
+  })
+
+  test('check GUID', () => {
+    const formats = n7zip_native.getFormats()
+
+    const fmt_7zip = formats.filter((fmt) => fmt.name === '7z')[0]
+    expect(fmt_7zip).not.toBeUndefined()
+
+    expect(fmt_7zip.classId).toBe('23170F69-40C1-278A-1000-000110070000')
   })
 })
