@@ -285,7 +285,8 @@ LibraryInfo::get_formats(const Napi::CallbackInfo& info)
     obj.Set("extension", format->Extension.c_str());
     obj.Set("addExtension", format->AddExtension.c_str());
     obj.Set("canUpdate", format->CanUpdate);
-    obj.Set("classId", GuidToString(&format->ClassId).c_str());
+    auto guid = GuidToString(&format->ClassId);
+    obj.Set("classId", guid.c_str());
 
     auto flags = Napi::Object::New(env);
     flags.Set("KeepName", format->KeepName());
