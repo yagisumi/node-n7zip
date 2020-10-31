@@ -62,7 +62,7 @@ public:
   UInt32 LibIndex;
   UInt32 LibFmtIndex;
   UInt32 Flags = 0;
-  GUID ClassId = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+  GUID ClassId;
   std::string Name;
   std::string Extension;
   std::string AddExtension;
