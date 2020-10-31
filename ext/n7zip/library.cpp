@@ -285,18 +285,6 @@ LibraryInfo::get_formats(const Napi::CallbackInfo& info)
     obj.Set("extension", format->Extension.c_str());
     obj.Set("addExtension", format->AddExtension.c_str());
     obj.Set("canUpdate", format->CanUpdate);
-    TRACE("%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
-          format->ClassId.Data1,
-          format->ClassId.Data2,
-          format->ClassId.Data3,
-          format->ClassId.Data4[0],
-          format->ClassId.Data4[1],
-          format->ClassId.Data4[2],
-          format->ClassId.Data4[3],
-          format->ClassId.Data4[4],
-          format->ClassId.Data4[5],
-          format->ClassId.Data4[6],
-          format->ClassId.Data4[7]);
     auto guid = GuidToString(&(format->ClassId));
     obj.Set("classId", guid.c_str());
 
