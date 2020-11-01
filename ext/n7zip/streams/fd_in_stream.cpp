@@ -75,6 +75,8 @@ FdInStream::New(uv_file fd, bool AutoClose)
   uv_buf_t buf = uv_buf_init(nullptr, 0);
 
   auto r_read = uv_fs_read(nullptr, &req, fd, &buf, 1, 0, nullptr);
+  uv_fs_req_cleanup(&req);
+
   if (r_read < 0) {
     return nullptr;
   } else {
@@ -95,6 +97,8 @@ FdInStream::New(const char* path)
 {
   uv_fs_t open_req;
   auto r = uv_fs_open(nullptr, &open_req, path, UV_FS_O_RDONLY, 0666, nullptr);
+  uv_fs_req_cleanup(&open_req);
+
   if (r < 0) {
     return nullptr;
   }
