@@ -6,22 +6,26 @@
 
 namespace n7zip {
 
-// template<typename... Args>
-// std::string
-// format(const char* fmt, Args const&... args);
-
 std::string
 format(const char* fmt, ...);
 
-// template<typename... Args>
-// inline std::string
-// format(const char* fmt, Args const&... args)
-// {
-//   return format_impl(fmt, args...);
-// }
-
-std::string
-GuidToString(const GUID* guid);
+inline std::string
+GuidToString(const GUID* guid)
+{
+  return format( //
+    "%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
+    guid->Data1,
+    guid->Data2,
+    guid->Data3,
+    guid->Data4[0],
+    guid->Data4[1],
+    guid->Data4[2],
+    guid->Data4[3],
+    guid->Data4[4],
+    guid->Data4[5],
+    guid->Data4[6],
+    guid->Data4[7]);
+}
 
 Napi::String
 ConvertBStrToNapiString(Napi::Env env, BSTR bstr);
