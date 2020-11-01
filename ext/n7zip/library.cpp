@@ -362,20 +362,22 @@ loadLibrary(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
   if (info.Length() == 0 || !info[0].IsString()) {
-    return ERR(env, "loadLibrary() argument must be a string");
+    return ERR(env, "The “path” argument must be string");
   }
 
   auto lock = g_library_info->get_deferred_unique_lock();
   if (!lock.try_lock()) {
-    return ERR(env, "Failed to lock");
+    return ERR(env, "Aborted due to other work in progress");
   }
 
   auto path = info[0].As<Napi::String>();
   auto r = g_library_info->add_library(path);
-  if (SUCCEEDED(r)) {
+  if (r == S_OK) {
     return OK(env, Napi::Boolean::New(env, r == S_OK));
-  } else {
+  } else if (r == E_FAIL) {
     return ERR(env, "Failed to load library");
+  } else {
+    return ERR(env, "No valid formats or loaded library");
   }
 }
 
