@@ -91,11 +91,11 @@ ReaderWrap::close(const Napi::CallbackInfo& info)
   auto env = info.Env();
 
   if (!m_reader) {
-    return ERR(env, "invalid reader");
+    return ERR(env, "Uninitialized Reader");
   }
 
   if (info.Length() == 0 || !(info[0].IsFunction())) {
-    return ERR(env, "InvalidArgs");
+    return ERR(env, "No callback function was given");
   }
 
   auto callback = info[0].As<Napi::Function>();

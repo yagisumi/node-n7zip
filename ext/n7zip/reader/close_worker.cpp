@@ -43,7 +43,7 @@ CloseWorker::Invoke(Napi::Env env, Napi::Function jsCallback, void* value)
   if (result) {
     jsCallback.Call({ OK(env) });
   } else {
-    jsCallback.Call({ ERR(env, "failed to close") });
+    jsCallback.Call({ ERR(env, "Failed to close") });
   }
 }
 

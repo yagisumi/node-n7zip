@@ -372,12 +372,10 @@ loadLibrary(const Napi::CallbackInfo& info)
 
   auto path = info[0].As<Napi::String>();
   auto r = g_library_info->add_library(path);
-  if (r == S_OK) {
+  if (SUCCEEDED(r)) {
     return OK(env, Napi::Boolean::New(env, r == S_OK));
-  } else if (r == E_FAIL) {
-    return ERR(env, "Failed to load library");
   } else {
-    return ERR(env, "No valid formats or loaded library");
+    return ERR(env, "Failed to load library");
   }
 }
 
