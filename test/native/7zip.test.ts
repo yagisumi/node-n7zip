@@ -35,4 +35,18 @@ describe('7zip', () => {
     const expected2 = Buffer.from([0xf0, 0xa1, 0x88, 0xbd])
     expect(Buffer.compare(r2, expected2)).toBe(0)
   })
+
+  test('value.IsObject(null) => false', () => {
+    if (!n7zip_native.DEBUG || n7zip_native.tester == null) {
+      return
+    }
+
+    expect(n7zip_native.tester.isObject(null)).toBe(false)
+    expect(n7zip_native.tester.isObject([])).toBe(true)
+    expect(n7zip_native.tester.isObject({})).toBe(true)
+
+    expect(n7zip_native.tester.isObject(undefined)).toBe(false)
+    expect(n7zip_native.tester.isObject('')).toBe(false)
+    expect(n7zip_native.tester.isObject(100)).toBe(false)
+  })
 })

@@ -72,5 +72,6 @@ export interface n7zipNativeType {
     createInStream(stream: InStreamArg): Result<InStreamWrap>
     inspectUString(str: string): Buffer | undefined
     convertUStringToAString(str: string): Buffer | undefined
+    isObject(x: unknown): boolean
   }
 }

@@ -4,7 +4,7 @@
 
 namespace n7zip {
 
-Napi::Value // Buffer | undefined
+static Napi::Value // Buffer | undefined
 inspectUString(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
@@ -18,7 +18,7 @@ inspectUString(const Napi::CallbackInfo& info)
   return Napi::Buffer<char>::Copy(env, (char*)ustr->Ptr(), ustr->Len() * sizeof(wchar_t));
 }
 
-Napi::Value
+static Napi::Value
 convertUStringToAString(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
@@ -34,11 +34,24 @@ convertUStringToAString(const Napi::CallbackInfo& info)
   return Napi::Buffer<char>::Copy(env, astr.Ptr(), astr.Len());
 }
 
+static Napi::Value
+isObject(const Napi::CallbackInfo& info)
+{
+  auto env = info.Env();
+  auto v = info[0];
+  if (v.IsObject()) {
+    return Napi::Boolean::New(env, true);
+  } else {
+    return Napi::Boolean::New(env, false);
+  }
+}
+
 Napi::Object
 Init7zipInspector(Napi::Env env, Napi::Object tester)
 {
   tester.Set("inspectUString", Napi::Function::New(env, inspectUString));
   tester.Set("convertUStringToAString", Napi::Function::New(env, convertUStringToAString));
+  tester.Set("isObject", Napi::Function::New(env, isObject));
 
   return tester;
 }
