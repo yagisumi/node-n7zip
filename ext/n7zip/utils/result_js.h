@@ -32,6 +32,15 @@ ERR(Napi::Env env, Napi::Error error)
   return obj;
 }
 
+inline Napi::Object
+ERR(Napi::Env env, const std::string& message)
+{
+  auto obj = Napi::Object::New(env);
+  obj["ok"] = Napi::Boolean::New(env, false);
+  obj["error"] = Napi::Error::New(env, message).Value();
+  return obj;
+}
+
 template<typename... Args>
 inline Napi::Object
 ERR(Napi::Env env, const char* fmt, Args const&... args)
@@ -45,12 +54,21 @@ ERR(Napi::Env env, const char* fmt, Args const&... args)
 
 template<typename... Args>
 inline Napi::Object
-ERR_TE(Napi::Env env, const char* fmt, Args const&... args)
+TYPE_ERR(Napi::Env env, const char* fmt, Args const&... args)
 {
   auto message = format(fmt, args...);
   auto obj = Napi::Object::New(env);
   obj["ok"] = Napi::Boolean::New(env, false);
   obj["error"] = Napi::TypeError::New(env, message.c_str()).Value();
+  return obj;
+}
+
+inline Napi::Object
+TYPE_ERR(Napi::Env env, const std::string& message)
+{
+  auto obj = Napi::Object::New(env);
+  obj["ok"] = Napi::Boolean::New(env, false);
+  obj["error"] = Napi::TypeError::New(env, message).Value();
   return obj;
 }
 
