@@ -130,7 +130,7 @@ createFdInStreamFromPath(Napi::Object arg)
   auto path = arg.Get("source").ToString().Utf8Value();
   auto r = FdInStream::New(path.c_str());
   if (r.ok()) {
-    return dynamic_cast<FdInStream*>(r.release_ok());
+    return reinterpret_cast<FdInStream*>(r.release_ok());
   } else {
     return nullptr;
   }
