@@ -14,6 +14,7 @@ format(const char* fmt, ...)
   auto len = std::vsnprintf(nullptr, 0, fmt, list);
   if (len > 0) {
     buf.reserve(len);
+    buf.resize(len);
     std::vsnprintf(&buf[0], len + 1, fmt, list2);
   }
 

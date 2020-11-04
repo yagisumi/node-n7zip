@@ -65,6 +65,7 @@
                 "ext/n7zip/streams/in_streams.cpp",
                 "ext/n7zip/reader/create_reader.cpp",
                 "ext/n7zip/reader/create_reader2.cpp",
+                "ext/n7zip/reader/create_reader_args.cpp",
                 "ext/n7zip/reader/reader_wrap.cpp",
                 "ext/n7zip/reader/reader.cpp",
                 "ext/n7zip/reader/close_worker.cpp",

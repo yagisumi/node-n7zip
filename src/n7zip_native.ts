@@ -66,12 +66,15 @@ export interface n7zipNativeType {
     baseDir?: string
     password?: string
   }): Result<Reader>
-  createReader2(arg: {
-    streams: InStreamArg[]
-    formats: number[]
-    baseDir?: string
-    password?: string
-  }): Result<undefined>
+  createReader2(
+    arg: {
+      streams: InStreamArg[]
+      formats: number[]
+      baseDir?: string
+      password?: string
+    },
+    cb: (r: Result<Reader>) => void
+  ): Result<undefined>
 
   tester?: {
     SharedLocker: typeof SharedLocker
