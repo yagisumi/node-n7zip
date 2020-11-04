@@ -48,7 +48,7 @@ ERR(Napi::Env env, const char* fmt, Args const&... args)
   auto message = format(fmt, args...);
   auto obj = Napi::Object::New(env);
   obj["ok"] = Napi::Boolean::New(env, false);
-  obj["error"] = Napi::Error::New(env, message.c_str()).Value();
+  obj["error"] = Napi::Error::New(env, message).Value();
   return obj;
 }
 
@@ -59,7 +59,7 @@ TYPE_ERR(Napi::Env env, const char* fmt, Args const&... args)
   auto message = format(fmt, args...);
   auto obj = Napi::Object::New(env);
   obj["ok"] = Napi::Boolean::New(env, false);
-  obj["error"] = Napi::TypeError::New(env, message.c_str()).Value();
+  obj["error"] = Napi::TypeError::New(env, message).Value();
   return obj;
 }
 
