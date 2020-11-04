@@ -10,7 +10,7 @@ MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&
   UInt64 offset = 0;
   m_ranges.reserve(m_streams->size());
 
-  for (const auto& stream : *m_streams.get()) {
+  for (const auto& stream : *m_streams) {
     UInt64 len;
     auto r = stream->Seek(0, STREAM_SEEK_END, &len);
     if (r != S_OK) {
