@@ -46,9 +46,11 @@ struct InStreamArg
   {}
   // BufferCopy
   std::unique_ptr<char[]> copied_buf;
-  InStreamArg(std::unique_ptr<char[]>&& buf)
+  size_t buf_len;
+  InStreamArg(std::unique_ptr<char[]>&& buf, size_t len)
     : type(InStreamType::BufferCopy)
     , copied_buf(std::move(buf))
+    , buf_len(len)
   {}
   // Multi
   std::unique_ptr<StreamsArg> streams;
@@ -61,6 +63,8 @@ struct InStreamArg
   InStreamArg& operator=(const InStreamArg& rhs) = delete;
   InStreamArg(InStreamArg&& other) = default;
   InStreamArg& operator=(InStreamArg&& rhs) = default;
+
+  result<IInStream> createInStream();
 };
 
 struct CreateReaderArg

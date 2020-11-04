@@ -18,6 +18,40 @@ BufferInStream::BufferInStream(Napi::Buffer<char> buf, bool ShareBuffer)
   }
 }
 
+BufferInStream::BufferInStream(Napi::Reference<Napi::Buffer<char>>&& ref)
+{
+  TRACE("+ BufferInStream %p", this);
+  m_ShareBuffer = true;
+  auto buf = ref.Value();
+  m_length = buf.Length();
+  m_buffer = buf.Data();
+  m_ref = std::move(ref);
+}
+
+BufferInStream::BufferInStream(const char* buffer, size_t length)
+{
+  TRACE("+ BufferInStream %p", this);
+  m_ShareBuffer = false;
+  m_length = length;
+  m_buffer = buffer;
+}
+
+result<IInStream>
+BufferInStream::New(const char* buffer, size_t length)
+{
+  if (buffer == nullptr) {
+    return err<IInStream>("Invalid buffer");
+  }
+
+  return ok<IInStream>(new BufferInStream(buffer, length));
+}
+
+result<IInStream>
+BufferInStream::New(Napi::Reference<Napi::Buffer<char>>&& ref)
+{
+  return ok<IInStream>(new BufferInStream(std::move(ref)));
+}
+
 BufferInStream::~BufferInStream()
 {
   TRACE("- BufferInStream %p", this);

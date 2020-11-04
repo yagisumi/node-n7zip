@@ -24,8 +24,8 @@ public:
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64* newPosition);
   STDMETHOD(Read)(void* data, UInt32 size, UInt32* processedSize);
 
-  static FdInStream* New(uv_file fd, bool autoclose);
-  static FdInStream* New(const char* path);
+  static result<IInStream> New(uv_file fd, bool autoclose);
+  static result<IInStream> New(const char* path);
 
 private:
   uv_file m_fd;

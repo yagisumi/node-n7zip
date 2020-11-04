@@ -1,6 +1,33 @@
 #include "create_reader_args.h"
+#include "../streams/fd_in_stream.h"
+#include "../streams/buffer_in_stream.h"
+#include "../streams/multi_in_stream.h"
 
 namespace n7zip {
+
+result<IInStream>
+InStreamArg::createInStream()
+{
+
+  if (type == InStreamType::Fd) {
+    type = InStreamType::None;
+    return FdInStream::New(fd, AutoClose);
+  } else if (type == InStreamType::Path) {
+    type = InStreamType::None;
+    return FdInStream::New(path.c_str());
+  } else if (type == InStreamType::Buffer) {
+    type = InStreamType::None;
+    return BufferInStream::New(std::move(buf_ref));
+  } else if (type == InStreamType::BufferCopy) {
+    type = InStreamType::None;
+    return BufferInStream::New(copied_buf.release(), buf_len);
+  } else if (type == InStreamType::Multi) {
+    type = InStreamType::None;
+    return MultiInStream::New(std::move(streams));
+  } else {
+    return err<IInStream>("Uninitialized or already used to create stream");
+  }
+}
 
 static result<StreamsArg>
 buildStreamsArg(Napi::Array ary, bool in_streams);
@@ -58,9 +85,10 @@ buildBufferStreamArg(Napi::Object obj)
   if (ShareBuffer) {
     return ok(new InStreamArg(Napi::Persistent(buf)));
   } else {
-    auto tmp = std::make_unique<char[]>(buf.Length());
-    std::memcpy(tmp.get(), buf.Data(), buf.Length());
-    return ok(new InStreamArg(std::move(tmp)));
+    auto len = buf.Length();
+    auto tmp = std::make_unique<char[]>(len);
+    std::memcpy(tmp.get(), buf.Data(), len);
+    return ok(new InStreamArg(std::move(tmp), len));
   }
 }
 

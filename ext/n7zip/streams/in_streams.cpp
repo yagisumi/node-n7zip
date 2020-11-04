@@ -136,7 +136,12 @@ InStreams::load_stream(const wchar_t* name)
   AString astr;
   ConvertUnicodeToUTF8(ustr, astr);
 
-  return FdInStream::New(astr.Ptr());
+  auto r = FdInStream::New(astr.Ptr());
+  if (r.ok()) {
+    return r.release_ok();
+  } else {
+    return nullptr;
+  }
 }
 
 } // namespace n7zip

@@ -25,6 +25,29 @@ MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&
   m_length = offset;
 }
 
+result<IInStream>
+MultiInStream::New(std::unique_ptr<StreamsArg>&& streams)
+{
+  auto com_streams = std::make_unique<std::vector<CMyComPtr<IInStream>>>();
+
+  for (auto& stream : *(streams.get())) {
+    auto r = stream->createInStream();
+    if (r.err()) {
+      return r;
+    } else if (!r.ok()) {
+      return err<IInStream>("Unexpected error");
+    }
+    CMyComPtr<IInStream> in_stream = r.release_ok();
+    com_streams->push_back(in_stream);
+  }
+
+  if (com_streams->size() == 0) {
+    return err<IInStream>("No valid stream");
+  } else {
+    return ok<IInStream>(new MultiInStream(std::move(com_streams)));
+  }
+}
+
 MultiInStream::~MultiInStream()
 {
   TRACE("- MultiInStream %p", this);

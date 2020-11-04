@@ -3,6 +3,7 @@
 #include "../common.h"
 #include "fd_in_stream.h"
 #include "buffer_in_stream.h"
+#include "../reader/create_reader_args.h"
 
 namespace n7zip {
 
@@ -26,6 +27,7 @@ class MultiInStream
   bool m_is_invalid = false;
 
 public:
+  static result<IInStream> New(std::unique_ptr<StreamsArg>&& streams);
   MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&& streams);
   virtual ~MultiInStream();
 

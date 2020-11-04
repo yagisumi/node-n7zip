@@ -82,43 +82,28 @@ static Napi::Value
 createInStream(const Napi::CallbackInfo& info)
 {
   auto env = info.Env();
-  if (info.Length() < 1 || !(info[0].IsObject())) {
-    return ERR(env, "InvalidArgument");
+  if (info.Length() < 1 || info[0].IsArray() || !info[0].IsObject()) {
+    return ERR(env, "The argument must be Object");
   }
 
-  auto arg = info[0].ToObject();
-  auto source = arg.Get("source");
-  auto name = arg.Get("name");
-  if (!(name.IsString())) {
-    return ERR(env, "InvalidArgument");
+  auto obj = info[0].ToObject();
+  auto r_arg = buildInStreamArg(obj, true);
+  if (r_arg.err()) {
+    return r_arg.err()->ERR(env);
+  } else if (!r_arg.ok()) {
+    return ERR(env, "Unexpected error");
   }
 
-  CMyComPtr<IInStream> stream;
+  auto arg = r_arg.move_ok();
 
-  if (source.IsArray()) {
-    stream = createMultiInStream(arg);
-    if (!stream) {
-      return ERR(env, "InvalidArgument");
-    }
-  } else if (source.IsNumber()) {
-    // FdInStream
-    stream = createFdInStream(arg);
-  } else if (source.IsString()) {
-    // FdInStream
-    stream = createFdInStreamFromPath(arg);
-    if (!stream) {
-      return ERR(env, "FailedToOpenFile");
-    }
-  } else if (source.IsBuffer()) {
-    // BufferInStream
-    stream = createBufferInStream(arg);
-  } else {
-    return ERR(env, "InvalidArgument");
+  auto r_stream = arg->createInStream();
+  if (r_stream.err()) {
+    return r_stream.err()->ERR(env);
+  } else if (!r_stream.ok()) {
+    return ERR(env, "Unexpected error");
   }
 
-  if (!stream) {
-    return ERR(env, "UnexpectedError");
-  }
+  CMyComPtr<IInStream> stream = r_stream.release_ok();
 
   auto in_stream_obj = InStreamWrap::constructor.New({});
   auto in_stream_wrap = Napi::ObjectWrap<InStreamWrap>::Unwrap(in_stream_obj);

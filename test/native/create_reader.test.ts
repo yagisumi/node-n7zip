@@ -2,7 +2,7 @@ import { n7zip_native } from '@/n7zip_native'
 import path from 'path'
 
 describe('create_reader', () => {
-  describe.only('check errors', () => {
+  describe('check errors', () => {
     test('argument errors', () => {
       {
         // The first argument must be Object

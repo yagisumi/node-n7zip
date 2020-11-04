@@ -11,6 +11,7 @@ FdInStream::FdInStream(uv_file fd, bool autoclose)
   m_handle = reinterpret_cast<HANDLE>(uv_get_osfhandle(fd));
 #endif
 }
+
 FdInStream::~FdInStream()
 {
   TRACE("- FdInStream %p", this);
@@ -20,6 +21,48 @@ FdInStream::~FdInStream()
     uv_fs_close(nullptr, &req, m_fd, nullptr);
     uv_fs_req_cleanup(&req);
   }
+}
+
+result<IInStream>
+FdInStream::New(uv_file fd, bool AutoClose)
+{
+  uv_fs_t req;
+  uv_buf_t buf = uv_buf_init(nullptr, 0);
+
+  auto r_read = uv_fs_read(nullptr, &req, fd, &buf, 1, 0, nullptr);
+  uv_fs_req_cleanup(&req);
+
+  if (r_read < 0) {
+    return err<IInStream>(format("Cannot read (file descriptor: %d)", fd));
+  } else {
+    // auto stream = new FdInStream(fd, AutoClose);
+    auto stream = std::make_unique<FdInStream>(fd, AutoClose);
+    UInt64 pos;
+    auto r_seek = stream->Seek(0, STREAM_SEEK_SET, &pos);
+    if (r_seek == S_OK) {
+      return ok<IInStream>(std::move(stream));
+    } else {
+      return err<IInStream>(format("Cannot seek (file descriptor: %d)", fd));
+    }
+  }
+}
+
+result<IInStream>
+FdInStream::New(const char* path)
+{
+  if (path == nullptr) {
+    return err<IInStream>("Invalid path");
+  }
+
+  uv_fs_t open_req;
+  auto r = uv_fs_open(nullptr, &open_req, path, UV_FS_O_RDONLY, 0666, nullptr);
+  uv_fs_req_cleanup(&open_req);
+
+  if (r < 0) {
+    return err<IInStream>(format("Cannot open file: %s", path));
+  }
+
+  return FdInStream::New(r, true);
 }
 
 STDMETHODIMP
@@ -69,44 +112,6 @@ FdInStream::Read(void* data, UInt32 size, UInt32* processedSize)
 }
 
 FdInStream*
-FdInStream::New(uv_file fd, bool AutoClose)
-{
-  uv_fs_t req;
-  uv_buf_t buf = uv_buf_init(nullptr, 0);
-
-  auto r_read = uv_fs_read(nullptr, &req, fd, &buf, 1, 0, nullptr);
-  uv_fs_req_cleanup(&req);
-
-  if (r_read < 0) {
-    return nullptr;
-  } else {
-    auto stream = new FdInStream(fd, AutoClose);
-    UInt64 pos;
-    auto r_seek = stream->Seek(0, STREAM_SEEK_SET, &pos);
-    if (r_seek != S_OK) {
-      delete stream;
-      return nullptr;
-    } else {
-      return stream;
-    }
-  }
-}
-
-FdInStream*
-FdInStream::New(const char* path)
-{
-  uv_fs_t open_req;
-  auto r = uv_fs_open(nullptr, &open_req, path, UV_FS_O_RDONLY, 0666, nullptr);
-  uv_fs_req_cleanup(&open_req);
-
-  if (r < 0) {
-    return nullptr;
-  }
-
-  return new FdInStream(r, true);
-}
-
-FdInStream*
 createFdInStream(Napi::Object arg)
 {
   auto fd = arg.Get("source").ToNumber();
@@ -116,14 +121,19 @@ createFdInStream(Napi::Object arg)
     AutoClose = auto_close.ToBoolean().Value();
   }
 
-  return FdInStream::New(fd, AutoClose);
+  return new FdInStream(fd, AutoClose);
 }
 
 FdInStream*
 createFdInStreamFromPath(Napi::Object arg)
 {
   auto path = arg.Get("source").ToString().Utf8Value();
-  return FdInStream::New(path.c_str());
+  auto r = FdInStream::New(path.c_str());
+  if (r.ok()) {
+    return dynamic_cast<FdInStream*>(r.release_ok());
+  } else {
+    return nullptr;
+  }
 }
 
 } // namespace n7zip

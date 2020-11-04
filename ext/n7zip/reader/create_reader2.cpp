@@ -19,8 +19,6 @@ createReader(const Napi::CallbackInfo& info)
   auto arg = info[0].ToObject();
   auto result = buildCreateReaderArg(arg);
   if (result.err()) {
-    TRACE("err");
-    TRACE(result.err()->message.c_str());
     return result.err()->ERR(env);
   } else if (!result.ok()) {
     return ERR(env, "Unexpected error");
