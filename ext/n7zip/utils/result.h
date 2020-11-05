@@ -16,6 +16,10 @@ struct error
   ErrorType type;
   std::string message;
 
+  error(const char* _message)
+    : type(ErrorType::Error)
+    , message(_message)
+  {}
   error(ErrorType _type, const char* _message)
     : type(_type)
     , message(_message)

@@ -1,4 +1,6 @@
 #include "create_reader2.h"
+#include "create_reader_args.h"
+#include "create_reader_worker.h"
 
 namespace n7zip {
 
@@ -24,7 +26,8 @@ createReader(const Napi::CallbackInfo& info)
     return ERR(env, "Unexpected error");
   }
 
-  auto cr_arg = result.move_ok();
+  new CreateReaderWorker(result.move_ok(), env, info[1].As<Napi::Function>());
+
   return OK(env);
 }
 

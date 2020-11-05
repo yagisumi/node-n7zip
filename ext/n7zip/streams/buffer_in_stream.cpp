@@ -49,6 +49,10 @@ BufferInStream::New(const char* buffer, size_t length)
 result<IInStream>
 BufferInStream::New(Napi::Reference<Napi::Buffer<char>>&& ref)
 {
+  if (ref.IsEmpty()) {
+    return err<IInStream>("Invalid buffer reference");
+  }
+
   return ok<IInStream>(new BufferInStream(std::move(ref)));
 }
 

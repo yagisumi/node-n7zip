@@ -1,7 +1,37 @@
-import { n7zip_native } from '@/n7zip_native'
+import { n7zip_native, InStreamArg } from '@/n7zip_native'
 import path from 'path'
 
 describe('create_reader', () => {
+  const formats = n7zip_native.getFormats()
+
+  test.only('createReader2', (done) => {
+    const fmtIndices = formats.filter((fmt) => ['zip'].includes(fmt.name)).map((fmt) => fmt.index)
+    const baseDir = path.resolve(__dirname, '../files') + path.sep
+    const files: InStreamArg[] = [
+      {
+        type: 'path',
+        name: 'archive.zip',
+        source: path.join(baseDir, 'archive.zip'),
+      },
+    ]
+
+    const r_reader = n7zip_native.createReader2(
+      {
+        formats: fmtIndices,
+        streams: files,
+        baseDir,
+      },
+      (r) => {
+        console.log({ r })
+        done()
+      }
+    )
+    console.log({ r_reader })
+    if (r_reader.error) {
+      done()
+    }
+  })
+
   describe('check errors', () => {
     test('argument errors', () => {
       {

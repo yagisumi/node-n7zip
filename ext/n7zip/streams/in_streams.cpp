@@ -68,6 +68,27 @@ InStreams::append_streams(Napi::Array ary)
   return true;
 }
 
+std::unique_ptr<error>
+InStreams::append_streams(std::unique_ptr<StreamsArg>&& streams)
+{
+  for (auto& stream : *streams) {
+    auto r_stream = stream->createInStream();
+    if (r_stream.err()) {
+      return r_stream.move_err();
+    } else if (!r_stream.ok()) {
+      return std::make_unique<error>("Unexpected error");
+    }
+    CMyComPtr<IInStream> in_stream = r_stream.release_ok();
+
+    auto r_append = append(std::move(stream->name), in_stream);
+    if (!r_append) { // never
+      return std::make_unique<error>("Unexpected error");
+    }
+  }
+
+  return std::unique_ptr<error>();
+}
+
 bool
 InStreams::append(std::unique_ptr<UString>&& name, CMyComPtr<IInStream>& stream)
 {

@@ -28,6 +28,7 @@ public:
   ~InStreams();
   bool append(std::unique_ptr<UString>&& name, CMyComPtr<IInStream>& stream);
   bool append_streams(Napi::Array ary);
+  std::unique_ptr<error> append_streams(std::unique_ptr<StreamsArg>&& streams);
   CMyComPtr<IInStream> get_stream(const wchar_t* name);
   CMyComPtr<IInStream> get_stream_by_index(size_t index);
   const std::unique_ptr<UString>& get_name(size_t index);
