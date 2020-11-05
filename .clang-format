@@ -9,3 +9,4 @@ IndentPPDirectives: BeforeHash
 FixNamespaceComments: true
 SortIncludes: false
 AlignEscapedNewlines: Left
+FixNamespaceComments: true
