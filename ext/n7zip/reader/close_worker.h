@@ -16,9 +16,10 @@ public:
   CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi::Function func);
   ~CloseWorker();
 
+  void execute();
+
   static void Finalize(Napi::Env, void*, CloseWorker* self);
-  static void Invoke(Napi::Env env, Napi::Function jsCallback, void* value);
-  static void Execute(CloseWorker* self);
+  static void InvokeCallback(Napi::Env env, Napi::Function jsCallback, void* value);
 };
 
 } // namespace n7zip

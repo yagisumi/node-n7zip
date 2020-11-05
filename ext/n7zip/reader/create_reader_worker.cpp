@@ -1,10 +1,9 @@
 #include "create_reader_worker.h"
 
 namespace n7zip {
-CreateReaderWorker::CreateReaderWorker( //
-  std::unique_ptr<CreateReaderArg>&& arg,
-  Napi::Env env,
-  Napi::Function func)
+CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
+                                       Napi::Env env,
+                                       Napi::Function func)
   : m_arg(std::move(arg))
 {
   TRACE("+ CreateReaderWorker %p", this);
@@ -33,7 +32,7 @@ CreateReaderWorker::abort(std::unique_ptr<error>&& err)
 {
   TRACE("[CreateReaderWorker::abort]");
   m_err = std::move(err);
-  auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::Invoke);
+  auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
   TRACE("napi_status: %d", r_status);
   m_tsfn.Release();
 }
@@ -43,7 +42,7 @@ CreateReaderWorker::finish(std::unique_ptr<Reader>&& reader)
 {
   TRACE("[CreateReaderWorker::finish]");
   m_reader = std::move(reader);
-  auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::Invoke);
+  auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
   TRACE("napi_status: %d", r_status);
   m_tsfn.Release();
 }
@@ -95,9 +94,11 @@ CreateReaderWorker::Finalize(Napi::Env, void*, CreateReaderWorker* self)
 }
 
 void
-CreateReaderWorker::Invoke(Napi::Env env, Napi::Function jsCallback, CreateReaderWorker* self)
+CreateReaderWorker::InvokeCallback(Napi::Env env,
+                                   Napi::Function jsCallback,
+                                   CreateReaderWorker* self)
 {
-  TRACE("[CreateReaderWorker::Invoke]");
+  TRACE("[CreateReaderWorker::InvokeCallback]");
   if (self->m_err) {
     jsCallback.Call({ self->m_err->ERR(env) });
   } else if (!self->m_reader) {
@@ -108,7 +109,6 @@ CreateReaderWorker::Invoke(Napi::Env env, Napi::Function jsCallback, CreateReade
   auto wrap = Napi::ObjectWrap<ReaderWrap>::Unwrap(wrap_obj);
   wrap->m_reader = std::move(self->m_reader);
   jsCallback.Call({ OK(env, wrap_obj) });
-  TRACE("[CreateReaderWorker::Invoke] end");
 }
 
 } // namespace n7zip

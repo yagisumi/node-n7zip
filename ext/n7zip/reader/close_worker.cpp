@@ -18,7 +18,7 @@ CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi:
     CloseWorker::Finalize,
     (void*)nullptr);
 
-  m_thread = std::thread(CloseWorker::Execute, this);
+  m_thread = std::thread(&CloseWorker::execute, this);
 }
 
 CloseWorker::~CloseWorker()
@@ -30,6 +30,15 @@ CloseWorker::~CloseWorker()
 }
 
 void
+CloseWorker::execute()
+{
+  auto r_close = m_reader->close();
+  auto r_status = m_tsfn.BlockingCall((void*)r_close, CloseWorker::InvokeCallback);
+  TRACE("napi_status: %d", r_status);
+  m_tsfn.Release();
+}
+
+void
 CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 {
   TRACE("[CloseWorker::Finalize]");
@@ -37,7 +46,7 @@ CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 }
 
 void
-CloseWorker::Invoke(Napi::Env env, Napi::Function jsCallback, void* value)
+CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, void* value)
 {
   auto result = (bool)value;
   if (result) {
@@ -45,15 +54,6 @@ CloseWorker::Invoke(Napi::Env env, Napi::Function jsCallback, void* value)
   } else {
     jsCallback.Call({ ERR(env, "Failed to close") });
   }
-}
-
-void
-CloseWorker::Execute(CloseWorker* self)
-{
-  auto r_close = self->m_reader->close();
-  auto r_status = self->m_tsfn.BlockingCall((void*)r_close, CloseWorker::Invoke);
-  TRACE("napi_status: %d", r_status);
-  self->m_tsfn.Release();
 }
 
 } // namespace n7zip

@@ -18,12 +18,13 @@ class CreateReaderWorker
 public:
   CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg, Napi::Env env, Napi::Function func);
   ~CreateReaderWorker();
+
   void abort(std::unique_ptr<error>&& err);
   void finish(std::unique_ptr<Reader>&& reader);
   void execute();
 
   static void Finalize(Napi::Env, void*, CreateReaderWorker* self);
-  static void Invoke(Napi::Env env, Napi::Function jsCallback, CreateReaderWorker* self);
+  static void InvokeCallback(Napi::Env env, Napi::Function jsCallback, CreateReaderWorker* self);
 };
 
 } // namespace n7zip
