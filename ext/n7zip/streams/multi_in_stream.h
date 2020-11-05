@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../common.h"
-#include "fd_in_stream.h"
-#include "buffer_in_stream.h"
 #include "../reader/create_reader_args.h"
 
 namespace n7zip {
@@ -27,17 +25,15 @@ class MultiInStream
   bool m_is_invalid = false;
 
 public:
-  static result<IInStream> New(std::unique_ptr<StreamsArg>&& streams);
   MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&& streams);
   virtual ~MultiInStream();
+  static result<IInStream> New(
+    std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& streams);
 
   MY_UNKNOWN_IMP1(IInStream)
 
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64* newPosition);
   STDMETHOD(Read)(void* data, UInt32 size, UInt32* processedSize);
 };
-
-MultiInStream*
-createMultiInStream(Napi::Object arg);
 
 } // namespace n7zip

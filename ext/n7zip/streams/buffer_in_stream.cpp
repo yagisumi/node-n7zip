@@ -36,6 +36,19 @@ BufferInStream::BufferInStream(const char* buffer, size_t length)
   m_buffer = buffer;
 }
 
+BufferInStream::~BufferInStream()
+{
+  TRACE("- BufferInStream %p", this);
+
+  if (m_ShareBuffer) {
+    m_buffer = nullptr;
+    m_ref.Unref();
+  } else {
+    TRACE("- buffer %p", m_buffer);
+    delete[] m_buffer;
+  }
+}
+
 result<IInStream>
 BufferInStream::New(const char* buffer, size_t length)
 {
@@ -54,18 +67,6 @@ BufferInStream::New(Napi::Reference<Napi::Buffer<char>>&& ref)
   }
 
   return ok<IInStream>(new BufferInStream(std::move(ref)));
-}
-
-BufferInStream::~BufferInStream()
-{
-  TRACE("- BufferInStream %p", this);
-
-  if (m_ShareBuffer) {
-    m_buffer = nullptr;
-    m_ref.Unref();
-  } else {
-    delete[] m_buffer;
-  }
 }
 
 STDMETHODIMP
@@ -133,19 +134,6 @@ BufferInStream::Read(void* data, UInt32 size, UInt32* processedSize)
   }
 
   return S_OK;
-}
-
-BufferInStream*
-createBufferInStream(Napi::Object arg)
-{
-  auto buf = arg.Get("source").As<Napi::Buffer<char>>();
-  auto ShareBuffer = false;
-  auto share_buffer = arg.Get("ShareBuffer");
-  if (share_buffer.IsBoolean()) {
-    ShareBuffer = share_buffer.ToBoolean().Value();
-  }
-
-  return new BufferInStream(buf, ShareBuffer);
 }
 
 } // namespace n7zip

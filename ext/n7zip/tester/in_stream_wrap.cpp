@@ -1,4 +1,5 @@
 #include "in_stream_wrap.h"
+#include "../reader/create_reader_args.h"
 
 namespace n7zip {
 

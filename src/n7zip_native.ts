@@ -60,13 +60,7 @@ export interface n7zipNativeType {
   loadLibrary(path: string): Result<boolean>
   getFormats(): Array<Format>
   getCodecs(): Array<Codec>
-  createReader(arg: {
-    streams: InStreamArg[]
-    formats: number[]
-    baseDir?: string
-    password?: string
-  }): Result<Reader>
-  createReader2(
+  createReader(
     arg: {
       streams: InStreamArg[]
       formats: number[]

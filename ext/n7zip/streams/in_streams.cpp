@@ -13,63 +13,8 @@ InStreams::~InStreams()
   TRACE("- InStreams %p", this);
 }
 
-bool
-InStreams::append_streams(Napi::Array ary)
-{
-  for (uint32_t i = 0; i < ary.Length(); i++) {
-    auto v = ary.Get(i);
-    if (!v.IsObject()) {
-      TRACE("[InStreams::append_streams] unexpected stream data isn't object type: %u", i);
-      return false;
-    }
-
-    auto obj = v.ToObject();
-    auto v_source = obj.Get("source");
-    CMyComPtr<IInStream> stream;
-
-    if (v_source.IsArray()) {
-      stream = createMultiInStream(obj);
-    } else if (v_source.IsNumber()) {
-      stream = createFdInStream(obj);
-    } else if (v_source.IsString()) {
-      stream = createFdInStreamFromPath(obj);
-    } else if (v_source.IsBuffer()) {
-      stream = createBufferInStream(obj);
-    } else {
-      TRACE("[InStreams::append_streams] unexpected source type: %u", i);
-      return false;
-    }
-
-    if (!stream) {
-      TRACE("[InStreams::append_streams] failed to create stream: %u", i);
-      return false;
-    }
-
-    auto stream_name = std::make_unique<UString>();
-    AString astr;
-    auto v_name = obj.Get("name");
-    if (!v_name.IsString()) {
-      TRACE("[InStreams::append_streams] unexpected stream name");
-      astr = "no-name";
-    } else {
-      auto name_str = v_name.ToString();
-      auto name_u8str = name_str.Utf8Value();
-      astr.SetFrom(name_u8str.c_str(), name_u8str.length());
-    }
-    ConvertUTF8ToUnicode(astr, *stream_name);
-
-    auto r = append(std::move(stream_name), stream);
-    if (!r) {
-      TRACE("[InStreams::append_streams] failed to append stream data");
-      return false;
-    }
-  }
-
-  return true;
-}
-
 std::unique_ptr<error>
-InStreams::append_streams(std::unique_ptr<StreamsArg>&& streams)
+InStreams::append_streams(std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& streams)
 {
   for (auto& stream : *streams) {
     auto r_stream = stream->createInStream();
@@ -101,9 +46,9 @@ InStreams::append(std::unique_ptr<UString>&& name, CMyComPtr<IInStream>& stream)
 }
 
 CMyComPtr<IInStream>
-InStreams::get_stream(const wchar_t* name)
+InStreams::get_stream_by_name(const wchar_t* name)
 {
-  TRACE("[InStreams::get_stream]");
+  TRACE("[InStreams::get_stream_by_name]");
   CMyComPtr<IInStream> ret;
   for (auto& stream : m_streams) {
     if (stream.name && *stream.name == name) {

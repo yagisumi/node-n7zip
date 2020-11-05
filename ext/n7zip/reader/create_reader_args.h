@@ -16,7 +16,6 @@ enum class InStreamType
 };
 
 struct InStreamArg;
-using StreamsArg = std::vector<std::unique_ptr<InStreamArg>>;
 
 // I apologize for the waste of memory.
 struct InStreamArg
@@ -53,8 +52,8 @@ struct InStreamArg
     , buf_len(len)
   {}
   // Multi
-  std::unique_ptr<StreamsArg> streams;
-  InStreamArg(std::unique_ptr<StreamsArg>&& _streams)
+  std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>> streams;
+  InStreamArg(std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& _streams)
     : type(InStreamType::Multi)
     , streams(std::move(_streams))
   {}
@@ -72,7 +71,7 @@ struct CreateReaderArg
   std::unique_ptr<UString> base_dir;
   std::unique_ptr<UString> password;
   std::vector<int32_t> formats;
-  std::unique_ptr<StreamsArg> streams;
+  std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>> streams;
 
   CreateReaderArg() = default;
   CreateReaderArg(const CreateReaderArg& other) = delete;

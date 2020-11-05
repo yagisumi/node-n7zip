@@ -111,29 +111,4 @@ FdInStream::Read(void* data, UInt32 size, UInt32* processedSize)
   return S_OK;
 }
 
-FdInStream*
-createFdInStream(Napi::Object arg)
-{
-  auto fd = arg.Get("source").ToNumber();
-  auto AutoClose = true;
-  auto auto_close = arg.Get("AutoClose");
-  if (auto_close.IsBoolean()) {
-    AutoClose = auto_close.ToBoolean().Value();
-  }
-
-  return new FdInStream(fd, AutoClose);
-}
-
-FdInStream*
-createFdInStreamFromPath(Napi::Object arg)
-{
-  auto path = arg.Get("source").ToString().Utf8Value();
-  auto r = FdInStream::New(path.c_str());
-  if (r.ok()) {
-    return reinterpret_cast<FdInStream*>(r.release_ok());
-  } else {
-    return nullptr;
-  }
-}
-
 } // namespace n7zip

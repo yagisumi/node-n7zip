@@ -29,7 +29,7 @@ InStreamArg::createInStream()
   }
 }
 
-static result<StreamsArg>
+static result<std::vector<std::unique_ptr<InStreamArg>>>
 buildStreamsArg(Napi::Array ary, bool in_streams);
 
 static result<InStreamArg>
@@ -87,6 +87,7 @@ buildBufferStreamArg(Napi::Object obj)
   } else {
     auto len = buf.Length();
     auto tmp = std::make_unique<char[]>(len);
+    TRACE("+ buffer %p", tmp.get());
     std::memcpy(tmp.get(), buf.Data(), len);
     return ok(new InStreamArg(std::move(tmp), len));
   }
@@ -156,32 +157,34 @@ buildInStreamArg(Napi::Object obj, bool in_streams)
   return ok(r.move_ok());
 }
 
-static result<StreamsArg>
+static result<std::vector<std::unique_ptr<InStreamArg>>>
 buildStreamsArg(Napi::Array ary, bool in_streams)
 {
   auto prop_name = in_streams ? "streams" : "source";
-  auto streams = std::make_unique<StreamsArg>();
+  auto streams = std::make_unique<std::vector<std::unique_ptr<InStreamArg>>>();
 
   for (uint32_t i = 0; i < ary.Length(); i++) {
     auto v = ary.Get(i);
     if (v.IsArray() || !v.IsObject()) {
-      return type_err<StreamsArg>(format("Invalid stream type (at %s[%u])", prop_name, i));
+      return type_err<std::vector<std::unique_ptr<InStreamArg>>>(
+        format("Invalid stream type (at %s[%u])", prop_name, i));
     }
 
     auto obj = v.ToObject();
     auto r = buildInStreamArg(obj, in_streams);
     if (r.err()) {
       r.err()->message.append(format(" (at %s[%u])", prop_name, i));
-      return err<StreamsArg>(r.move_err());
+      return err<std::vector<std::unique_ptr<InStreamArg>>>(r.move_err());
     } else if (!r.ok()) {
-      return err<StreamsArg>(format("Unexpected error (at %s[%u])", prop_name, i));
+      return err<std::vector<std::unique_ptr<InStreamArg>>>(
+        format("Unexpected error (at %s[%u])", prop_name, i));
     }
 
     streams->push_back(r.move_ok());
   }
 
   if (streams->size() == 0) {
-    return type_err<StreamsArg>(format("'%s' is empty", prop_name));
+    return type_err<std::vector<std::unique_ptr<InStreamArg>>>(format("'%s' is empty", prop_name));
   }
 
   return ok(std::move(streams));

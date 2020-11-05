@@ -4,7 +4,7 @@ import path from 'path'
 describe('create_reader', () => {
   const formats = n7zip_native.getFormats()
 
-  test.only('createReader2', (done) => {
+  test('createReader', (done) => {
     const fmtIndices = formats.filter((fmt) => ['zip'].includes(fmt.name)).map((fmt) => fmt.index)
     const baseDir = path.resolve(__dirname, '../files') + path.sep
     const files: InStreamArg[] = [
@@ -15,28 +15,55 @@ describe('create_reader', () => {
       },
     ]
 
-    const r_reader = n7zip_native.createReader2(
+    const r_create_reader = n7zip_native.createReader(
       {
         formats: fmtIndices,
         streams: files,
         baseDir,
       },
       (r) => {
-        console.log({ r })
-        done()
+        expect(r.error).toBeUndefined()
+        expect(r.ok).toBe(true)
+        if (r.ok) {
+          const reader = r.value
+
+          expect(reader.getNumberOfItems()).toBe(29)
+
+          if (process.platform === 'win32') {
+            expect(reader.getNumberOfArchiveProperties()).toBe(8)
+          } else {
+            expect(reader.getNumberOfArchiveProperties()).toBe(7)
+          }
+
+          if (process.platform === 'win32') {
+            expect(reader.getNumberOfProperties()).toBe(17)
+          } else {
+            expect(reader.getNumberOfProperties()).toBe(15)
+          }
+
+          expect(reader.isClosed()).toBe(false)
+
+          const r_close1 = reader.close((r_close2) => {
+            expect(r_close2.error).toBeUndefined()
+            expect(r_close2.ok).toBe(true)
+            expect(reader.isClosed()).toBe(true)
+            done()
+          })
+          expect(r_close1.error).toBeUndefined()
+          expect(r_close1.ok).toBe(true)
+        }
       }
     )
-    console.log({ r_reader })
-    if (r_reader.error) {
-      done()
-    }
+
+    expect(r_create_reader.error).toBeUndefined()
+    expect(r_create_reader.ok).toBe(true)
   })
 
   describe('check errors', () => {
     test('argument errors', () => {
       {
         // The first argument must be Object
-        const r = n7zip_native.createReader2(null as any, () => {})
+        const r = n7zip_native.createReader(null as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('The first argument must be Object')
@@ -44,7 +71,7 @@ describe('create_reader', () => {
 
       {
         // The first argument must be Object
-        const r = n7zip_native.createReader2([] as any, () => {})
+        const r = n7zip_native.createReader([] as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('The first argument must be Object')
@@ -52,7 +79,7 @@ describe('create_reader', () => {
 
       {
         // The second argument must be callback function
-        const r = (n7zip_native['createReader2'] as any)({})
+        const r = (n7zip_native['createReader'] as any)({})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('The second argument must be callback function')
@@ -60,7 +87,7 @@ describe('create_reader', () => {
 
       {
         // The second argument must be callback function
-        const r = (n7zip_native['createReader2'] as any)({}, 'test')
+        const r = (n7zip_native['createReader'] as any)({}, 'test')
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('The second argument must be callback function')
@@ -70,7 +97,7 @@ describe('create_reader', () => {
     test('invalid formats', () => {
       {
         // 'formats' must be Array
-        const r = n7zip_native.createReader2({} as any, () => {})
+        const r = n7zip_native.createReader({} as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe("'formats' must be Array")
@@ -78,7 +105,7 @@ describe('create_reader', () => {
 
       {
         // 'formats' must be Array
-        const r = n7zip_native.createReader2({} as any, () => {})
+        const r = n7zip_native.createReader({} as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe("'formats' must be Array")
@@ -86,7 +113,7 @@ describe('create_reader', () => {
 
       {
         // No valid value for 'formats'
-        const r = n7zip_native.createReader2({ formats: [] } as any, () => {})
+        const r = n7zip_native.createReader({ formats: [] } as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe("No valid value for 'formats'")
@@ -96,7 +123,7 @@ describe('create_reader', () => {
     test('invalid streams', () => {
       {
         // 'streams' must be Array
-        const r = n7zip_native.createReader2({ formats: [0] } as any, () => {})
+        const r = n7zip_native.createReader({ formats: [0] } as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe("'streams' must be Array")
@@ -104,7 +131,7 @@ describe('create_reader', () => {
 
       {
         // 'streams' is empty
-        const r = n7zip_native.createReader2({ formats: [0], streams: [] } as any, () => {})
+        const r = n7zip_native.createReader({ formats: [0], streams: [] } as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe("'streams' is empty")
@@ -112,7 +139,7 @@ describe('create_reader', () => {
 
       {
         // No stream type is specified (at streams[0])
-        const r = n7zip_native.createReader2({ formats: [0], streams: [{}] } as any, () => {})
+        const r = n7zip_native.createReader({ formats: [0], streams: [{}] } as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('No stream type is specified (at streams[0])')
@@ -120,7 +147,7 @@ describe('create_reader', () => {
 
       {
         // Invalid stream type (at streams[0])
-        const r = n7zip_native.createReader2({ formats: [0], streams: [[]] } as any, () => {})
+        const r = n7zip_native.createReader({ formats: [0], streams: [[]] } as any, () => {})
         expect(r.error).toBeInstanceOf(TypeError)
         expect(r.ok).toBe(false)
         expect(r.error?.message).toBe('Invalid stream type (at streams[0])')
@@ -128,7 +155,7 @@ describe('create_reader', () => {
 
       {
         // Unkonwn type: test (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'test' }] } as any,
           () => {}
         )
@@ -139,7 +166,7 @@ describe('create_reader', () => {
 
       {
         // No stream type is specified (at streams[1])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'fd', source: 0 }, {}] } as any,
           () => {}
         )
@@ -152,7 +179,7 @@ describe('create_reader', () => {
     test('invalid fd stream', () => {
       {
         // The source of fd type must be Number (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'fd' }] } as any,
           () => {}
         )
@@ -163,7 +190,7 @@ describe('create_reader', () => {
 
       {
         // The source of fd type must be Number (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'fd', source: '100' }] } as any,
           () => {}
         )
@@ -176,7 +203,7 @@ describe('create_reader', () => {
     test('invalid path stream', () => {
       {
         // The source of path type must be String (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'path' }] } as any,
           () => {}
         )
@@ -187,7 +214,7 @@ describe('create_reader', () => {
 
       {
         // The source of path type must be String (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'path', source: 100 }] } as any,
           () => {}
         )
@@ -200,7 +227,7 @@ describe('create_reader', () => {
     test('invalid buffer stream', () => {
       {
         // The source of buffer type must be Buffer (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'buffer' }] } as any,
           () => {}
         )
@@ -211,7 +238,7 @@ describe('create_reader', () => {
 
       {
         // The source of buffer type must be Buffer (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'buffer', source: '100' }] } as any,
           () => {}
         )
@@ -224,7 +251,7 @@ describe('create_reader', () => {
     test('multi buffer stream', () => {
       {
         // The source of multi type must be Array (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'multi' }] } as any,
           () => {}
         )
@@ -235,7 +262,7 @@ describe('create_reader', () => {
 
       {
         // The source of multi type must be Array (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'multi', source: '100' }] } as any,
           () => {}
         )
@@ -246,7 +273,7 @@ describe('create_reader', () => {
 
       {
         // 'source' is empty (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'multi', source: [] }] } as any,
           () => {}
         )
@@ -257,7 +284,7 @@ describe('create_reader', () => {
 
       {
         // Unkonwn type: test (at source[0]) (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'multi', source: [{ type: 'test' }] }] } as any,
           () => {}
         )
@@ -268,7 +295,7 @@ describe('create_reader', () => {
 
       {
         // Multi type in multi type is not supported (at source[0]) (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           { formats: [0], streams: [{ type: 'multi', source: [{ type: 'multi' }] }] } as any,
           () => {}
         )
@@ -281,7 +308,7 @@ describe('create_reader', () => {
 
       {
         // No stream type is specified (at source[1]) (at streams[0])
-        const r = n7zip_native.createReader2(
+        const r = n7zip_native.createReader(
           {
             formats: [0],
             streams: [{ type: 'multi', source: [{ type: 'fd', source: 0 }, {}] }],

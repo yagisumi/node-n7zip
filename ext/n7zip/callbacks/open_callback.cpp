@@ -79,7 +79,7 @@ OpenCallback::GetStream(const wchar_t* name, IInStream** inStream)
 {
   TRACE("[OpenCallback::GetStream]");
 
-  auto stream = m_streams->get_stream(name);
+  auto stream = m_streams->get_stream_by_name(name);
   if (stream) {
     *inStream = stream.Detach();
     return S_OK;
