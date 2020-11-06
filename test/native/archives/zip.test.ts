@@ -75,7 +75,16 @@ describe.only('archives', () => {
 
           const reader = r_reader.value
           expect(reader.getNumberOfItems()).toBe(29)
-          done()
+
+          const r_close1 = reader.close((r_close2) => {
+            process.nextTick(() => {
+              expect(r_close2.error).toBeUndefined()
+              expect(r_close2.ok).toBe(true)
+              done()
+            })
+          })
+          expect(r_close1.error).toBeUndefined()
+          expect(r_close1.ok).toBe(true)
         })
       }
     )
