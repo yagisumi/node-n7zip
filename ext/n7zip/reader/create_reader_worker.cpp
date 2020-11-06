@@ -103,12 +103,12 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
     jsCallback.Call({ self->m_err->ERR(env) });
   } else if (!self->m_reader) {
     jsCallback.Call({ ERR(env, "Unexpected error") });
+  } else {
+    auto wrap_obj = ReaderWrap::constructor.New({});
+    auto wrap = Napi::ObjectWrap<ReaderWrap>::Unwrap(wrap_obj);
+    wrap->m_reader = std::move(self->m_reader);
+    jsCallback.Call({ OK(env, wrap_obj) });
   }
-
-  auto wrap_obj = ReaderWrap::constructor.New({});
-  auto wrap = Napi::ObjectWrap<ReaderWrap>::Unwrap(wrap_obj);
-  wrap->m_reader = std::move(self->m_reader);
-  jsCallback.Call({ OK(env, wrap_obj) });
 }
 
 } // namespace n7zip
