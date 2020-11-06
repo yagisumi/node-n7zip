@@ -8,7 +8,7 @@ namespace n7zip {
 result<IInStream>
 InStreamArg::createInStream()
 {
-
+  TRACE("InStreamArg::createInStream");
   if (type == InStreamType::Fd) {
     type = InStreamType::None;
     return FdInStream::New(fd, AutoClose);

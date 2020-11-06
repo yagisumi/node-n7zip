@@ -16,6 +16,7 @@ InStreams::~InStreams()
 std::unique_ptr<error>
 InStreams::append_streams(std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& streams)
 {
+  TRACE("InStreams::append_streams");
   for (auto& stream : *streams) {
     auto r_stream = stream->createInStream();
     if (r_stream.err()) {
