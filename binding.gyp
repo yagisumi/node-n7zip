@@ -93,7 +93,9 @@
             'xcode_settings': {
                 'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
                 'CLANG_CXX_LIBRARY': 'libc++',
-                'MACOSX_DEPLOYMENT_TARGET': '10.7',
+                # 'MACOSX_DEPLOYMENT_TARGET': '10.7',
+                # 'shared_timed_mutex' is unavailable: introduced in macOS 10.12
+                'MACOSX_DEPLOYMENT_TARGET': '10.12',
             },
             'msvs_settings': {
                 'VCCLCompilerTool': {
@@ -120,8 +122,6 @@
                         ],
                         'xcode_settings': {
                             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
-                            # 'shared_timed_mutex' is unavailable: introduced in macOS 10.12
-                            'MACOSX_DEPLOYMENT_TARGET': '10.12',
                         }
                     }
                 ],
