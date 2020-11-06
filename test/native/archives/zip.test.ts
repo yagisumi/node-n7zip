@@ -14,35 +14,26 @@ const streams: InStreamArg[] = [
 ]
 
 const all_formats = n7zip_native.getFormats()
-const formats = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
-
-function proxyCreateReader(arg: {
-  streams: InStreamArg[]
-  formats: number[]
-  baseDir?: string | undefined
-  password?: string | undefined
-}): Promise<Result<Reader>> {
-  return new Promise((resolve) => {
-    const r1 = n7zip_native.createReader(arg, (r2) => {
-      resolve(r2)
-    })
-    if (r1.error) {
-      resolve(r1)
-    }
-  })
-}
+const format_zip = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
+const format_7zip = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
 
 describe('archives', () => {
-  test.only('zip', (done) => {
-    const r_cr = n7zip_native.createReader({ baseDir, streams, formats }, (r_reader) => {
-      console.log({ r_reader })
-      expect(r_reader.error).toBeUndefined()
-      done()
-      // nextTick(() => {
-      //   expect(r_reader.error).toBeUndefined()
-      //   done()
-      // })
-    })
+  test.only('non-existent zip', (done) => {
+    const r_cr = n7zip_native.createReader(
+      {
+        streams: [{ type: 'path', source: 'non-existent.zip', name: '' }], //
+        formats: format_zip,
+      },
+      (r_reader) => {
+        console.log({ r_reader })
+        expect(r_reader.error).toBeUndefined()
+        done()
+        // nextTick(() => {
+        //   expect(r_reader.error).toBeUndefined()
+        //   done()
+        // })
+      }
+    )
 
     console.log({ r_cr })
 
