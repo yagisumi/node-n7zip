@@ -1,5 +1,4 @@
-import { n7zip_native, InStreamArg, Reader } from '@/n7zip_native'
-import { Result } from '@/n7zip_types'
+import { n7zip_native, InStreamArg } from '@/n7zip_native'
 import path from 'path'
 
 const baseDir = path.resolve(__dirname, '../../files')
@@ -16,7 +15,7 @@ const all_formats = n7zip_native.getFormats()
 const format_zip = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
 const format_7zip = all_formats.filter((fmt) => fmt.name === '7z').map((fmt) => fmt.index)
 
-describe.only('archives', () => {
+describe('archives', () => {
   test('non-existent zip file', (done) => {
     const r_cr = n7zip_native.createReader(
       {
