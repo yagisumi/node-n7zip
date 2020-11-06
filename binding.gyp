@@ -54,7 +54,7 @@
             'dependencies': ['extract_src'],
             "sources": [
                 "ext/n7zip.cpp",
-                "ext/n7zip/debug.c",
+                "ext/n7zip/debug.cpp",
                 "ext/n7zip/guid.cpp",
                 "ext/n7zip/library.cpp",
                 "ext/n7zip/utils/string_utils.cpp",

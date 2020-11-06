@@ -1,10 +1,6 @@
 #pragma once
 
 #ifdef DEBUG
-  #ifdef __cplusplus
-extern "C"
-{
-  #endif
 
   #ifdef _WIN32
     #include <windows.h>
@@ -12,13 +8,11 @@ extern "C"
     #include <unistd.h>
   #endif
 
-  #include <stdarg.h>
-  #include <stdio.h>
-  void TRACE(const char* fmt, ...);
-
-  #ifdef __cplusplus
-}
-  #endif
+  #include <cstdarg>
+  #include <cstdio>
+  #include <memory>
+void
+TRACE(const char* fmt, ...);
 #else
   #define TRACE(...)
 #endif
