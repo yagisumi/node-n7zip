@@ -1,5 +1,7 @@
-#include "in_stream_wrap.h"
-#include "../reader/create_reader_args.h"
+#ifdef DEBUG
+
+  #include "in_stream_wrap.h"
+  #include "../reader/create_reader_args.h"
 
 namespace n7zip {
 
@@ -123,3 +125,5 @@ InitInStreamWrap(Napi::Env env, Napi::Object tester)
 }
 
 } // namespace n7zip
+
+#endif
