@@ -30,7 +30,7 @@ Reader::lock()
   return std::unique_lock<std::recursive_mutex>(m_mutex);
 }
 
-bool
+HRESULT
 Reader::close()
 {
   if (!m_closed) {
@@ -38,14 +38,11 @@ Reader::close()
     auto r = m_archive->Close();
     if (r == S_OK) {
       m_closed.store(true);
-    } else {
-      TRACE("[Reader::close] false");
-      return false;
     }
+    return r;
+  } else {
+    return S_OK;
   }
-
-  TRACE("[Reader::close] true");
-  return true;
 }
 
 } // namespace n7zip

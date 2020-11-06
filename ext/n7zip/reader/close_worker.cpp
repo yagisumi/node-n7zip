@@ -32,8 +32,8 @@ CloseWorker::~CloseWorker()
 void
 CloseWorker::execute()
 {
-  auto r_close = m_reader->close();
-  auto r_status = m_tsfn.BlockingCall((void*)r_close, CloseWorker::InvokeCallback);
+  m_result = m_reader->close();
+  auto r_status = m_tsfn.BlockingCall(this, CloseWorker::InvokeCallback);
   TRACE("napi_status: %d", r_status);
   m_tsfn.Release();
 }
@@ -46,13 +46,15 @@ CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 }
 
 void
-CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, void* value)
+CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, CloseWorker* self)
 {
-  auto result = (bool)value;
-  if (result) {
-    jsCallback.Call({ OK(env) });
-  } else {
-    jsCallback.Call({ ERR(env, "Failed to close") });
+  try {
+    if (self->m_result == S_OK) {
+      jsCallback.Call({ OK(env) });
+    } else {
+      jsCallback.Call({ ERR(env, "Failed to close (HRESULT: %d)", self->m_result) });
+    }
+  } catch (...) {
   }
 }
 

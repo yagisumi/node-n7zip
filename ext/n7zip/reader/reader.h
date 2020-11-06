@@ -25,7 +25,7 @@ public:
   ~Reader();
 
   std::unique_lock<std::recursive_mutex> lock();
-  bool close();
+  HRESULT close();
 };
 
 } // namespace n7zip
