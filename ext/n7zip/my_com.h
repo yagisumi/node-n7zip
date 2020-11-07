@@ -28,28 +28,28 @@ public:
   CMyComPtr(T* p) throw()
   {
     if ((_p = p) != NULL) {
-      TRACE("AddRef() %p", p);
+      TRACE("0x%p: AddRef()", p);
       p->AddRef();
     }
   }
   CMyComPtr(const CMyComPtr<T>& lp) throw()
   {
     if ((_p = lp._p) != NULL) {
-      TRACE("AddRef() %p", _p);
+      TRACE("0x%p: AddRef()", _p);
       _p->AddRef();
     }
   }
   ~CMyComPtr()
   {
     if (_p) {
-      TRACE("Release() %p", _p);
+      TRACE("0x%p: Release()", _p);
       _p->Release();
     }
   }
   void Release()
   {
     if (_p) {
-      TRACE("Release() %p", _p);
+      TRACE("0x%p: Release()", _p);
       _p->Release();
       _p = NULL;
     }
@@ -61,11 +61,11 @@ public:
   T* operator=(T* p)
   {
     if (p) {
-      TRACE("AddRef() %p", p);
+      TRACE("0x%p: AddRef()", p);
       p->AddRef();
     }
     if (_p) {
-      TRACE("Release() %p", _p);
+      TRACE("0x%p: Release()", _p);
       _p->Release();
     }
     _p = p;
@@ -86,13 +86,17 @@ public:
     return pt;
   }
 #ifdef _WIN32
-  HRESULT CoCreateInstance(REFCLSID rclsid, REFIID iid, LPUNKNOWN pUnkOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
+  HRESULT CoCreateInstance(REFCLSID rclsid,
+                           REFIID iid,
+                           LPUNKNOWN pUnkOuter = NULL,
+                           DWORD dwClsContext = CLSCTX_ALL)
   {
     return ::CoCreateInstance(rclsid, pUnkOuter, dwClsContext, iid, (void**)&_p);
   }
 #endif
   /*
-  HRESULT CoCreateInstance(LPCOLESTR szProgID, LPUNKNOWN pUnkOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
+  HRESULT CoCreateInstance(LPCOLESTR szProgID, LPUNKNOWN pUnkOuter = NULL, DWORD dwClsContext =
+  CLSCTX_ALL)
   {
     CLSID clsid;
     HRESULT hr = CLSIDFromProgID(szProgID, &clsid);
@@ -218,11 +222,11 @@ public:
   CMyUnknownImp()
     : __m_RefCount(0)
   {
-    TRACE("+ CMyUnknownImp %p", this);
+    TRACE_P("+ CMyUnknownImp");
   }
 
   // virtual
-  ~CMyUnknownImp() { TRACE("- CMyUnknownImp %p", this); }
+  ~CMyUnknownImp() { TRACE_P("- CMyUnknownImp"); }
 };
 
 #define MY_QUERYINTERFACE_BEGIN           \
@@ -244,28 +248,28 @@ public:
   MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) \
   MY_QUERYINTERFACE_ENTRY(i)
 
-#define MY_QUERYINTERFACE_END                                            \
-  else return E_NOINTERFACE;                                             \
-  ++__m_RefCount; /* AddRef(); */                                        \
-  TRACE("+ CMyUnknownImp::count %p (%u) QI", this, __m_RefCount.load()); \
-  return S_OK;                                                           \
+#define MY_QUERYINTERFACE_END                              \
+  else return E_NOINTERFACE;                               \
+  ++__m_RefCount; /* AddRef(); */                          \
+  TRACE_P("++ CMyUnknownImp #%u QI", __m_RefCount.load()); \
+  return S_OK;                                             \
   }
 
-#define MY_ADDREF_RELEASE                                                   \
-  STDMETHOD_(ULONG, AddRef)() throw()                                       \
-  {                                                                         \
-    TRACE("+ CMyUnknownImp::count %p (%u)", this, __m_RefCount.load() + 1); \
-    return ++__m_RefCount;                                                  \
-  }                                                                         \
-  STDMETHOD_(ULONG, Release)()                                              \
-  {                                                                         \
-    if (--__m_RefCount != 0) {                                              \
-      TRACE("- CMyUnknownImp::count %p (%u)", this, __m_RefCount.load());   \
-      return __m_RefCount;                                                  \
-    }                                                                       \
-    TRACE("- CMyUnknownImp::count %p (%u)", this, __m_RefCount.load());     \
-    delete this;                                                            \
-    return 0;                                                               \
+#define MY_ADDREF_RELEASE                                     \
+  STDMETHOD_(ULONG, AddRef)() throw()                         \
+  {                                                           \
+    TRACE_P("++ CMyUnknownImp #%u", __m_RefCount.load() + 1); \
+    return ++__m_RefCount;                                    \
+  }                                                           \
+  STDMETHOD_(ULONG, Release)()                                \
+  {                                                           \
+    if (--__m_RefCount != 0) {                                \
+      TRACE_P("-- CMyUnknownImp #%u", __m_RefCount.load());   \
+      return __m_RefCount;                                    \
+    }                                                         \
+    TRACE_P("-- CMyUnknownImp #%u", __m_RefCount.load());     \
+    delete this;                                              \
+    return 0;                                                 \
   }
 
 #define MY_UNKNOWN_IMP_SPEC(i) \
@@ -278,32 +282,37 @@ public:
   MY_QUERYINTERFACE_END                     \
   MY_ADDREF_RELEASE
 
-#define MY_UNKNOWN_IMP1(i) MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) MY_QUERYINTERFACE_ENTRY(i))
+#define MY_UNKNOWN_IMP1(i) \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) MY_QUERYINTERFACE_ENTRY(i))
 
-#define MY_UNKNOWN_IMP2(i1, i2) \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2))
+#define MY_UNKNOWN_IMP2(i1, i2)                                                       \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) \
+                        MY_QUERYINTERFACE_ENTRY(i2))
 
-#define MY_UNKNOWN_IMP3(i1, i2, i3)                                                                               \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2) \
-                        MY_QUERYINTERFACE_ENTRY(i3))
+#define MY_UNKNOWN_IMP3(i1, i2, i3)                                                   \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) \
+                        MY_QUERYINTERFACE_ENTRY(i2) MY_QUERYINTERFACE_ENTRY(i3))
 
-#define MY_UNKNOWN_IMP4(i1, i2, i3, i4)                                                                           \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2) \
-                        MY_QUERYINTERFACE_ENTRY(i3) MY_QUERYINTERFACE_ENTRY(i4))
+#define MY_UNKNOWN_IMP4(i1, i2, i3, i4)                                            \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY( \
+    i1) MY_QUERYINTERFACE_ENTRY(i2) MY_QUERYINTERFACE_ENTRY(i3) MY_QUERYINTERFACE_ENTRY(i4))
 
-#define MY_UNKNOWN_IMP5(i1, i2, i3, i4, i5)                                                                       \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2) \
-                        MY_QUERYINTERFACE_ENTRY(i3) MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5))
+#define MY_UNKNOWN_IMP5(i1, i2, i3, i4, i5)                                           \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) \
+                        MY_QUERYINTERFACE_ENTRY(i2) MY_QUERYINTERFACE_ENTRY(i3)       \
+                          MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5))
 
-#define MY_UNKNOWN_IMP6(i1, i2, i3, i4, i5, i6)                                                                   \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2) \
-                        MY_QUERYINTERFACE_ENTRY(i3) MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5)       \
-                          MY_QUERYINTERFACE_ENTRY(i6))
+#define MY_UNKNOWN_IMP6(i1, i2, i3, i4, i5, i6)                                       \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) \
+                        MY_QUERYINTERFACE_ENTRY(i2) MY_QUERYINTERFACE_ENTRY(i3)       \
+                          MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5)     \
+                            MY_QUERYINTERFACE_ENTRY(i6))
 
-#define MY_UNKNOWN_IMP7(i1, i2, i3, i4, i5, i6, i7)                                                               \
-  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) MY_QUERYINTERFACE_ENTRY(i2) \
-                        MY_QUERYINTERFACE_ENTRY(i3) MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5)       \
-                          MY_QUERYINTERFACE_ENTRY(i6) MY_QUERYINTERFACE_ENTRY(i7))
+#define MY_UNKNOWN_IMP7(i1, i2, i3, i4, i5, i6, i7)                                   \
+  MY_UNKNOWN_IMP_SPEC(MY_QUERYINTERFACE_ENTRY_UNKNOWN(i1) MY_QUERYINTERFACE_ENTRY(i1) \
+                        MY_QUERYINTERFACE_ENTRY(i2) MY_QUERYINTERFACE_ENTRY(i3)       \
+                          MY_QUERYINTERFACE_ENTRY(i4) MY_QUERYINTERFACE_ENTRY(i5)     \
+                            MY_QUERYINTERFACE_ENTRY(i6) MY_QUERYINTERFACE_ENTRY(i7))
 
 const HRESULT k_My_HRESULT_WritingWasCut = 0x20000010;
 

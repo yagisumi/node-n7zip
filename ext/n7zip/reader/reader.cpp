@@ -9,7 +9,7 @@ Reader::Reader(int fmt_index,
   , m_archive(archive)
   , m_open_callback(open_callback)
 {
-  TRACE("+ Reader %p", this);
+  TRACE_P("+ Reader");
   m_archive->GetNumberOfItems(&m_num_of_items);
   m_archive->GetNumberOfArchiveProperties(&m_num_of_arc_props);
   m_archive->GetNumberOfProperties(&m_num_of_props);
@@ -18,7 +18,7 @@ Reader::Reader(int fmt_index,
 
 Reader::~Reader()
 {
-  TRACE("- Reader %p", this);
+  TRACE_P("- Reader");
   if (!m_closed.load()) {
     close();
   }

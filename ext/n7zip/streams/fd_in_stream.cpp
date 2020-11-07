@@ -4,7 +4,7 @@ namespace n7zip {
 
 FdInStream::FdInStream(uv_file fd, bool autoclose)
 {
-  TRACE("+ FdInStream %p", this);
+  TRACE_P("+ FdInStream");
   m_fd = fd;
   m_AutoClose = autoclose;
 #ifdef _WIN32
@@ -14,9 +14,9 @@ FdInStream::FdInStream(uv_file fd, bool autoclose)
 
 FdInStream::~FdInStream()
 {
-  TRACE("- FdInStream %p", this);
+  TRACE_P("- FdInStream");
   if (m_AutoClose) {
-    TRACE("[FdInStream::~FdInStream] autoclose");
+    TRACE_P("[FdInStream::~FdInStream] AutoClose");
     uv_fs_t req;
     uv_fs_close(nullptr, &req, m_fd, nullptr);
     uv_fs_req_cleanup(&req);
@@ -68,20 +68,20 @@ FdInStream::New(const char* path)
 STDMETHODIMP
 FdInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 {
-  TRACE("[FdInStream::Seek] offset: %lld, seekOrigin: %u", offset, seekOrigin);
+  TRACE_P("[FdInStream::Seek] offset: %lld, seekOrigin: %u", offset, seekOrigin);
 #ifdef _WIN32
   auto r =
     SetFilePointerEx(m_handle, *(LARGE_INTEGER*)(&offset), (PLARGE_INTEGER)newPosition, seekOrigin);
-  TRACE("SetFilePointerEx: %d", r);
+  TRACE_P("SetFilePointerEx: %d", r);
   if (r == 0) {
-    TRACE("[FdInStream::Read] SeekError");
+    TRACE_P("[FdInStream::Read] SeekError");
     return E_ABORT;
   }
 #else
   auto r = lseek(m_fd, offset, seekOrigin);
-  TRACE("lseek: %lu", r);
+  TRACE_P("lseek: %lu", r);
   if (r < 0) {
-    TRACE("[FdInStream::Read] SeekError");
+    TRACE_P("[FdInStream::Read] SeekError");
     return E_ABORT;
   } else {
     if (newPosition) {
@@ -103,7 +103,7 @@ FdInStream::Read(void* data, UInt32 size, UInt32* processedSize)
   uv_fs_req_cleanup(&req);
 
   if (r < 0) {
-    TRACE("[FdInStream::Read] ReadError");
+    TRACE_P("[FdInStream::Read] ReadError");
     return E_ABORT;
   }
 

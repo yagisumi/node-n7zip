@@ -13,6 +13,7 @@
   #include <memory>
 void
 TRACE(const char* fmt, ...);
+  #define TRACE_P(fmt, ...) TRACE("0x%p: " fmt, this, __VA_ARGS__)
 
 class n7zipMarker
 {
@@ -22,4 +23,5 @@ public:
 };
 #else
   #define TRACE(...)
+  #define TRACE_P(...)
 #endif

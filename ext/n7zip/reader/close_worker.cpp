@@ -5,7 +5,7 @@ namespace n7zip {
 CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi::Function func)
   : m_reader(reader)
 {
-  TRACE("+ CloseWorker %p", this);
+  TRACE_P("+ CloseWorker");
   m_ref = Napi::Persistent(wrap);
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
@@ -23,9 +23,9 @@ CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi:
 
 CloseWorker::~CloseWorker()
 {
-  TRACE("- CloseWorker %p", this);
+  TRACE_P("- CloseWorker");
   auto n = m_ref.Unref();
-  TRACE("m_ref: %u", n);
+  TRACE_P("m_ref: %u", n);
   m_thread.join();
 }
 
@@ -34,20 +34,21 @@ CloseWorker::execute()
 {
   m_result = m_reader->close();
   auto r_status = m_tsfn.BlockingCall(this, CloseWorker::InvokeCallback);
-  TRACE("napi_status: %d", r_status);
+  TRACE_P("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
 void
 CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 {
-  TRACE("[CloseWorker::Finalize]");
+  TRACE("0x%p: [CloseWorker::Finalize]", self);
   delete self;
 }
 
 void
 CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, CloseWorker* self)
 {
+  TRACE("0x%p: [CloseWorker::InvokeCallback]", self);
   try {
     if (self->m_result == S_OK) {
       jsCallback.Call({ OK(env) });

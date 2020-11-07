@@ -4,7 +4,7 @@ namespace n7zip {
 
 BufferInStream::BufferInStream(Napi::Buffer<char> buf, bool ShareBuffer)
 {
-  TRACE("+ BufferInStream %p", this);
+  TRACE_P("+ BufferInStream");
 
   m_ShareBuffer = ShareBuffer;
   m_length = buf.Length();
@@ -20,7 +20,7 @@ BufferInStream::BufferInStream(Napi::Buffer<char> buf, bool ShareBuffer)
 
 BufferInStream::BufferInStream(Napi::Reference<Napi::Buffer<char>>&& ref)
 {
-  TRACE("+ BufferInStream %p", this);
+  TRACE_P("+ BufferInStream");
   m_ShareBuffer = true;
   auto buf = ref.Value();
   m_length = buf.Length();
@@ -30,7 +30,7 @@ BufferInStream::BufferInStream(Napi::Reference<Napi::Buffer<char>>&& ref)
 
 BufferInStream::BufferInStream(const char* buffer, size_t length)
 {
-  TRACE("+ BufferInStream %p", this);
+  TRACE_P("+ BufferInStream");
   m_ShareBuffer = false;
   m_length = length;
   m_buffer = buffer;
@@ -38,13 +38,13 @@ BufferInStream::BufferInStream(const char* buffer, size_t length)
 
 BufferInStream::~BufferInStream()
 {
-  TRACE("- BufferInStream %p", this);
+  TRACE_P("- BufferInStream");
 
   if (m_ShareBuffer) {
     m_buffer = nullptr;
     m_ref.Unref();
   } else {
-    TRACE("- buffer %p", m_buffer);
+    TRACE("0x%p: - buffer", m_buffer);
     delete[] m_buffer;
   }
 }
@@ -72,11 +72,11 @@ BufferInStream::New(Napi::Reference<Napi::Buffer<char>>&& ref)
 STDMETHODIMP
 BufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 {
-  TRACE("[BufferInStream::Seek] offset: %lld, seekOrigin: %u (%llu/%llu)",
-        offset,
-        seekOrigin,
-        m_position,
-        m_length);
+  TRACE_P("[BufferInStream::Seek] offset: %lld, seekOrigin: %u (%llu/%llu)",
+          offset,
+          seekOrigin,
+          m_position,
+          m_length);
 
   switch (seekOrigin) {
     case STREAM_SEEK_SET:
@@ -107,7 +107,7 @@ BufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 STDMETHODIMP
 BufferInStream::Read(void* data, UInt32 size, UInt32* processedSize)
 {
-  TRACE("[BufferInStream::Read] size: %u (%llu/%llu)", size, m_position, m_length);
+  TRACE_P("[BufferInStream::Read] size: %u (%llu/%llu)", size, m_position, m_length);
 
   if (processedSize) {
     *processedSize = 0;

@@ -27,18 +27,18 @@ ReaderWrap::Init(Napi::Env env, Napi::Object exports)
 ReaderWrap::ReaderWrap(const Napi::CallbackInfo& info)
   : Napi::ObjectWrap<ReaderWrap>(info)
 {
-  TRACE("+ ReaderWrap %p", this);
+  TRACE_P("+ ReaderWrap");
 }
 
 ReaderWrap::~ReaderWrap()
 {
-  TRACE("- ReaderWrap %p", this);
+  TRACE_P("- ReaderWrap");
 }
 
 Napi::Value
 ReaderWrap::getNumberOfItems(const Napi::CallbackInfo& info)
 {
-  TRACE("[ReaderWrap::getNumberOfItems]");
+  TRACE_P("[ReaderWrap::getNumberOfItems]");
   auto env = info.Env();
   if (m_reader) {
     return Napi::Number::New(env, m_reader->m_num_of_items);
@@ -50,7 +50,7 @@ ReaderWrap::getNumberOfItems(const Napi::CallbackInfo& info)
 Napi::Value
 ReaderWrap::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 {
-  TRACE("[ReaderWrap::getNumberOfArchiveProperties]");
+  TRACE_P("[ReaderWrap::getNumberOfArchiveProperties]");
   auto env = info.Env();
   if (m_reader) {
     return Napi::Number::New(env, m_reader->m_num_of_arc_props);
@@ -62,7 +62,7 @@ ReaderWrap::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 Napi::Value
 ReaderWrap::getNumberOfProperties(const Napi::CallbackInfo& info)
 {
-  TRACE("[ReaderWrap::getNumberOfProperties]");
+  TRACE_P("[ReaderWrap::getNumberOfProperties]");
   auto env = info.Env();
   if (m_reader) {
     return Napi::Number::New(env, m_reader->m_num_of_props);
@@ -74,7 +74,7 @@ ReaderWrap::getNumberOfProperties(const Napi::CallbackInfo& info)
 Napi::Value
 ReaderWrap::isClosed(const Napi::CallbackInfo& info)
 {
-  TRACE("[ReaderWrap::isClosed]");
+  TRACE_P("[ReaderWrap::isClosed]");
   auto env = info.Env();
 
   if (m_reader) {
@@ -87,7 +87,7 @@ ReaderWrap::isClosed(const Napi::CallbackInfo& info)
 Napi::Value
 ReaderWrap::close(const Napi::CallbackInfo& info)
 {
-  TRACE("[ReaderWrap::close]");
+  TRACE_P("[ReaderWrap::close]");
   auto env = info.Env();
 
   if (!m_reader) {

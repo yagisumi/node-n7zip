@@ -6,7 +6,7 @@ CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
                                        Napi::Function func)
   : m_arg(std::move(arg))
 {
-  TRACE("+ CreateReaderWorker %p", this);
+  TRACE_P("+ CreateReaderWorker");
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
@@ -23,27 +23,27 @@ CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
 
 CreateReaderWorker::~CreateReaderWorker()
 {
-  TRACE("- CreateReaderWorker %p", this);
+  TRACE_P("- CreateReaderWorker");
   m_thread.join();
 }
 
 void
 CreateReaderWorker::abort(std::unique_ptr<error>&& err)
 {
-  TRACE("[CreateReaderWorker::abort]");
+  TRACE_P("[CreateReaderWorker::abort]");
   m_err = std::move(err);
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
-  TRACE("napi_status: %d", r_status);
+  TRACE_P("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
 void
 CreateReaderWorker::finish(std::unique_ptr<Reader>&& reader)
 {
-  TRACE("[CreateReaderWorker::finish]");
+  TRACE_P("[CreateReaderWorker::finish]");
   m_reader = std::move(reader);
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
-  TRACE("napi_status: %d", r_status);
+  TRACE_P("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
@@ -71,13 +71,13 @@ CreateReaderWorker::execute()
   for (auto i : m_arg->formats) {
     CMyComPtr<IInArchive> archive;
     auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
-    TRACE("create_object > fmt: %d, r: %d", i, r);
+    TRACE_P("create_object > fmt: %d, r: %d", i, r);
     if (r == S_OK) {
+      TRACE("0x%p: @ IInArchive", (IInArchive*)archive);
       auto r_open = archive->Open(first_stream, 0, open_callback);
-      TRACE("r_open: %d", r_open);
+      TRACE_P("r_open: %d", r_open);
       if (r_open == S_OK) {
         finish(std::make_unique<Reader>(i, archive, open_callback));
-        TRACE("finish");
         return;
       }
     }
@@ -89,7 +89,7 @@ CreateReaderWorker::execute()
 void
 CreateReaderWorker::Finalize(Napi::Env, void*, CreateReaderWorker* self)
 {
-  TRACE("[CreateReaderWorker::Finalize]");
+  TRACE("0x%p: [CreateReaderWorker::Finalize]", self);
   delete self;
 }
 
@@ -98,7 +98,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
                                    Napi::Function jsCallback,
                                    CreateReaderWorker* self)
 {
-  TRACE("[CreateReaderWorker::InvokeCallback]");
+  TRACE("0x%p: [CreateReaderWorker::InvokeCallback]", self);
   try {
     if (self->m_err) {
       jsCallback.Call({ self->m_err->ERR(env) });
@@ -111,7 +111,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
       jsCallback.Call({ OK(env, wrap_obj) });
     }
   } catch (...) {
-    TRACE("[CreateReaderWorker::InvokeCallback] catch ...");
+    TRACE("0x%p: [CreateReaderWorker::InvokeCallback] catch ...", self);
   }
 }
 

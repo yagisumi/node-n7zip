@@ -9,8 +9,8 @@ namespace n7zip {
 
 struct SharedLockerContext
 {
-  SharedLockerContext() { TRACE("+ SharedLockerContext %p", this); }
-  ~SharedLockerContext() { TRACE("- SharedLockerContext %p", this); }
+  SharedLockerContext() { TRACE_P("+ SharedLockerContext"); }
+  ~SharedLockerContext() { TRACE_P("- SharedLockerContext"); }
   std::thread native_thread;
   Napi::ThreadSafeFunction tsfn;
   std::shared_lock<std::shared_timed_mutex> lock;

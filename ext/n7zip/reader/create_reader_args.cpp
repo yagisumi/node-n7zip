@@ -8,7 +8,6 @@ namespace n7zip {
 result<IInStream>
 InStreamArg::createInStream()
 {
-  TRACE("InStreamArg::createInStream");
   if (type == InStreamType::Fd) {
     type = InStreamType::None;
     return FdInStream::New(fd, AutoClose);
@@ -87,7 +86,7 @@ buildBufferStreamArg(Napi::Object obj)
   } else {
     auto len = buf.Length();
     auto tmp = std::make_unique<char[]>(len);
-    TRACE("+ buffer %p", tmp.get());
+    TRACE("0x%p: + buffer", tmp.get());
     std::memcpy(tmp.get(), buf.Data(), len);
     return ok(new InStreamArg(std::move(tmp), len));
   }
