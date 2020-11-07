@@ -1,5 +1,9 @@
 #include "library.h"
 
+#ifdef DEBUG
+n7zipMarker _marker;
+#endif
+
 namespace n7zip {
 
 Library::Library(TLIB lib)
