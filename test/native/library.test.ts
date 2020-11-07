@@ -100,11 +100,6 @@ describe('library', () => {
       'Swap4',
     ]
     expect(codecs).toEqual(defaultCodecs)
-
-    // console.log({ length: n7zip.getFormats().length })
-    // console.log(n7zip.getFormats())
-    // console.log(n7zip.getFormats().filter((fmt) => fmt.canUpdate))
-    // console.log(n7zip.getCodecs())
   })
 
   test('loadLibrary should fail when it fails to acquire a lock', (done) => {
