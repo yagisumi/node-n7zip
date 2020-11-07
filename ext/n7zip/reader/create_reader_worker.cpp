@@ -1,4 +1,5 @@
 #include "create_reader_worker.h"
+#include "../library.h"
 
 namespace n7zip {
 CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,

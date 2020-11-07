@@ -1,6 +1,7 @@
 #ifdef DEBUG
 
   #include "shared_locker.h"
+  #include "../library.h"
 
 namespace n7zip {
 

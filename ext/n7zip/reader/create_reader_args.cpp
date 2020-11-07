@@ -1,4 +1,5 @@
 #include "create_reader_args.h"
+#include "../library.h"
 #include "../streams/fd_in_stream.h"
 #include "../streams/buffer_in_stream.h"
 #include "../streams/multi_in_stream.h"
