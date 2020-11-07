@@ -13,7 +13,8 @@
   #include <memory>
 void
 TRACE(const char* fmt, ...);
-  #define TRACE_P(fmt, ...) TRACE("0x%p: " fmt, this, __VA_ARGS__)
+
+  #define TRACE_P(fmt, ...) TRACE("0x%p: " fmt, this, ##__VA_ARGS__)
 
 class n7zipMarker
 {
