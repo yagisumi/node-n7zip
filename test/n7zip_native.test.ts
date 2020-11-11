@@ -1,7 +1,10 @@
 import { n7zip } from '@/n7zip'
+import { TRACE } from '?/utils'
 
-describe('n7zip', () => {
-  test('Native module properties', () => {
+describe('n7zip_native', function () {
+  test('native module properties', function (this: Context) {
+    TRACE(this)
+
     expect(n7zip).toHaveProperty('DEBUG')
     expect(typeof n7zip.DEBUG).toBe('boolean')
 

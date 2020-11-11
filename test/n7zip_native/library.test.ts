@@ -1,9 +1,12 @@
 import { n7zip } from '@/n7zip'
 import { n7zip_native } from '@/n7zip_native'
 import path from 'path'
+import { TRACE } from '?/utils'
 
-describe('library', () => {
-  test('original formats and codecs', () => {
+describe('n7zip_native/library', function () {
+  test('original formats and codecs', function (this: Context) {
+    TRACE(this)
+
     const formats = n7zip_native
       .getFormats()
       .map((fmt) => fmt.name)
@@ -102,11 +105,12 @@ describe('library', () => {
     expect(codecs).toEqual(defaultCodecs)
   })
 
-  test('loadLibrary should fail when it fails to acquire a lock', (done) => {
+  test('loadLibrary should fail when it fails to acquire a lock', function (this: Context, done) {
     if (!n7zip.DEBUG) {
       done()
       return
     }
+    TRACE(this)
 
     const lib =
       process.platform === 'win32'
@@ -138,7 +142,9 @@ describe('library', () => {
     }
   })
 
-  test('check GUID', () => {
+  test('check GUID', function (this: Context) {
+    TRACE(this)
+
     const formats = n7zip_native.getFormats()
 
     const fmt_7zip = formats.filter((fmt) => fmt.name === '7z')[0]

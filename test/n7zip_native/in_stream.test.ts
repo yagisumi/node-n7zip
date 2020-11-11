@@ -2,16 +2,18 @@ import fs from 'fs'
 import path from 'path'
 import { n7zip } from '@/n7zip'
 import { n7zip_native, SeekOrigin, InStreamWrap } from '@/n7zip_native'
+import { TRACE } from '?/utils'
 
 const file = path.resolve(__dirname, '../files/in_stream.txt')
 const file_c = path.resolve(__dirname, '../files/in_stream_C.txt')
 const stat = fs.statSync(file)
 
-describe('InStream', () => {
-  test('FdInStream Seek Error', () => {
+describe('n7zip_native/in_stream', function () {
+  test('FdInStream Seek Error', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const fd = fs.openSync(file, 'r')
     const r1 = n7zip_native.tester.createInStream({ type: 'fd', source: fd, name: 'in_stream.txt' })
@@ -27,10 +29,11 @@ describe('InStream', () => {
     }
   })
 
-  test('FdInStream', () => {
+  test('FdInStream', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const fd = fs.openSync(file, 'r')
     const r = n7zip_native.tester.createInStream({ type: 'fd', source: fd, name: 'in_stream.txt' })
@@ -42,10 +45,11 @@ describe('InStream', () => {
     }
   })
 
-  test('FdInStream (string path)', () => {
+  test('FdInStream (string path)', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const r = n7zip_native.tester.createInStream({
       type: 'path',
@@ -60,10 +64,11 @@ describe('InStream', () => {
     }
   })
 
-  test('BufferInStream (ShareBuffer: false)', () => {
+  test('BufferInStream (ShareBuffer: false)', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const buf = fs.readFileSync(file)
 
@@ -93,10 +98,11 @@ describe('InStream', () => {
     }
   })
 
-  test('BufferInStream (ShareBuffer: true)', () => {
+  test('BufferInStream (ShareBuffer: true)', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const buf = fs.readFileSync(file)
 
@@ -126,10 +132,11 @@ describe('InStream', () => {
     }
   })
 
-  test('MultiInStream (Buffer)', () => {
+  test('MultiInStream (Buffer)', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const buf1 = Buffer.alloc(5, 'A', 'utf-8')
     const buf2 = Buffer.alloc(5, 'B', 'utf-8')
@@ -153,10 +160,11 @@ describe('InStream', () => {
     }
   })
 
-  test('MultiInStream (Buffer, file)', () => {
+  test('MultiInStream (Buffer, file)', function (this: Context) {
     if (!n7zip.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     const buf1 = Buffer.alloc(5, 'A', 'utf-8')
     const buf2 = Buffer.alloc(5, 'B', 'utf-8')

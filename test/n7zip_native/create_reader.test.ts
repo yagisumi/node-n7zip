@@ -1,10 +1,13 @@
 import { n7zip_native, InStreamArg } from '@/n7zip_native'
 import path from 'path'
+import { TRACE } from '?/utils'
 
-describe('create_reader', () => {
+describe('n7zip_native/create_reader', function () {
   const formats = n7zip_native.getFormats()
 
-  test('createReader', (done) => {
+  test('createReader', function (this: Context, done) {
+    TRACE(this)
+
     const fmtIndices = formats.filter((fmt) => ['zip'].includes(fmt.name)).map((fmt) => fmt.index)
     const baseDir = path.resolve(__dirname, '../files') + path.sep
     const files: InStreamArg[] = [
@@ -59,8 +62,10 @@ describe('create_reader', () => {
     expect(r_create_reader.ok).toBe(true)
   })
 
-  describe('check errors', () => {
-    test('argument errors', () => {
+  describe('errors', function () {
+    test('argument errors', function (this: Context) {
+      TRACE(this)
+
       {
         // The first argument must be Object
         const r = n7zip_native.createReader(null as any, () => {})
@@ -94,7 +99,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('invalid formats', () => {
+    test('invalid formats', function (this: Context) {
+      TRACE(this)
+
       {
         // 'formats' must be Array
         const r = n7zip_native.createReader({} as any, () => {})
@@ -120,7 +127,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('invalid streams', () => {
+    test('invalid streams', function (this: Context) {
+      TRACE(this)
+
       {
         // 'streams' must be Array
         const r = n7zip_native.createReader({ formats: [0] } as any, () => {})
@@ -176,7 +185,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('invalid fd stream', () => {
+    test('invalid fd stream', function (this: Context) {
+      TRACE(this)
+
       {
         // The source of fd type must be Number (at streams[0])
         const r = n7zip_native.createReader(
@@ -200,7 +211,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('invalid path stream', () => {
+    test('invalid path stream', function (this: Context) {
+      TRACE(this)
+
       {
         // The source of path type must be String (at streams[0])
         const r = n7zip_native.createReader(
@@ -224,7 +237,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('invalid buffer stream', () => {
+    test('invalid buffer stream', function (this: Context) {
+      TRACE(this)
+
       {
         // The source of buffer type must be Buffer (at streams[0])
         const r = n7zip_native.createReader(
@@ -248,7 +263,9 @@ describe('create_reader', () => {
       }
     })
 
-    test('multi buffer stream', () => {
+    test('multi buffer stream', function (this: Context) {
+      TRACE(this)
+
       {
         // The source of multi type must be Array (at streams[0])
         const r = n7zip_native.createReader(

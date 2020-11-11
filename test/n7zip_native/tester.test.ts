@@ -1,8 +1,11 @@
 import { n7zip_native } from '@/n7zip_native'
 import { Buffer } from 'buffer'
+import { TRACE } from '?/utils'
 
-describe('7zip', () => {
-  test('UString is utf-16le encoding, regardless of the size of wchar_t.', () => {
+describe('n7zip_native/tester', function () {
+  test('UString is utf-16le encoding.', function (this: Context) {
+    TRACE(this)
+
     if (!n7zip_native.DEBUG || n7zip_native.tester == null) {
       return
     }
@@ -36,10 +39,11 @@ describe('7zip', () => {
     expect(Buffer.compare(r2, expected2)).toBe(0)
   })
 
-  test('value.IsObject(null) => false', () => {
+  test('value.IsObject(null) => false', function (this: Context) {
     if (!n7zip_native.DEBUG || n7zip_native.tester == null) {
       return
     }
+    TRACE(this)
 
     expect(n7zip_native.tester.isObject(null)).toBe(false)
     expect(n7zip_native.tester.isObject([])).toBe(true)
