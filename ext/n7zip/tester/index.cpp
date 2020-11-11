@@ -1,6 +1,9 @@
 #ifdef DEBUG
 
   #include "index.h"
+  #include "shared_locker.h"
+  #include "in_stream_wrap.h"
+  #include "n7zip_inspector.h"
 
 namespace n7zip {
 
@@ -12,7 +15,7 @@ InitTester(Napi::Env env, Napi::Object exports)
 
   InitSharedLocker(env, tester);
   InitInStreamWrap(env, tester);
-  Init7zipInspector(env, tester);
+  InitN7zipInspector(env, tester);
 
   return exports;
 }

@@ -76,5 +76,6 @@ export interface n7zipNativeType {
     inspectUString(str: string): Buffer | undefined
     convertUStringToAString(str: string): Buffer | undefined
     isObject(x: unknown): boolean
+    TRACE(msg: string): void
   }
 }

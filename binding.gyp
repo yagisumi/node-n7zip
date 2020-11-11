@@ -74,7 +74,7 @@
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",
                 "ext/n7zip/tester/in_stream_wrap.cpp",
-                "ext/n7zip/tester/7zip_inspector.cpp",
+                "ext/n7zip/tester/n7zip_inspector.cpp",
 
                 "ext/7z/CPP/Common/IntToString.cpp",
                 "ext/7z/CPP/Common/MyString.cpp",

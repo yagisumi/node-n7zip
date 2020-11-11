@@ -1,6 +1,6 @@
 #ifdef DEBUG
 
-  #include "7zip_inspector.h"
+  #include "n7zip_inspector.h"
 
 namespace n7zip {
 
@@ -46,12 +46,21 @@ isObject(const Napi::CallbackInfo& info)
   }
 }
 
+static Napi::Value
+trace(const Napi::CallbackInfo& info)
+{
+  auto str = info[0].ToString();
+  TRACE(str.Utf8Value().c_str());
+  return info.Env().Undefined();
+}
+
 Napi::Object
-Init7zipInspector(Napi::Env env, Napi::Object tester)
+InitN7zipInspector(Napi::Env env, Napi::Object tester)
 {
   tester.Set("inspectUString", Napi::Function::New(env, inspectUString));
   tester.Set("convertUStringToAString", Napi::Function::New(env, convertUStringToAString));
   tester.Set("isObject", Napi::Function::New(env, isObject));
+  tester.Set("TRACE", Napi::Function::New(env, trace));
 
   return tester;
 }

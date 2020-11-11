@@ -3,9 +3,6 @@
 #ifdef DEBUG
 
   #include "../common.h"
-  #include "shared_locker.h"
-  #include "in_stream_wrap.h"
-  #include "7zip_inspector.h"
 
 namespace n7zip {
 
