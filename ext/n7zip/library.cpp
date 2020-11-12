@@ -9,7 +9,7 @@ namespace n7zip {
 Library::Library(TLIB lib)
   : m_lib(lib)
 {
-  TRACE("0x%p: + Library::m_lib", m_lib);
+  TRACE(ADDR "+ Library::m_lib", m_lib);
 
   this->CreateObject = MyGetProcAddress<Func_CreateObject>(m_lib, "CreateObject");
   GetNumberOfFormats = MyGetProcAddress<Func_GetNumberOfFormats>(m_lib, "GetNumberOfFormats");
@@ -43,7 +43,7 @@ Library::~Library()
 #else
     dlclose(m_lib);
 #endif
-    TRACE("0x%p: - Library::m_lib", m_lib);
+    TRACE(ADDR "- Library::m_lib", m_lib);
     m_lib = NULL;
   }
 }

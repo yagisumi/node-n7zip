@@ -44,7 +44,7 @@ BufferInStream::~BufferInStream()
     m_buffer = nullptr;
     m_ref.Unref();
   } else {
-    TRACE("0x%p: - buffer", m_buffer);
+    TRACE(ADDR "- buffer", m_buffer);
     delete[] m_buffer;
   }
 }

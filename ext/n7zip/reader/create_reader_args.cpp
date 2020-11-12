@@ -87,7 +87,7 @@ buildBufferStreamArg(Napi::Object obj)
   } else {
     auto len = buf.Length();
     auto tmp = std::make_unique<char[]>(len);
-    TRACE("0x%p: + buffer", tmp.get());
+    TRACE(ADDR "+ buffer", tmp.get());
     std::memcpy(tmp.get(), buf.Data(), len);
     return ok(new InStreamArg(std::move(tmp), len));
   }

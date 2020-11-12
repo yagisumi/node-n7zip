@@ -74,7 +74,7 @@ CreateReaderWorker::execute()
     auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
     TRACE_P("create_object > fmt: %d, r: %d", i, r);
     if (r == S_OK) {
-      TRACE("0x%p: @ IInArchive", (IInArchive*)archive);
+      TRACE(ADDR "@ IInArchive", (IInArchive*)archive);
       auto r_open = archive->Open(first_stream, 0, open_callback);
       TRACE_P("r_open: %d", r_open);
       if (r_open == S_OK) {
@@ -90,7 +90,7 @@ CreateReaderWorker::execute()
 void
 CreateReaderWorker::Finalize(Napi::Env, void*, CreateReaderWorker* self)
 {
-  TRACE("0x%p: [CreateReaderWorker::Finalize]", self);
+  TRACE(ADDR "[CreateReaderWorker::Finalize]", self);
   delete self;
 }
 
@@ -99,7 +99,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
                                    Napi::Function jsCallback,
                                    CreateReaderWorker* self)
 {
-  TRACE("0x%p: [CreateReaderWorker::InvokeCallback]", self);
+  TRACE(ADDR "[CreateReaderWorker::InvokeCallback]", self);
   try {
     if (self->m_err) {
       jsCallback.Call({ self->m_err->ERR(env) });
@@ -112,7 +112,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
       jsCallback.Call({ OK(env, wrap_obj) });
     }
   } catch (...) {
-    TRACE("0x%p: [CreateReaderWorker::InvokeCallback] catch ...", self);
+    TRACE(ADDR "[CreateReaderWorker::InvokeCallback] catch ...", self);
   }
 }
 
