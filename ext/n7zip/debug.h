@@ -14,7 +14,11 @@
 void
 TRACE(const char* fmt, ...);
 
-  #define TRACE_P(fmt, ...) TRACE("0x%p: " fmt, this, ##__VA_ARGS__)
+  #ifdef _WIN32
+    #define TRACE_P(fmt, ...) TRACE("0x%p: " fmt, this, ##__VA_ARGS__)
+  #else
+    #define TRACE_P(fmt, ...) TRACE("%018p: " fmt, this, ##__VA_ARGS__)
+  #endif
 
 class n7zipMarker
 {
