@@ -41,14 +41,14 @@ CloseWorker::execute()
 void
 CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 {
-  TRACE(ADDR "[CloseWorker::Finalize]", self);
+  TRACE_ADDR(self, "[CloseWorker::Finalize]");
   delete self;
 }
 
 void
 CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, CloseWorker* self)
 {
-  TRACE(ADDR "[CloseWorker::InvokeCallback]", self);
+  TRACE_ADDR(self, "[CloseWorker::InvokeCallback]");
   try {
     if (self->m_result == S_OK) {
       jsCallback.Call({ OK(env) });

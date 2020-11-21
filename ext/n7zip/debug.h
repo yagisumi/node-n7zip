@@ -20,6 +20,7 @@ TRACE(const char* fmt, ...);
     #define ADDR "%018p: "
   #endif
   #define TRACE_P(fmt, ...) TRACE(ADDR fmt, this, ##__VA_ARGS__)
+  #define TRACE_ADDR(ptr, fmt, ...) TRACE(ADDR fmt, ptr, ##__VA_ARGS__)
 
 class n7zipMarker
 {

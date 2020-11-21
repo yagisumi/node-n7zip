@@ -28,28 +28,28 @@ public:
   CMyComPtr(T* p) throw()
   {
     if ((_p = p) != NULL) {
-      TRACE(ADDR "AddRef()", p);
+      TRACE_ADDR(p, "AddRef()");
       p->AddRef();
     }
   }
   CMyComPtr(const CMyComPtr<T>& lp) throw()
   {
     if ((_p = lp._p) != NULL) {
-      TRACE(ADDR "AddRef()", _p);
+      TRACE_ADDR(_p, "AddRef()");
       _p->AddRef();
     }
   }
   ~CMyComPtr()
   {
     if (_p) {
-      TRACE(ADDR "Release()", _p);
+      TRACE_ADDR(_p, "Release()");
       _p->Release();
     }
   }
   void Release()
   {
     if (_p) {
-      TRACE(ADDR "Release()", _p);
+      TRACE_ADDR(_p, "Release()");
       _p->Release();
       _p = NULL;
     }
@@ -61,11 +61,11 @@ public:
   T* operator=(T* p)
   {
     if (p) {
-      TRACE(ADDR "AddRef()", p);
+      TRACE_ADDR(p, "AddRef()");
       p->AddRef();
     }
     if (_p) {
-      TRACE(ADDR "Release()", _p);
+      TRACE_ADDR(_p, "Release()");
       _p->Release();
     }
     _p = p;
