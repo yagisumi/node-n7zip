@@ -45,4 +45,29 @@ Reader::close()
   }
 }
 
+std::unique_ptr<ReaderPropertyInfo>
+Reader::get_property_info()
+{
+  if (m_closed) {
+    return std::unique_ptr<ReaderPropertyInfo>();
+  }
+  auto locked = lock();
+
+  auto info = std::make_unique<ReaderPropertyInfo>();
+
+  info->archive.resize(m_num_of_arc_props);
+  info->entry.resize(m_num_of_props);
+
+  for (UInt32 i = 0; i < m_num_of_arc_props; i++) {
+    m_archive->GetArchivePropertyInfo(
+      i, &info->archive[i].name, &info->archive[i].pid, &info->archive[i].type);
+  }
+
+  for (UInt32 i = 0; i < m_num_of_props; i++) {
+    m_archive->GetPropertyInfo(i, &info->entry[i].name, &info->entry[i].pid, &info->entry[i].type);
+  }
+
+  return info;
+}
+
 } // namespace n7zip

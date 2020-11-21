@@ -2,7 +2,6 @@
 
 #include "../common.h"
 #include "reader.h"
-#include "close_worker.h"
 
 namespace n7zip {
 
@@ -18,10 +17,11 @@ public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
 
   Napi::Value isClosed(const Napi::CallbackInfo& info);
-  Napi::Value close(const Napi::CallbackInfo& info);
   Napi::Value getNumberOfItems(const Napi::CallbackInfo& info);
   Napi::Value getNumberOfArchiveProperties(const Napi::CallbackInfo& info);
   Napi::Value getNumberOfProperties(const Napi::CallbackInfo& info);
+  Napi::Value close(const Napi::CallbackInfo& info);
+  Napi::Value getPropertyInfo(const Napi::CallbackInfo& info);
 };
 
 } // namespace n7zip

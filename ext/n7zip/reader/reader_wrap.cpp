@@ -1,4 +1,6 @@
 #include "reader_wrap.h"
+#include "close_worker.h"
+#include "get_property_info_worker.h"
 
 namespace n7zip {
 
@@ -16,6 +18,7 @@ ReaderWrap::Init(Napi::Env env, Napi::Object exports)
       InstanceMethod("getNumberOfProperties", &ReaderWrap::getNumberOfProperties),
       InstanceMethod("isClosed", &ReaderWrap::isClosed),
       InstanceMethod("close", &ReaderWrap::close),
+      InstanceMethod("getPropertyInfo", &ReaderWrap::getPropertyInfo),
     });
 
   constructor = Napi::Persistent(func);
@@ -101,12 +104,41 @@ ReaderWrap::close(const Napi::CallbackInfo& info)
   auto callback = info[0].As<Napi::Function>();
 
   if (m_reader->m_closed.load()) {
-    callback.Call({ OK(env) });
+    try {
+      callback.Call({ OK(env) });
+    } catch (...) {
+    }
     return OK(env);
   }
 
   auto self = info.This().ToObject();
   new CloseWorker(m_reader.get(), env, self, callback);
+
+  return OK(env);
+}
+
+Napi::Value
+ReaderWrap::getPropertyInfo(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[ReaderWrap::getPropertyInfo]");
+  auto env = info.Env();
+
+  if (!m_reader) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (m_reader->m_closed.load()) {
+    return ERR(env, "Reader is already closed");
+  }
+
+  if (info.Length() == 0 || !(info[0].IsFunction())) {
+    return ERR(env, "No callback function was given");
+  }
+
+  auto callback = info[0].As<Napi::Function>();
+
+  auto self = info.This().ToObject();
+  new GetPropertyInfoWorker(m_reader.get(), env, self, callback);
 
   return OK(env);
 }

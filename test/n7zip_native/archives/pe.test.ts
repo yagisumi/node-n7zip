@@ -2,9 +2,8 @@ import { n7zip_native, InStreamArg } from '@/n7zip_native'
 import path from 'path'
 import { TRACE } from '?/utils'
 
-const baseDir = path.resolve(__dirname, '../../files')
-const name = 'archive.zip'
-const num_of_items = 29
+const baseDir = path.resolve(__dirname, '../../../ext/files/7z32')
+const name = '7z.exe'
 const streams: InStreamArg[] = [
   {
     type: 'path',
@@ -14,12 +13,12 @@ const streams: InStreamArg[] = [
 ]
 
 const all_formats = n7zip_native.getFormats()
-const target_format = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
-const incorrect_format = all_formats.filter((fmt) => fmt.name === '7z').map((fmt) => fmt.index)
-const format_ext = 'zip'
+const target_format = all_formats.filter((fmt) => fmt.name === 'PE').map((fmt) => fmt.index)
+const incorrect_format = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
+const format_ext = 'exe'
 
-describe('n7zip_native/archives/zip', function () {
-  test('non-existent zip file', function (this: Context, done) {
+describe('n7zip_native/archives/pe', function () {
+  test('non-existent pe file', function (this: Context, done) {
     TRACE(this)
 
     const r_cr = n7zip_native.createReader(
@@ -82,7 +81,7 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
+          console.log(reader.getNumberOfItems())
 
           const r_close1 = reader.close((r_close2) => {
             process.nextTick(() => {
@@ -120,7 +119,6 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
 
           const r_info1 = reader.getPropertyInfo((r_info2) => {
             process.nextTick(() => {

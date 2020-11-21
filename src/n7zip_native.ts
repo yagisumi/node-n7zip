@@ -46,12 +46,24 @@ export type MultiInStreamArg = {
 export type WithName = { name: string }
 export type InStreamArg = (InStreamSubArg | MultiInStreamArg) & WithName
 
+export type PropertyInfo = {
+  name?: string
+  propID: number
+  varType: number
+}
+
+export type ReaderPropertyInfo = {
+  archive: PropertyInfo[]
+  entry: PropertyInfo[]
+}
+
 export declare class Reader {
   getNumberOfItems(): number
   getNumberOfArchiveProperties(): number
   getNumberOfProperties(): number
-  close(cb: (r: Result) => void): Result
   isClosed(): boolean
+  close(cb: (r: Result<undefined>) => void): Result<undefined>
+  getPropertyInfo(cb: (r: Result<ReaderPropertyInfo>) => void): Result<undefined>
 }
 
 export interface n7zipNativeType {

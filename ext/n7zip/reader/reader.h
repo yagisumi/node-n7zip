@@ -5,6 +5,26 @@
 
 namespace n7zip {
 
+struct PropertyInfo
+{
+  CMyComBSTR2 name;
+  PROPID pid;
+  VARTYPE type;
+  PropertyInfo() {}
+  PropertyInfo(const PropertyInfo& other)
+  {
+    name = other.name;
+    pid = other.pid;
+    type = other.type;
+  };
+};
+
+struct ReaderPropertyInfo
+{
+  std::vector<PropertyInfo> archive;
+  std::vector<PropertyInfo> entry;
+};
+
 class Reader
 {
   int m_fmt_index;
@@ -26,6 +46,7 @@ public:
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();
+  std::unique_ptr<ReaderPropertyInfo> get_property_info();
 };
 
 } // namespace n7zip
