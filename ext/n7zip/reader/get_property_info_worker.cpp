@@ -67,11 +67,7 @@ GetPropertyInfoWorker::InvokeCallback(Napi::Env env,
         obj.Set("propID", Napi::Number::New(env, info.pid));
         obj.Set("varType", Napi::Number::New(env, info.type));
         if (info.name) {
-          UString ustr;
-          AString astr;
-          ustr.SetFromBstr(info.name);
-          ConvertUnicodeToUTF8(ustr, astr);
-          obj.Set("name", Napi::String::New(env, astr.Ptr()));
+          obj.Set("name", ConvertBStrToNapiString(env, info.name));
         } else {
           obj.Set("name", env.Undefined());
         }
@@ -84,11 +80,7 @@ GetPropertyInfoWorker::InvokeCallback(Napi::Env env,
         obj.Set("propID", Napi::Number::New(env, info.pid));
         obj.Set("varType", Napi::Number::New(env, info.type));
         if (info.name) {
-          UString ustr;
-          AString astr;
-          ustr.SetFromBstr(info.name);
-          ConvertUnicodeToUTF8(ustr, astr);
-          obj.Set("name", Napi::String::New(env, astr.Ptr()));
+          obj.Set("name", ConvertBStrToNapiString(env, info.name));
         } else {
           obj.Set("name", env.Undefined());
         }
