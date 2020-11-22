@@ -27,7 +27,7 @@ format(const char* fmt, ...)
 Napi::String
 ConvertBStrToNapiString(Napi::Env env, const BSTR bstr)
 {
-#ifndef _WIN32
+#ifdef _WIN32
   return Napi::String::New(env, (char16_t*)bstr);
 #else
   UString ustr;
