@@ -1,7 +1,7 @@
 #include "n7zip/common.h"
 #include "n7zip/library.h"
 #include "n7zip/canceler.h"
-#include "n7zip/reader/create_reader.h"
+#include "n7zip/reader/reader.h"
 #ifdef DEBUG
   #include "n7zip/tester/index.h"
 #endif

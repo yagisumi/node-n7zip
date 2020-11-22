@@ -86,4 +86,7 @@ public:
   std::vector<Entry> get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids);
 };
 
+Napi::Object
+InitReader(Napi::Env env, Napi::Object exports);
+
 } // namespace n7zip
