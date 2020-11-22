@@ -72,12 +72,12 @@ public:
                           CMyComPtr<IInArchive>& archive,
                           CMyComPtr<IArchiveOpenCallback>& open_callback);
 
-  Napi::Value isClosed(const Napi::CallbackInfo& info);
-  Napi::Value getNumberOfItems(const Napi::CallbackInfo& info);
-  Napi::Value getNumberOfArchiveProperties(const Napi::CallbackInfo& info);
-  Napi::Value getNumberOfProperties(const Napi::CallbackInfo& info);
-  Napi::Value close(const Napi::CallbackInfo& info);
-  Napi::Value getPropertyInfo(const Napi::CallbackInfo& info);
+  Napi::Value IsClosed(const Napi::CallbackInfo& info);
+  Napi::Value GetNumberOfItems(const Napi::CallbackInfo& info);
+  Napi::Value GetNumberOfArchiveProperties(const Napi::CallbackInfo& info);
+  Napi::Value GetNumberOfProperties(const Napi::CallbackInfo& info);
+  Napi::Value Close(const Napi::CallbackInfo& info);
+  Napi::Value GetPropertyInfo(const Napi::CallbackInfo& info);
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();

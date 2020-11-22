@@ -11,8 +11,8 @@ Canceler::Init(Napi::Env env, Napi::Object exports)
     env,
     "Canceler",
     {
-      InstanceMethod("cancel", &Canceler::cancel),
-      InstanceAccessor("taskName", &Canceler::taskName, nullptr),
+      InstanceMethod("cancel", &Canceler::Cancel),
+      InstanceAccessor("taskName", &Canceler::TaskName, nullptr),
     });
 
   constructor = Napi::Persistent(func);
@@ -44,7 +44,7 @@ Canceler::~Canceler()
 }
 
 Napi::Value
-Canceler::cancel(const Napi::CallbackInfo& info)
+Canceler::Cancel(const Napi::CallbackInfo& info)
 {
   m_canceled.store(true);
 
@@ -52,7 +52,7 @@ Canceler::cancel(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Canceler::taskName(const Napi::CallbackInfo& info)
+Canceler::TaskName(const Napi::CallbackInfo& info)
 {
   return Napi::String::New(info.Env(), m_task_name.c_str());
 }

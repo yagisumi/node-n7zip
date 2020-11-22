@@ -15,12 +15,12 @@ Reader::Init(Napi::Env env, Napi::Object exports)
     env,
     "Reader",
     {
-      InstanceMethod("getNumberOfItems", &Reader::getNumberOfItems),
-      InstanceMethod("getNumberOfArchiveProperties", &Reader::getNumberOfArchiveProperties),
-      InstanceMethod("getNumberOfProperties", &Reader::getNumberOfProperties),
-      InstanceMethod("isClosed", &Reader::isClosed),
-      InstanceMethod("close", &Reader::close),
-      InstanceMethod("getPropertyInfo", &Reader::getPropertyInfo),
+      InstanceMethod("getNumberOfItems", &Reader::GetNumberOfItems),
+      InstanceMethod("getNumberOfArchiveProperties", &Reader::GetNumberOfArchiveProperties),
+      InstanceMethod("getNumberOfProperties", &Reader::GetNumberOfProperties),
+      InstanceMethod("isClosed", &Reader::IsClosed),
+      InstanceMethod("close", &Reader::Close),
+      InstanceMethod("getPropertyInfo", &Reader::GetPropertyInfo),
     });
 
   constructor = Napi::Persistent(func);
@@ -62,9 +62,9 @@ Reader::~Reader()
 }
 
 Napi::Value
-Reader::getNumberOfItems(const Napi::CallbackInfo& info)
+Reader::GetNumberOfItems(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::getNumberOfItems]");
+  TRACE_P("[Reader::GetNumberOfItems]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_items);
@@ -74,9 +74,9 @@ Reader::getNumberOfItems(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Reader::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
+Reader::GetNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::getNumberOfArchiveProperties]");
+  TRACE_P("[Reader::GetNumberOfArchiveProperties]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_arc_props);
@@ -86,9 +86,9 @@ Reader::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Reader::getNumberOfProperties(const Napi::CallbackInfo& info)
+Reader::GetNumberOfProperties(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::getNumberOfProperties]");
+  TRACE_P("[Reader::GetNumberOfProperties]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_props);
@@ -98,9 +98,9 @@ Reader::getNumberOfProperties(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Reader::isClosed(const Napi::CallbackInfo& info)
+Reader::IsClosed(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::isClosed]");
+  TRACE_P("[Reader::IsClosed]");
   auto env = info.Env();
 
   if (m_archive) {
@@ -111,7 +111,7 @@ Reader::isClosed(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Reader::close(const Napi::CallbackInfo& info)
+Reader::Close(const Napi::CallbackInfo& info)
 {
   TRACE_P("[Reader::close]");
   auto env = info.Env();
@@ -140,9 +140,9 @@ Reader::close(const Napi::CallbackInfo& info)
 }
 
 Napi::Value
-Reader::getPropertyInfo(const Napi::CallbackInfo& info)
+Reader::GetPropertyInfo(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::getPropertyInfo]");
+  TRACE_P("[Reader::GetPropertyInfo]");
   auto env = info.Env();
 
   if (!m_archive) {
