@@ -28,28 +28,28 @@ public:
   CMyComPtr(T* p) throw()
   {
     if ((_p = p) != NULL) {
-      TRACE_ADDR(p, "AddRef()");
+      TRACE_PTR(p, "AddRef()");
       p->AddRef();
     }
   }
   CMyComPtr(const CMyComPtr<T>& lp) throw()
   {
     if ((_p = lp._p) != NULL) {
-      TRACE_ADDR(_p, "AddRef()");
+      TRACE_PTR(_p, "AddRef()");
       _p->AddRef();
     }
   }
   ~CMyComPtr()
   {
     if (_p) {
-      TRACE_ADDR(_p, "Release()");
+      TRACE_PTR(_p, "Release()");
       _p->Release();
     }
   }
   void Release()
   {
     if (_p) {
-      TRACE_ADDR(_p, "Release()");
+      TRACE_PTR(_p, "Release()");
       _p->Release();
       _p = NULL;
     }
@@ -61,11 +61,11 @@ public:
   T* operator=(T* p)
   {
     if (p) {
-      TRACE_ADDR(p, "AddRef()");
+      TRACE_PTR(p, "AddRef()");
       p->AddRef();
     }
     if (_p) {
-      TRACE_ADDR(_p, "Release()");
+      TRACE_PTR(_p, "Release()");
       _p->Release();
     }
     _p = p;
@@ -222,11 +222,11 @@ public:
   CMyUnknownImp()
     : __m_RefCount(0)
   {
-    TRACE_P("+ CMyUnknownImp");
+    TRACE_THIS("+ CMyUnknownImp");
   }
 
   // virtual
-  ~CMyUnknownImp() { TRACE_P("- CMyUnknownImp"); }
+  ~CMyUnknownImp() { TRACE_THIS("- CMyUnknownImp"); }
 };
 
 #define MY_QUERYINTERFACE_BEGIN           \
@@ -248,28 +248,28 @@ public:
   MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) \
   MY_QUERYINTERFACE_ENTRY(i)
 
-#define MY_QUERYINTERFACE_END                              \
-  else return E_NOINTERFACE;                               \
-  ++__m_RefCount; /* AddRef(); */                          \
-  TRACE_P("++ CMyUnknownImp #%u QI", __m_RefCount.load()); \
-  return S_OK;                                             \
+#define MY_QUERYINTERFACE_END                                 \
+  else return E_NOINTERFACE;                                  \
+  ++__m_RefCount; /* AddRef(); */                             \
+  TRACE_THIS("++ CMyUnknownImp #%u QI", __m_RefCount.load()); \
+  return S_OK;                                                \
   }
 
-#define MY_ADDREF_RELEASE                                     \
-  STDMETHOD_(ULONG, AddRef)() throw()                         \
-  {                                                           \
-    TRACE_P("++ CMyUnknownImp #%u", __m_RefCount.load() + 1); \
-    return ++__m_RefCount;                                    \
-  }                                                           \
-  STDMETHOD_(ULONG, Release)()                                \
-  {                                                           \
-    if (--__m_RefCount != 0) {                                \
-      TRACE_P("-- CMyUnknownImp #%u", __m_RefCount.load());   \
-      return __m_RefCount;                                    \
-    }                                                         \
-    TRACE_P("-- CMyUnknownImp #%u", __m_RefCount.load());     \
-    delete this;                                              \
-    return 0;                                                 \
+#define MY_ADDREF_RELEASE                                        \
+  STDMETHOD_(ULONG, AddRef)() throw()                            \
+  {                                                              \
+    TRACE_THIS("++ CMyUnknownImp #%u", __m_RefCount.load() + 1); \
+    return ++__m_RefCount;                                       \
+  }                                                              \
+  STDMETHOD_(ULONG, Release)()                                   \
+  {                                                              \
+    if (--__m_RefCount != 0) {                                   \
+      TRACE_THIS("-- CMyUnknownImp #%u", __m_RefCount.load());   \
+      return __m_RefCount;                                       \
+    }                                                            \
+    TRACE_THIS("-- CMyUnknownImp #%u", __m_RefCount.load());     \
+    delete this;                                                 \
+    return 0;                                                    \
   }
 
 #define MY_UNKNOWN_IMP_SPEC(i) \

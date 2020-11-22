@@ -103,8 +103,8 @@ class LibraryInfo
   std::set<CMethodId> m_method_ids;
 
 public:
-  LibraryInfo() { TRACE_P("+ LibraryInfo"); }
-  virtual ~LibraryInfo() { TRACE_P("- LibraryInfo"); }
+  LibraryInfo() { TRACE_THIS("+ LibraryInfo"); }
+  virtual ~LibraryInfo() { TRACE_THIS("- LibraryInfo"); }
 
   MY_UNKNOWN_IMP1(ICompressCodecsInfo)
 

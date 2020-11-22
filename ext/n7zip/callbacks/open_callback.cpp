@@ -7,12 +7,12 @@ OpenCallback::OpenCallback(std::unique_ptr<InStreams>&& streams,
   : m_streams(std::move(streams))
   , m_password(std::move(password))
 {
-  TRACE_P("+ OpenCallback ");
+  TRACE_THIS("+ OpenCallback ");
 }
 
 OpenCallback::~OpenCallback()
 {
-  TRACE_P("- OpenCallback ");
+  TRACE_THIS("- OpenCallback ");
 }
 
 STDMETHODIMP
@@ -20,13 +20,13 @@ OpenCallback::SetTotal(const UInt64* files, const UInt64* bytes)
 {
 #ifdef DEBUG
   if (files && bytes) {
-    TRACE_P("[OpenCallback::SetTotal] files: %llu, bytes: %llu", *files, *bytes);
+    TRACE_THIS("[OpenCallback::SetTotal] files: %llu, bytes: %llu", *files, *bytes);
   } else if (files) {
-    TRACE_P("[OpenCallback::SetTotal] files: %llu, bytes: NULL", *files);
+    TRACE_THIS("[OpenCallback::SetTotal] files: %llu, bytes: NULL", *files);
   } else if (bytes) {
-    TRACE_P("[OpenCallback::SetTotal] files: NULL, bytes: %llu", *bytes);
+    TRACE_THIS("[OpenCallback::SetTotal] files: NULL, bytes: %llu", *bytes);
   } else {
-    TRACE_P("[OpenCallback::SetTotal] files: NULL, bytes: NULL");
+    TRACE_THIS("[OpenCallback::SetTotal] files: NULL, bytes: NULL");
   }
 #endif
   return S_OK;
@@ -37,13 +37,13 @@ OpenCallback::SetCompleted(const UInt64* files, const UInt64* bytes)
 {
 #ifdef DEBUG
   if (files && bytes) {
-    TRACE_P("[OpenCallback::SetTotal] files: %llu, bytes: %llu", *files, *bytes);
+    TRACE_THIS("[OpenCallback::SetTotal] files: %llu, bytes: %llu", *files, *bytes);
   } else if (files) {
-    TRACE_P("[OpenCallback::SetTotal] files: %llu, bytes: NULL", *files);
+    TRACE_THIS("[OpenCallback::SetTotal] files: %llu, bytes: NULL", *files);
   } else if (bytes) {
-    TRACE_P("[OpenCallback::SetTotal] files: NULL, bytes: %llu", *bytes);
+    TRACE_THIS("[OpenCallback::SetTotal] files: NULL, bytes: %llu", *bytes);
   } else {
-    TRACE_P("[OpenCallback::SetTotal] files: NULL, bytes: NULL");
+    TRACE_THIS("[OpenCallback::SetTotal] files: NULL, bytes: NULL");
   }
 #endif
   return S_OK;
@@ -52,9 +52,9 @@ OpenCallback::SetCompleted(const UInt64* files, const UInt64* bytes)
 STDMETHODIMP
 OpenCallback::GetProperty(PROPID propID, PROPVARIANT* value)
 {
-  TRACE_P("[OpenCallback::GetProperty]");
+  TRACE_THIS("[OpenCallback::GetProperty]");
   if (propID != kpidName) {
-    TRACE_P("propID != kpidName");
+    TRACE_THIS("propID != kpidName");
     return E_NOTIMPL;
   }
 
@@ -66,10 +66,10 @@ OpenCallback::GetProperty(PROPID propID, PROPVARIANT* value)
   }
 
   if (value->bstrVal) {
-    TRACE_P("S_OK");
+    TRACE_THIS("S_OK");
     return S_OK;
   } else {
-    TRACE_P("E_OUTOFMEMORY");
+    TRACE_THIS("E_OUTOFMEMORY");
     return E_OUTOFMEMORY;
   }
 }
@@ -77,7 +77,7 @@ OpenCallback::GetProperty(PROPID propID, PROPVARIANT* value)
 STDMETHODIMP
 OpenCallback::GetStream(const wchar_t* name, IInStream** inStream)
 {
-  TRACE_P("[OpenCallback::GetStream]");
+  TRACE_THIS("[OpenCallback::GetStream]");
 
   auto stream = m_streams->get_stream_by_name(name);
   if (stream) {
@@ -91,15 +91,15 @@ OpenCallback::GetStream(const wchar_t* name, IInStream** inStream)
 STDMETHODIMP
 OpenCallback::CryptoGetTextPassword(BSTR* password)
 {
-  TRACE_P("[OpenCallback::CryptoGetTextPassword]");
+  TRACE_THIS("[OpenCallback::CryptoGetTextPassword]");
 
   if (m_password) {
     *password = SysAllocStringLen(m_password->Ptr(), m_password->Len());
-    TRACE_P("S_OK");
+    TRACE_THIS("S_OK");
     return S_OK;
   }
 
-  TRACE_P("E_ABORT");
+  TRACE_THIS("E_ABORT");
   return E_ABORT;
 }
 

@@ -34,13 +34,13 @@ Canceler::New(Napi::Env _env, const char* task_name)
 Canceler::Canceler(const Napi::CallbackInfo& info)
   : Napi::ObjectWrap<Canceler>(info)
 {
-  TRACE_P("+ Canceler");
+  TRACE_THIS("+ Canceler");
   m_canceled.store(false);
 }
 
 Canceler::~Canceler()
 {
-  TRACE_P("- Canceler");
+  TRACE_THIS("- Canceler");
 }
 
 Napi::Value

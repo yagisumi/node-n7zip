@@ -23,14 +23,14 @@ SharedLocker::Init(Napi::Env env, Napi::Object tester)
 SharedLocker::SharedLocker(const Napi::CallbackInfo& info)
   : Napi::ObjectWrap<SharedLocker>(info)
 {
-  TRACE_P("+ SharedLocker");
+  TRACE_THIS("+ SharedLocker");
   auto self = info.This();
   m_self = Napi::Reference<Napi::Value>::New(self);
 }
 
 SharedLocker::~SharedLocker()
 {
-  TRACE_P("- SharedLocker");
+  TRACE_THIS("- SharedLocker");
 }
 
 Napi::Value

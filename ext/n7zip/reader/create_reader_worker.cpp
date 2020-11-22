@@ -9,7 +9,7 @@ CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
                                        Napi::Function callback)
   : m_arg(std::move(arg))
 {
-  TRACE_P("+ CreateReaderWorker");
+  TRACE_THIS("+ CreateReaderWorker");
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
@@ -26,17 +26,17 @@ CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
 
 CreateReaderWorker::~CreateReaderWorker()
 {
-  TRACE_P("- CreateReaderWorker");
+  TRACE_THIS("- CreateReaderWorker");
   m_thread.join();
 }
 
 void
 CreateReaderWorker::abort(std::unique_ptr<error>&& err)
 {
-  TRACE_P("[CreateReaderWorker::abort]");
+  TRACE_THIS("[CreateReaderWorker::abort]");
   m_err = std::move(err);
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
-  TRACE_P("napi_status: %d", r_status);
+  TRACE_THIS("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
@@ -45,12 +45,12 @@ CreateReaderWorker::finish(int fmt_index,
                            CMyComPtr<IInArchive>& archive,
                            CMyComPtr<IArchiveOpenCallback>& open_callback)
 {
-  TRACE_P("[CreateReaderWorker::finish]");
+  TRACE_THIS("[CreateReaderWorker::finish]");
   m_reader_args.fmt_index = fmt_index;
   m_reader_args.archive = archive;
   m_reader_args.open_callback = open_callback;
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
-  TRACE_P("napi_status: %d", r_status);
+  TRACE_THIS("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
@@ -78,11 +78,11 @@ CreateReaderWorker::execute()
   for (auto i : m_arg->formats) {
     CMyComPtr<IInArchive> archive;
     auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
-    TRACE_P("create_object > fmt: %d, r: %d", i, r);
+    TRACE_THIS("create_object > fmt: %d, r: %d", i, r);
     if (r == S_OK) {
-      TRACE_ADDR((IInArchive*)archive, "@ IInArchive");
+      TRACE_PTR((IInArchive*)archive, "@ IInArchive");
       auto r_open = archive->Open(first_stream, 0, open_callback);
-      TRACE_P("r_open: %d", r_open);
+      TRACE_THIS("r_open: %d", r_open);
       if (r_open == S_OK) {
         finish(i, archive, open_callback);
         return;
@@ -96,7 +96,7 @@ CreateReaderWorker::execute()
 void
 CreateReaderWorker::Finalize(Napi::Env, void*, CreateReaderWorker* self)
 {
-  TRACE_ADDR(self, "[CreateReaderWorker::Finalize]");
+  TRACE_PTR(self, "[CreateReaderWorker::Finalize]");
   delete self;
 }
 
@@ -105,7 +105,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
                                    Napi::Function jsCallback,
                                    CreateReaderWorker* self)
 {
-  TRACE_ADDR(self, "[CreateReaderWorker::InvokeCallback]");
+  TRACE_PTR(self, "[CreateReaderWorker::InvokeCallback]");
   try {
     if (self->m_err) {
       jsCallback.Call({ self->m_err->ERR(env) });
@@ -119,7 +119,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
       jsCallback.Call({ OK(env, reader_obj) });
     }
   } catch (...) {
-    TRACE_ADDR(self, "[CreateReaderWorker::InvokeCallback] catch ...");
+    TRACE_PTR(self, "[CreateReaderWorker::InvokeCallback] catch ...");
   }
 }
 

@@ -5,7 +5,7 @@ namespace n7zip {
 GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Function callback)
   : m_reader(reader)
 {
-  TRACE_P("+ GetPropertyInfoWorker");
+  TRACE_THIS("+ GetPropertyInfoWorker");
   reader->Ref();
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
@@ -23,9 +23,9 @@ GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi
 
 GetPropertyInfoWorker::~GetPropertyInfoWorker()
 {
-  TRACE_P("- GetPropertyInfoWorker");
+  TRACE_THIS("- GetPropertyInfoWorker");
   auto n = m_reader->Unref();
-  TRACE_P("m_ref: %u", n);
+  TRACE_THIS("m_ref: %u", n);
   m_thread.join();
 }
 
@@ -34,14 +34,14 @@ GetPropertyInfoWorker::execute()
 {
   m_info = m_reader->get_property_info();
   auto r_status = m_tsfn.BlockingCall(this, GetPropertyInfoWorker::InvokeCallback);
-  TRACE_P("napi_status: %d", r_status);
+  TRACE_THIS("napi_status: %d", r_status);
   m_tsfn.Release();
 }
 
 void
 GetPropertyInfoWorker::Finalize(Napi::Env, void*, GetPropertyInfoWorker* self)
 {
-  TRACE_ADDR(self, "[GetPropertyInfoWorker::Finalize]");
+  TRACE_PTR(self, "[GetPropertyInfoWorker::Finalize]");
   delete self;
 }
 
@@ -50,7 +50,7 @@ GetPropertyInfoWorker::InvokeCallback(Napi::Env env,
                                       Napi::Function jsCallback,
                                       GetPropertyInfoWorker* self)
 {
-  TRACE_ADDR(self, "[GetPropertyInfoWorker::InvokeCallback]");
+  TRACE_PTR(self, "[GetPropertyInfoWorker::InvokeCallback]");
   try {
     if (self->m_info) {
       auto prop_info = Napi::Object::New(env);

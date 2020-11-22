@@ -5,7 +5,7 @@ namespace n7zip {
 MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&& streams)
   : m_streams(std::move(streams))
 {
-  TRACE_P("+ MultiInStream");
+  TRACE_THIS("+ MultiInStream");
 
   UInt64 offset = 0;
   m_ranges.reserve(m_streams->size());
@@ -27,7 +27,7 @@ MultiInStream::MultiInStream(std::unique_ptr<std::vector<CMyComPtr<IInStream>>>&
 
 MultiInStream::~MultiInStream()
 {
-  TRACE_P("- MultiInStream");
+  TRACE_THIS("- MultiInStream");
 }
 
 result<IInStream>
@@ -56,11 +56,11 @@ MultiInStream::New(std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& 
 STDMETHODIMP
 MultiInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 {
-  TRACE_P("[MultiInStream::Seek] offset: %lld, seekOrigin: %u (%llu/%llu)",
-          offset,
-          seekOrigin,
-          m_position,
-          m_length);
+  TRACE_THIS("[MultiInStream::Seek] offset: %lld, seekOrigin: %u (%llu/%llu)",
+             offset,
+             seekOrigin,
+             m_position,
+             m_length);
 
   if (m_is_invalid) {
     return E_FAIL;
@@ -95,7 +95,7 @@ MultiInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64* newPosition)
 STDMETHODIMP
 MultiInStream::Read(void* data, UInt32 size, UInt32* processedSize)
 {
-  TRACE_P("[MultiInStream::Read] size: %u (%llu/%llu)", size, m_position, m_length);
+  TRACE_THIS("[MultiInStream::Read] size: %u (%llu/%llu)", size, m_position, m_length);
 
   if (m_is_invalid) {
     return E_FAIL;
@@ -125,14 +125,14 @@ MultiInStream::Read(void* data, UInt32 size, UInt32* processedSize)
 
   for (size_t i = 0; i < m_ranges.size(); i++) {
     auto& range = m_ranges.at(i);
-    TRACE_P("m_postion: %llu, i: %llu, %llu..%llu", m_position, i, range.begin, range.end);
+    TRACE_THIS("m_postion: %llu, i: %llu, %llu..%llu", m_position, i, range.begin, range.end);
     if ((range.begin <= m_position) && (m_position < range.end)) {
       UInt32 read_size = range.end - m_position;
       if (size < read_size) {
         read_size = size;
       }
 
-      TRACE_P("i: %llu, offset: %llu, size: %u, read_size: %u", i, offset, size, read_size);
+      TRACE_THIS("i: %llu, offset: %llu, size: %u, read_size: %u", i, offset, size, read_size);
 
       UInt32 processed_size = 0;
       auto& stream = m_streams->at(i);
@@ -144,7 +144,7 @@ MultiInStream::Read(void* data, UInt32 size, UInt32* processedSize)
       }
 
       auto r_read = stream->Read((char*)data + offset, read_size, &processed_size);
-      TRACE_P("read_size: %u, processed_size: %u", read_size, processed_size);
+      TRACE_THIS("read_size: %u, processed_size: %u", read_size, processed_size);
       if (r_read != S_OK || read_size != processed_size) {
         m_is_invalid = true;
         return E_FAIL;

@@ -53,18 +53,18 @@ Reader::New(Napi::Env _env,
 Reader::Reader(const Napi::CallbackInfo& info)
   : Napi::ObjectWrap<Reader>(info)
 {
-  TRACE_P("+ Reader");
+  TRACE_THIS("+ Reader");
 }
 
 Reader::~Reader()
 {
-  TRACE_P("- Reader");
+  TRACE_THIS("- Reader");
 }
 
 Napi::Value
 Reader::GetNumberOfItems(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::GetNumberOfItems]");
+  TRACE_THIS("[Reader::GetNumberOfItems]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_items);
@@ -76,7 +76,7 @@ Reader::GetNumberOfItems(const Napi::CallbackInfo& info)
 Napi::Value
 Reader::GetNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::GetNumberOfArchiveProperties]");
+  TRACE_THIS("[Reader::GetNumberOfArchiveProperties]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_arc_props);
@@ -88,7 +88,7 @@ Reader::GetNumberOfArchiveProperties(const Napi::CallbackInfo& info)
 Napi::Value
 Reader::GetNumberOfProperties(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::GetNumberOfProperties]");
+  TRACE_THIS("[Reader::GetNumberOfProperties]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_props);
@@ -100,7 +100,7 @@ Reader::GetNumberOfProperties(const Napi::CallbackInfo& info)
 Napi::Value
 Reader::IsClosed(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::IsClosed]");
+  TRACE_THIS("[Reader::IsClosed]");
   auto env = info.Env();
 
   if (m_archive) {
@@ -113,7 +113,7 @@ Reader::IsClosed(const Napi::CallbackInfo& info)
 Napi::Value
 Reader::Close(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::close]");
+  TRACE_THIS("[Reader::close]");
   auto env = info.Env();
 
   if (!m_archive) {
@@ -142,7 +142,7 @@ Reader::Close(const Napi::CallbackInfo& info)
 Napi::Value
 Reader::GetPropertyInfo(const Napi::CallbackInfo& info)
 {
-  TRACE_P("[Reader::GetPropertyInfo]");
+  TRACE_THIS("[Reader::GetPropertyInfo]");
   auto env = info.Env();
 
   if (!m_archive) {

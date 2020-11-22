@@ -9,7 +9,7 @@ namespace n7zip {
 Library::Library(TLIB lib)
   : m_lib(lib)
 {
-  TRACE_ADDR(m_lib, "+ Library::m_lib");
+  TRACE_PTR(m_lib, "+ Library::m_lib");
 
   this->CreateObject = MyGetProcAddress<Func_CreateObject>(m_lib, "CreateObject");
   GetNumberOfFormats = MyGetProcAddress<Func_GetNumberOfFormats>(m_lib, "GetNumberOfFormats");
@@ -43,7 +43,7 @@ Library::~Library()
 #else
     dlclose(m_lib);
 #endif
-    TRACE_ADDR(m_lib, "- Library::m_lib");
+    TRACE_PTR(m_lib, "- Library::m_lib");
     m_lib = NULL;
   }
 }
@@ -353,7 +353,7 @@ LibraryInfo::create_object(size_t fmt_index, const GUID* iid, void** outObject)
     auto& fmt = m_formats.at(fmt_index);
     auto& lib = m_libraries.at(fmt->LibIndex);
 
-    TRACE_P("fmt.ClassId: %s", GuidToString(&fmt->ClassId).c_str());
+    TRACE_THIS("fmt.ClassId: %s", GuidToString(&fmt->ClassId).c_str());
 
     return lib->CreateObject(&fmt->ClassId, iid, outObject);
   } else {

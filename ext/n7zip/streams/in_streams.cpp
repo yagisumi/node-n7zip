@@ -5,18 +5,18 @@ namespace n7zip {
 InStreams::InStreams(std::unique_ptr<UString>&& base_dir)
   : m_base_dir(std::move(base_dir))
 {
-  TRACE_P("+ InStreams");
+  TRACE_THIS("+ InStreams");
 }
 
 InStreams::~InStreams()
 {
-  TRACE_P("- InStreams");
+  TRACE_THIS("- InStreams");
 }
 
 std::unique_ptr<error>
 InStreams::append_streams(std::unique_ptr<std::vector<std::unique_ptr<InStreamArg>>>&& streams)
 {
-  TRACE_P("[InStreams::append_streams]");
+  TRACE_THIS("[InStreams::append_streams]");
   for (auto& stream : *streams) {
     auto r_stream = stream->createInStream();
     if (r_stream.err()) {
@@ -49,7 +49,7 @@ InStreams::append(std::unique_ptr<UString>&& name, CMyComPtr<IInStream>& stream)
 CMyComPtr<IInStream>
 InStreams::get_stream_by_name(const wchar_t* name)
 {
-  TRACE_P("[InStreams::get_stream_by_name]");
+  TRACE_THIS("[InStreams::get_stream_by_name]");
   CMyComPtr<IInStream> ret;
   for (auto& stream : m_streams) {
     if (stream.name && *stream.name == name) {
@@ -60,7 +60,7 @@ InStreams::get_stream_by_name(const wchar_t* name)
 
   ret = load_stream(name);
   if (ret) {
-    TRACE_P("loaded");
+    TRACE_THIS("loaded");
     append(std::make_unique<UString>(name), ret);
   }
 
@@ -70,7 +70,7 @@ InStreams::get_stream_by_name(const wchar_t* name)
 CMyComPtr<IInStream>
 InStreams::get_stream_by_index(size_t index)
 {
-  TRACE_P("[InStreams::get_stream_by_index]");
+  TRACE_THIS("[InStreams::get_stream_by_index]");
   CMyComPtr<IInStream> stream;
 
   if (index < m_streams.size()) {
@@ -94,7 +94,7 @@ InStreams::get_name(size_t index)
 IInStream*
 InStreams::load_stream(const wchar_t* name)
 {
-  TRACE_P("[InStreams::load_stream]");
+  TRACE_THIS("[InStreams::load_stream]");
   UString ustr;
   if (m_base_dir) {
     ustr += *m_base_dir;
