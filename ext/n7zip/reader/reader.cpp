@@ -48,10 +48,10 @@ Reader::close()
 std::unique_ptr<ReaderPropertyInfo>
 Reader::get_property_info()
 {
+  auto locked = lock();
   if (m_closed) {
     return std::unique_ptr<ReaderPropertyInfo>();
   }
-  auto locked = lock();
 
   auto info = std::make_unique<ReaderPropertyInfo>();
 
@@ -68,6 +68,51 @@ Reader::get_property_info()
   }
 
   return info;
+}
+
+std::vector<EntryProperty>
+Reader::get_archive_properties()
+{
+  std::vector<EntryProperty> props;
+
+  auto locked = lock();
+  if (m_closed) {
+    return props;
+  }
+
+  props.resize(m_num_of_arc_props);
+
+  for (UInt32 i = 0; i < m_num_of_arc_props; i++) {
+    VARTYPE ver_type;
+    CMyComBSTR2 name;
+    m_archive->GetArchivePropertyInfo(i, &name, &props[i].prop_id, &ver_type);
+    m_archive->GetArchiveProperty(props[i].prop_id, &props[i].prop);
+  }
+
+  return props;
+}
+
+std::vector<Entry>
+Reader::get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids)
+{
+  std::vector<Entry> entries;
+
+  auto locked = lock();
+  if (m_closed) {
+    return entries;
+  }
+
+  for (UInt32 i = start; i < end; i++) {
+    std::vector<EntryProperty> props(prop_ids.size());
+    for (size_t pidx = 0; pidx < prop_ids.size(); pidx++) {
+      props[pidx].prop_id = prop_ids[pidx];
+      m_archive->GetProperty(i, prop_ids[pidx], &props[pidx].prop);
+    }
+
+    entries.emplace_back(i, std::move(props));
+  }
+
+  return entries;
 }
 
 } // namespace n7zip

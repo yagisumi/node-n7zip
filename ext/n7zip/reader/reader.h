@@ -25,6 +25,30 @@ struct ReaderPropertyInfo
   std::vector<PropertyInfo> entry;
 };
 
+struct GetEntriesOption
+{
+  uint32_t limit;
+  uint32_t start;
+  uint32_t end;
+  std::vector<PROPID> prop_ids;
+};
+
+struct EntryProperty
+{
+  PROPID prop_id;
+  NWindows::NCOM::CPropVariant prop;
+};
+
+struct Entry
+{
+  UInt32 index;
+  std::vector<EntryProperty> props;
+  Entry(UInt32 index, std::vector<EntryProperty>&& props)
+    : index(index)
+    , props(std::move(props))
+  {}
+};
+
 class Reader
 {
   int m_fmt_index;
@@ -47,6 +71,8 @@ public:
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();
   std::unique_ptr<ReaderPropertyInfo> get_property_info();
+  std::vector<EntryProperty> get_archive_properties();
+  std::vector<Entry> get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids);
 };
 
 } // namespace n7zip
