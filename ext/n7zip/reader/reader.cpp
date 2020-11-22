@@ -159,7 +159,6 @@ Reader::getPropertyInfo(const Napi::CallbackInfo& info)
 
   auto callback = info[0].As<Napi::Function>();
 
-  auto self = info.This().ToObject();
   new GetPropertyInfoWorker(this, env, callback);
 
   return OK(env);
