@@ -57,6 +57,7 @@
                 "ext/n7zip/debug.cpp",
                 "ext/n7zip/guid.cpp",
                 "ext/n7zip/library.cpp",
+                "ext/n7zip/canceler.cpp",
                 "ext/n7zip/utils/string_utils.cpp",
                 "ext/n7zip/callbacks/open_callback.cpp",
                 "ext/n7zip/streams/fd_in_stream.cpp",
