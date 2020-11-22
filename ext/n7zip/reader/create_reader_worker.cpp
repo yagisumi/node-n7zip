@@ -1,17 +1,19 @@
 #include "create_reader_worker.h"
 #include "../library.h"
+#include "../streams/in_streams.h"
+#include "../callbacks/open_callback.h"
 
 namespace n7zip {
 CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
                                        Napi::Env env,
-                                       Napi::Function func)
+                                       Napi::Function callback)
   : m_arg(std::move(arg))
 {
   TRACE_P("+ CreateReaderWorker");
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
-    func,
+    callback,
     "CreateReaderWorker",
     0,
     1,
@@ -39,10 +41,14 @@ CreateReaderWorker::abort(std::unique_ptr<error>&& err)
 }
 
 void
-CreateReaderWorker::finish(std::unique_ptr<Reader>&& reader)
+CreateReaderWorker::finish(int fmt_index,
+                           CMyComPtr<IInArchive>& archive,
+                           CMyComPtr<IArchiveOpenCallback>& open_callback)
 {
   TRACE_P("[CreateReaderWorker::finish]");
-  m_reader = std::move(reader);
+  m_reader_args.fmt_index = fmt_index;
+  m_reader_args.archive = archive;
+  m_reader_args.open_callback = open_callback;
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
   TRACE_P("napi_status: %d", r_status);
   m_tsfn.Release();
@@ -78,7 +84,7 @@ CreateReaderWorker::execute()
       auto r_open = archive->Open(first_stream, 0, open_callback);
       TRACE_P("r_open: %d", r_open);
       if (r_open == S_OK) {
-        finish(std::make_unique<Reader>(i, archive, open_callback));
+        finish(i, archive, open_callback);
         return;
       }
     }
@@ -103,13 +109,14 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
   try {
     if (self->m_err) {
       jsCallback.Call({ self->m_err->ERR(env) });
-    } else if (!self->m_reader) {
+    } else if (!self->m_reader_args.archive || !self->m_reader_args.open_callback) {
       jsCallback.Call({ ERR(env, "Unexpected error") });
     } else {
-      auto wrap_obj = ReaderWrap::constructor.New({});
-      auto wrap = Napi::ObjectWrap<ReaderWrap>::Unwrap(wrap_obj);
-      wrap->m_reader = std::move(self->m_reader);
-      jsCallback.Call({ OK(env, wrap_obj) });
+      auto reader_obj = Reader::New(env,
+                                    self->m_reader_args.fmt_index,
+                                    self->m_reader_args.archive,
+                                    self->m_reader_args.open_callback);
+      jsCallback.Call({ OK(env, reader_obj) });
     }
   } catch (...) {
     TRACE_ADDR(self, "[CreateReaderWorker::InvokeCallback] catch ...");

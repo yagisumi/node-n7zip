@@ -1,18 +1,16 @@
 #include "get_property_info_worker.h"
 
 namespace n7zip {
-GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader,
-                                             Napi::Env env,
-                                             Napi::Object wrap,
-                                             Napi::Function func)
+
+GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Function callback)
   : m_reader(reader)
 {
   TRACE_P("+ GetPropertyInfoWorker");
-  m_ref = Napi::Persistent(wrap);
+  reader->Ref();
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
-    func,
+    callback,
     "GetPropertyInfoWorker",
     0,
     1,
@@ -26,7 +24,7 @@ GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader,
 GetPropertyInfoWorker::~GetPropertyInfoWorker()
 {
   TRACE_P("- GetPropertyInfoWorker");
-  auto n = m_ref.Unref();
+  auto n = m_reader->Unref();
   TRACE_P("m_ref: %u", n);
   m_thread.join();
 }

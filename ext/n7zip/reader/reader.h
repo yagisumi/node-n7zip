@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../common.h"
-#include "../callbacks/open_callback.h"
 
 namespace n7zip {
 
@@ -49,7 +48,7 @@ struct Entry
   {}
 };
 
-class Reader
+class Reader : public Napi::ObjectWrap<Reader>
 {
   int m_fmt_index;
   CMyComPtr<IInArchive> m_archive;
@@ -63,10 +62,22 @@ public:
   std::atomic<bool> m_closed;
   Napi::ObjectReference m_wrap;
 
-  Reader(int fmt_index,
-         CMyComPtr<IInArchive>& archive,
-         CMyComPtr<IArchiveOpenCallback>& open_callback);
+  Reader(const Napi::CallbackInfo& info);
   ~Reader();
+
+  static Napi::FunctionReference constructor;
+  static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  static Napi::Object New(Napi::Env _env,
+                          int fmt_index,
+                          CMyComPtr<IInArchive>& archive,
+                          CMyComPtr<IArchiveOpenCallback>& open_callback);
+
+  Napi::Value isClosed(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfItems(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfArchiveProperties(const Napi::CallbackInfo& info);
+  Napi::Value getNumberOfProperties(const Napi::CallbackInfo& info);
+  Napi::Value close(const Napi::CallbackInfo& info);
+  Napi::Value getPropertyInfo(const Napi::CallbackInfo& info);
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();

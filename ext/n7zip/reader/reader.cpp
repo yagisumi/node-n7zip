@@ -1,27 +1,166 @@
 #include "reader.h"
+#include "close_worker.h"
+#include "get_property_info_worker.h"
 
 namespace n7zip {
 
-Reader::Reader(int fmt_index,
-               CMyComPtr<IInArchive>& archive,
-               CMyComPtr<IArchiveOpenCallback>& open_callback)
-  : m_fmt_index(fmt_index)
-  , m_archive(archive)
-  , m_open_callback(open_callback)
+Napi::FunctionReference Reader::constructor;
+
+Napi::Object
+Reader::Init(Napi::Env env, Napi::Object exports)
+{
+  auto func = DefineClass( //
+    env,
+    "Reader",
+    {
+      InstanceMethod("getNumberOfItems", &Reader::getNumberOfItems),
+      InstanceMethod("getNumberOfArchiveProperties", &Reader::getNumberOfArchiveProperties),
+      InstanceMethod("getNumberOfProperties", &Reader::getNumberOfProperties),
+      InstanceMethod("isClosed", &Reader::isClosed),
+      InstanceMethod("close", &Reader::close),
+      InstanceMethod("getPropertyInfo", &Reader::getPropertyInfo),
+    });
+
+  constructor = Napi::Persistent(func);
+  constructor.SuppressDestruct();
+
+  return exports;
+}
+
+Napi::Object
+Reader::New(Napi::Env _env,
+            int fmt_index,
+            CMyComPtr<IInArchive>& archive,
+            CMyComPtr<IArchiveOpenCallback>& open_callback)
+{
+  auto obj = constructor.New({});
+  auto self = Napi::ObjectWrap<Reader>::Unwrap(obj);
+
+  self->m_fmt_index = fmt_index;
+  self->m_archive = archive;
+  self->m_open_callback = open_callback;
+
+  self->m_archive->GetNumberOfItems(&self->m_num_of_items);
+  self->m_archive->GetNumberOfArchiveProperties(&self->m_num_of_arc_props);
+  self->m_archive->GetNumberOfProperties(&self->m_num_of_props);
+  self->m_closed.store(false);
+
+  return obj;
+}
+
+Reader::Reader(const Napi::CallbackInfo& info)
+  : Napi::ObjectWrap<Reader>(info)
 {
   TRACE_P("+ Reader");
-  m_archive->GetNumberOfItems(&m_num_of_items);
-  m_archive->GetNumberOfArchiveProperties(&m_num_of_arc_props);
-  m_archive->GetNumberOfProperties(&m_num_of_props);
-  m_closed.store(false);
 }
 
 Reader::~Reader()
 {
   TRACE_P("- Reader");
-  if (!m_closed.load()) {
-    close();
+}
+
+Napi::Value
+Reader::getNumberOfItems(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::getNumberOfItems]");
+  auto env = info.Env();
+  if (m_archive) {
+    return Napi::Number::New(env, m_num_of_items);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
   }
+}
+
+Napi::Value
+Reader::getNumberOfArchiveProperties(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::getNumberOfArchiveProperties]");
+  auto env = info.Env();
+  if (m_archive) {
+    return Napi::Number::New(env, m_num_of_arc_props);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
+  }
+}
+
+Napi::Value
+Reader::getNumberOfProperties(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::getNumberOfProperties]");
+  auto env = info.Env();
+  if (m_archive) {
+    return Napi::Number::New(env, m_num_of_props);
+  } else { // unexpected
+    return Napi::Number::New(env, 0);
+  }
+}
+
+Napi::Value
+Reader::isClosed(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::isClosed]");
+  auto env = info.Env();
+
+  if (m_archive) {
+    return Napi::Boolean::New(env, m_closed.load());
+  } else {
+    return Napi::Boolean::New(env, true);
+  }
+}
+
+Napi::Value
+Reader::close(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::close]");
+  auto env = info.Env();
+
+  if (!m_archive) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (info.Length() == 0 || !(info[0].IsFunction())) {
+    return ERR(env, "No callback function was given");
+  }
+
+  auto callback = info[0].As<Napi::Function>();
+
+  if (m_closed.load()) {
+    try {
+      callback.Call({ OK(env) });
+    } catch (...) {
+    }
+    return OK(env);
+  }
+
+  new CloseWorker(this, env, callback);
+
+  return OK(env);
+}
+
+Napi::Value
+Reader::getPropertyInfo(const Napi::CallbackInfo& info)
+{
+  TRACE_P("[Reader::getPropertyInfo]");
+  auto env = info.Env();
+
+  if (!m_archive) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (m_closed.load()) {
+    return ERR(env, "Reader is already closed");
+  }
+
+  if (info.Length() == 0 || !(info[0].IsFunction())) {
+    return ERR(env, "No callback function was given");
+  }
+
+  auto callback = info[0].As<Napi::Function>();
+
+  auto self = info.This().ToObject();
+  new GetPropertyInfoWorker(this, env, callback);
+
+  return OK(env);
 }
 
 std::unique_lock<std::recursive_mutex>

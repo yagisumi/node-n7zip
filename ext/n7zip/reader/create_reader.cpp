@@ -1,7 +1,6 @@
 #include "create_reader.h"
 #include "create_reader_args.h"
 #include "create_reader_worker.h"
-#include "reader_wrap.h"
 
 namespace n7zip {
 
@@ -35,7 +34,7 @@ createReader(const Napi::CallbackInfo& info)
 Napi::Object
 InitReader(Napi::Env env, Napi::Object exports)
 {
-  ReaderWrap::Init(env, exports);
+  Reader::Init(env, exports);
   exports.Set("createReader", Napi::Function::New(env, createReader));
 
   return exports;

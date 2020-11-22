@@ -67,7 +67,6 @@
                 "ext/n7zip/reader/create_reader.cpp",
                 "ext/n7zip/reader/create_reader_args.cpp",
                 "ext/n7zip/reader/create_reader_worker.cpp",
-                "ext/n7zip/reader/reader_wrap.cpp",
                 "ext/n7zip/reader/reader.cpp",
                 "ext/n7zip/reader/close_worker.cpp",
                 "ext/n7zip/reader/get_property_info_worker.cpp",

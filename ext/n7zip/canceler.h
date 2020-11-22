@@ -13,7 +13,7 @@ public:
   ~Canceler();
   static Napi::FunctionReference constructor;
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
-  static Napi::Object New(Napi::Env env, const char* task_name);
+  static Napi::Object New(Napi::Env _env, const char* task_name);
 
   Napi::Value cancel(const Napi::CallbackInfo& info);
   Napi::Value taskName(const Napi::CallbackInfo& info);

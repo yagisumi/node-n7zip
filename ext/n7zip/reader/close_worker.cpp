@@ -2,15 +2,15 @@
 
 namespace n7zip {
 
-CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi::Function func)
+CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Function callback)
   : m_reader(reader)
 {
   TRACE_P("+ CloseWorker");
-  m_ref = Napi::Persistent(wrap);
+  m_reader->Ref();
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
-    func,
+    callback,
     "CloseWorker",
     0,
     1,
@@ -24,7 +24,7 @@ CloseWorker::CloseWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi:
 CloseWorker::~CloseWorker()
 {
   TRACE_P("- CloseWorker");
-  auto n = m_ref.Unref();
+  auto n = m_reader->Unref();
   TRACE_P("m_ref: %u", n);
   m_thread.join();
 }

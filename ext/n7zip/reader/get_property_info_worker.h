@@ -8,13 +8,12 @@ namespace n7zip {
 class GetPropertyInfoWorker
 {
   Napi::ThreadSafeFunction m_tsfn;
-  Napi::ObjectReference m_ref;
   std::thread m_thread;
   Reader* m_reader;
   std::unique_ptr<ReaderPropertyInfo> m_info;
 
 public:
-  GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Object wrap, Napi::Function func);
+  GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Function callback);
   ~GetPropertyInfoWorker();
 
   void execute();
