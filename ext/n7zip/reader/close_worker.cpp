@@ -6,7 +6,8 @@ CloseWorker::CloseWorker(Napi::Env env, Napi::Function callback, Reader* reader)
   : m_reader(reader)
 {
   TRACE_THIS("+ CloseWorker");
-  m_reader->Ref();
+  auto n = m_reader->Ref();
+  TRACE_THIS("m_reader->Ref(): %u", n);
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
@@ -25,7 +26,7 @@ CloseWorker::~CloseWorker()
 {
   TRACE_THIS("- CloseWorker");
   auto n = m_reader->Unref();
-  TRACE_THIS("m_ref: %u", n);
+  TRACE_THIS("m_reader->Unref(): %u", n);
   m_thread.join();
 }
 

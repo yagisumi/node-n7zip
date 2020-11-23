@@ -6,7 +6,8 @@ GetPropertyInfoWorker::GetPropertyInfoWorker(Napi::Env env, Napi::Function callb
   : m_reader(reader)
 {
   TRACE_THIS("+ GetPropertyInfoWorker");
-  reader->Ref();
+  auto n = m_reader->Ref();
+  TRACE_THIS("m_reader->Ref(): %u", n);
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
@@ -25,7 +26,7 @@ GetPropertyInfoWorker::~GetPropertyInfoWorker()
 {
   TRACE_THIS("- GetPropertyInfoWorker");
   auto n = m_reader->Unref();
-  TRACE_THIS("m_ref: %u", n);
+  TRACE_THIS("m_reader->Unref(): %u", n);
   m_thread.join();
 }
 
