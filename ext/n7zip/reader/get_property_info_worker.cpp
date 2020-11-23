@@ -2,7 +2,7 @@
 
 namespace n7zip {
 
-GetPropertyInfoWorker::GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Function callback)
+GetPropertyInfoWorker::GetPropertyInfoWorker(Napi::Env env, Napi::Function callback, Reader* reader)
   : m_reader(reader)
 {
   TRACE_THIS("+ GetPropertyInfoWorker");

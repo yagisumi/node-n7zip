@@ -134,7 +134,7 @@ Reader::Close(const Napi::CallbackInfo& info)
     return OK(env);
   }
 
-  new CloseWorker(this, env, callback);
+  new CloseWorker(env, callback, this);
 
   return OK(env);
 }
@@ -159,7 +159,7 @@ Reader::GetPropertyInfo(const Napi::CallbackInfo& info)
 
   auto callback = info[0].As<Napi::Function>();
 
-  new GetPropertyInfoWorker(this, env, callback);
+  new GetPropertyInfoWorker(env, callback, this);
 
   return OK(env);
 }
@@ -269,6 +269,8 @@ createReader(const Napi::CallbackInfo& info)
     return TYPE_ERR(env, "The second argument must be callback function");
   }
 
+  auto callback = info[1].As<Napi::Function>();
+
   auto arg = info[0].ToObject();
   auto result = buildCreateReaderArg(arg);
   if (result.err()) {
@@ -277,7 +279,7 @@ createReader(const Napi::CallbackInfo& info)
     return ERR(env, "Unexpected error");
   }
 
-  new CreateReaderWorker(result.move_ok(), env, info[1].As<Napi::Function>());
+  new CreateReaderWorker(env, callback, result.move_ok());
 
   return OK(env);
 }

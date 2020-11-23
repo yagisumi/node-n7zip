@@ -13,7 +13,7 @@ class GetPropertyInfoWorker
   std::unique_ptr<ReaderPropertyInfo> m_info;
 
 public:
-  GetPropertyInfoWorker(Reader* reader, Napi::Env env, Napi::Function callback);
+  GetPropertyInfoWorker(Napi::Env env, Napi::Function callback, Reader* reader);
   ~GetPropertyInfoWorker();
 
   void execute();

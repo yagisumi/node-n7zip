@@ -4,9 +4,9 @@
 #include "../callbacks/open_callback.h"
 
 namespace n7zip {
-CreateReaderWorker::CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
-                                       Napi::Env env,
-                                       Napi::Function callback)
+CreateReaderWorker::CreateReaderWorker(Napi::Env env,
+                                       Napi::Function callback,
+                                       std::unique_ptr<CreateReaderArg>&& arg)
   : m_arg(std::move(arg))
 {
   TRACE_THIS("+ CreateReaderWorker");

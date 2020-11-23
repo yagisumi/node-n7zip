@@ -13,7 +13,7 @@ class CloseWorker
   HRESULT m_result = S_FALSE;
 
 public:
-  CloseWorker(Reader* reader, Napi::Env env, Napi::Function callback);
+  CloseWorker(Napi::Env env, Napi::Function callback, Reader* reader);
   ~CloseWorker();
 
   void execute();

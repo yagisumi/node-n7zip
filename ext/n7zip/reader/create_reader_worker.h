@@ -22,9 +22,9 @@ class CreateReaderWorker
   std::unique_ptr<error> m_err;
 
 public:
-  CreateReaderWorker(std::unique_ptr<CreateReaderArg>&& arg,
-                     Napi::Env env,
-                     Napi::Function callback);
+  CreateReaderWorker(Napi::Env env,
+                     Napi::Function callback,
+                     std::unique_ptr<CreateReaderArg>&& arg);
   ~CreateReaderWorker();
 
   void abort(std::unique_ptr<error>&& err);
