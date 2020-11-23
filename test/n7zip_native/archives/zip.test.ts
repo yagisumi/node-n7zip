@@ -126,21 +126,24 @@ describe('n7zip_native/archives/zip', function () {
             process.nextTick(() => {
               console.dir(r_info2, { depth: null })
 
-              const r_arc_props1 = reader.getArchiveProperties((r_arc_props2) => {
-                process.nextTick(() => {
-                  console.dir(r_arc_props2, { depth: null })
+              const r_arc_props1 = reader.getArchiveProperties(
+                { propIDs: [36, 44] },
+                (r_arc_props2) => {
+                  process.nextTick(() => {
+                    console.dir(r_arc_props2, { depth: null })
 
-                  const r_close1 = reader.close((r_close2) => {
-                    process.nextTick(() => {
-                      expect(r_close2.error).toBeUndefined()
-                      expect(r_close2.ok).toBe(true)
-                      done()
+                    const r_close1 = reader.close((r_close2) => {
+                      process.nextTick(() => {
+                        expect(r_close2.error).toBeUndefined()
+                        expect(r_close2.ok).toBe(true)
+                        done()
+                      })
                     })
+                    expect(r_close1.error).toBeUndefined()
+                    expect(r_close1.ok).toBe(true)
                   })
-                  expect(r_close1.error).toBeUndefined()
-                  expect(r_close1.ok).toBe(true)
-                })
-              })
+                }
+              )
               expect(r_arc_props1.error).toBeUndefined()
               expect(r_arc_props1.ok).toBe(true)
             })

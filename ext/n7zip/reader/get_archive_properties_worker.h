@@ -10,10 +10,14 @@ class GetArchivePropertiesWorker
   Napi::ThreadSafeFunction m_tsfn;
   std::thread m_thread;
   Reader* m_reader;
+  std::unique_ptr<std::vector<PROPID>> m_prop_ids;
   std::vector<EntryProperty> m_result;
 
 public:
-  GetArchivePropertiesWorker(Napi::Env env, Napi::Function callback, Reader* reader);
+  GetArchivePropertiesWorker(Napi::Env env,
+                             Napi::Function callback,
+                             Reader* reader,
+                             std::unique_ptr<std::vector<PROPID>>&& prop_id);
   ~GetArchivePropertiesWorker();
 
   void execute();

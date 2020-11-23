@@ -7,6 +7,24 @@
 
 namespace n7zip {
 
+static std::unique_ptr<std::vector<PROPID>>
+get_prop_ids(Napi::Array ary)
+{
+  auto prop_ids = std::make_unique<std::vector<PROPID>>();
+
+  for (uint32_t i = 0; i < ary.Length(); i++) {
+    auto v = ary.Get(i);
+    if (v.IsNumber()) {
+      auto num = v.ToNumber().Int32Value();
+      if (num >= 0) {
+        prop_ids->push_back(num);
+      }
+    }
+  }
+
+  return prop_ids;
+}
+
 Napi::FunctionReference Reader::constructor;
 
 Napi::Object
@@ -180,13 +198,28 @@ Reader::GetArchiveProperties(const Napi::CallbackInfo& info)
     return ERR(env, "Reader is already closed");
   }
 
-  if (info.Length() == 0 || !(info[0].IsFunction())) {
-    return ERR(env, "No callback function was given");
+  if (info.Length() < 2) {
+    return ERR(env, "The arguments must be Object and callback function");
   }
 
-  auto callback = info[0].As<Napi::Function>();
+  if (info[0].IsArray() || !info[0].IsObject()) {
+    return ERR(env, "The first arguments must be Object");
+  }
 
-  new GetArchivePropertiesWorker(env, callback, this);
+  if (!info[1].IsFunction()) {
+    return ERR(env, "The second arguments must be callback function");
+  }
+
+  std::unique_ptr<std::vector<PROPID>> prop_ids;
+  auto opts = info[0].ToObject();
+  auto callback = info[1].As<Napi::Function>();
+
+  auto prop_ary = opts.Get("propIDs");
+  if (prop_ary.IsArray()) {
+    prop_ids = get_prop_ids(prop_ary.As<Napi::Array>());
+  }
+
+  new GetArchivePropertiesWorker(env, callback, this, std::move(prop_ids));
 
   return OK(env);
 }
@@ -238,7 +271,7 @@ Reader::get_property_info()
 }
 
 std::vector<EntryProperty>
-Reader::get_archive_properties()
+Reader::get_archive_properties(std::unique_ptr<std::vector<PROPID>>& prop_ids)
 {
   std::vector<EntryProperty> props;
 
@@ -247,19 +280,21 @@ Reader::get_archive_properties()
     return props;
   }
 
-  props.resize(m_num_of_arc_props);
+  if (!prop_ids) {
+    prop_ids = std::make_unique<std::vector<PROPID>>();
+    prop_ids->resize(m_num_of_arc_props);
+    for (UInt32 i = 0; i < m_num_of_arc_props; i++) {
+      VARTYPE ver_type;
+      CMyComBSTR2 name;
+      m_archive->GetArchivePropertyInfo(i, &name, &(*prop_ids)[i], &ver_type);
+    }
+  }
 
-  for (UInt32 i = 0; i < m_num_of_arc_props; i++) {
-    VARTYPE ver_type;
-    CMyComBSTR2 name;
+  props.resize(prop_ids->size());
+  for (size_t i = 0; i < prop_ids->size(); i++) {
     auto& prop = props[i];
-    PROPVARIANT prop2 = { 0 };
-    // props[i].prop_id = i + 1;
-    m_archive->GetArchivePropertyInfo(i, &name, &prop.prop_id, &ver_type);
-    auto r = m_archive->GetArchiveProperty(prop.prop_id, &prop.prop);
-    TRACE("r: %d, prop_id: %d, ver_type: %d, vt: %d", r, prop.prop_id, ver_type, prop.prop.vt);
-    auto r2 = m_archive->GetArchiveProperty(props[i].prop_id, &prop2);
-    TRACE("r2: %d, prop_id: %d, vt: %d", r2, props[i].prop_id, prop2.vt);
+    prop.prop_id = (*prop_ids)[i];
+    m_archive->GetArchiveProperty(prop.prop_id, &prop.prop);
   }
 
   return props;

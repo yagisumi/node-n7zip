@@ -2,10 +2,13 @@
 
 namespace n7zip {
 
-GetArchivePropertiesWorker::GetArchivePropertiesWorker(Napi::Env env,
-                                                       Napi::Function callback,
-                                                       Reader* reader)
+GetArchivePropertiesWorker::GetArchivePropertiesWorker(
+  Napi::Env env,
+  Napi::Function callback,
+  Reader* reader,
+  std::unique_ptr<std::vector<PROPID>>&& prop_id)
   : m_reader(reader)
+  , m_prop_ids(std::move(prop_id))
 {
   TRACE_THIS("+ GetArchivePropertiesWorker");
   auto n = m_reader->Ref();
@@ -35,7 +38,7 @@ GetArchivePropertiesWorker::~GetArchivePropertiesWorker()
 void
 GetArchivePropertiesWorker::execute()
 {
-  m_result = m_reader->get_archive_properties();
+  m_result = m_reader->get_archive_properties(m_prop_ids);
   auto r_status = m_tsfn.BlockingCall(this, GetArchivePropertiesWorker::InvokeCallback);
   TRACE_THIS("napi_status: %d", r_status);
   m_tsfn.Release();
@@ -56,19 +59,15 @@ GetArchivePropertiesWorker::InvokeCallback(Napi::Env env,
   TRACE_PTR(self, "[GetArchivePropertiesWorker::InvokeCallback]");
   try {
     auto length = self->m_result.size();
-    if (length == self->m_reader->m_num_of_arc_props) {
-      auto prop_ary = Napi::Array::New(env, length);
-      for (size_t i = 0; i < length; i++) {
-        auto& prop = self->m_result[i];
-        auto prop_obj = Napi::Object::New(env);
-        prop_obj.Set("id", Napi::Number::New(env, prop.prop_id));
-        prop_obj.Set("value", ConvertPropVariant(env, prop.prop));
-        prop_ary.Set(i, prop_obj);
-      }
-      jsCallback.Call({ OK(env, prop_ary) });
-    } else {
-      jsCallback.Call({ ERR(env, "Failed to get_archive_properties") });
+    auto prop_ary = Napi::Array::New(env, length);
+    for (size_t i = 0; i < length; i++) {
+      auto& prop = self->m_result[i];
+      auto prop_obj = Napi::Object::New(env);
+      prop_obj.Set("id", Napi::Number::New(env, prop.prop_id));
+      prop_obj.Set("value", ConvertPropVariant(env, prop.prop));
+      prop_ary.Set(i, prop_obj);
     }
+    jsCallback.Call({ OK(env, prop_ary) });
   } catch (...) {
   }
 }
