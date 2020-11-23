@@ -22,7 +22,7 @@ Canceler::Init(Napi::Env env, Napi::Object exports)
 }
 
 Napi::Object
-Canceler::New(Napi::Env _env, const char* task_name)
+Canceler::New(Napi::Env, const char* task_name)
 {
   auto obj = constructor.New({});
   auto self = Napi::ObjectWrap<Canceler>::Unwrap(obj);

@@ -67,7 +67,7 @@ public:
 
   static Napi::FunctionReference constructor;
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
-  static Napi::Object New(Napi::Env _env,
+  static Napi::Object New(Napi::Env,
                           int fmt_index,
                           CMyComPtr<IInArchive>& archive,
                           CMyComPtr<IArchiveOpenCallback>& open_callback);

@@ -30,7 +30,7 @@ Reader::Init(Napi::Env env, Napi::Object exports)
 }
 
 Napi::Object
-Reader::New(Napi::Env _env,
+Reader::New(Napi::Env,
             int fmt_index,
             CMyComPtr<IInArchive>& archive,
             CMyComPtr<IArchiveOpenCallback>& open_callback)
