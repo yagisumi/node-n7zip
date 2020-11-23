@@ -78,6 +78,7 @@ public:
   Napi::Value GetNumberOfProperties(const Napi::CallbackInfo& info);
   Napi::Value Close(const Napi::CallbackInfo& info);
   Napi::Value GetPropertyInfo(const Napi::CallbackInfo& info);
+  Napi::Value GetArchiveProperties(const Napi::CallbackInfo& info);
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();

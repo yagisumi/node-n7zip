@@ -4,3 +4,4 @@
 #include "other_utils.h"
 #include "result_js.h"
 #include "result.h"
+#include "variant_utils.h"

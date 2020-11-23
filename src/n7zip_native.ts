@@ -57,6 +57,11 @@ export type ReaderPropertyInfo = {
   entry: PropertyInfo[]
 }
 
+type Prop = {
+  id: number
+  value: number | string | boolean | undefined
+}
+
 export declare class Reader {
   getNumberOfItems(): number
   getNumberOfArchiveProperties(): number
@@ -64,6 +69,7 @@ export declare class Reader {
   isClosed(): boolean
   close(cb: (r: Result<undefined>) => void): Result<undefined>
   getPropertyInfo(cb: (r: Result<ReaderPropertyInfo>) => void): Result<undefined>
+  getArchiveProperties(cb: (r: Result<Array<Prop>>) => void): Result<undefined>
 }
 
 export interface n7zipNativeType {

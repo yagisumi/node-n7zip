@@ -3,6 +3,7 @@
 #include "create_reader_worker.h"
 #include "close_worker.h"
 #include "get_property_info_worker.h"
+#include "get_archive_properties_worker.h"
 
 namespace n7zip {
 
@@ -21,6 +22,7 @@ Reader::Init(Napi::Env env, Napi::Object exports)
       InstanceMethod("isClosed", &Reader::IsClosed),
       InstanceMethod("close", &Reader::Close),
       InstanceMethod("getPropertyInfo", &Reader::GetPropertyInfo),
+      InstanceMethod("getArchiveProperties", &Reader::GetArchiveProperties),
     });
 
   constructor = Napi::Persistent(func);
@@ -164,6 +166,31 @@ Reader::GetPropertyInfo(const Napi::CallbackInfo& info)
   return OK(env);
 }
 
+Napi::Value
+Reader::GetArchiveProperties(const Napi::CallbackInfo& info)
+{
+  TRACE_THIS("[Reader::GetArchiveProperties]");
+  auto env = info.Env();
+
+  if (!m_archive) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (m_closed.load()) {
+    return ERR(env, "Reader is already closed");
+  }
+
+  if (info.Length() == 0 || !(info[0].IsFunction())) {
+    return ERR(env, "No callback function was given");
+  }
+
+  auto callback = info[0].As<Napi::Function>();
+
+  new GetArchivePropertiesWorker(env, callback, this);
+
+  return OK(env);
+}
+
 std::unique_lock<std::recursive_mutex>
 Reader::lock()
 {
@@ -225,8 +252,14 @@ Reader::get_archive_properties()
   for (UInt32 i = 0; i < m_num_of_arc_props; i++) {
     VARTYPE ver_type;
     CMyComBSTR2 name;
-    m_archive->GetArchivePropertyInfo(i, &name, &props[i].prop_id, &ver_type);
-    m_archive->GetArchiveProperty(props[i].prop_id, &props[i].prop);
+    auto& prop = props[i];
+    PROPVARIANT prop2 = { 0 };
+    // props[i].prop_id = i + 1;
+    m_archive->GetArchivePropertyInfo(i, &name, &prop.prop_id, &ver_type);
+    auto r = m_archive->GetArchiveProperty(prop.prop_id, &prop.prop);
+    TRACE("r: %d, prop_id: %d, ver_type: %d, vt: %d", r, prop.prop_id, ver_type, prop.prop.vt);
+    auto r2 = m_archive->GetArchiveProperty(props[i].prop_id, &prop2);
+    TRACE("r2: %d, prop_id: %d, vt: %d", r2, props[i].prop_id, prop2.vt);
   }
 
   return props;
