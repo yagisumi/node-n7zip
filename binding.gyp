@@ -75,6 +75,7 @@
                 "ext/n7zip/reader/close_worker.cpp",
                 "ext/n7zip/reader/get_property_info_worker.cpp",
                 "ext/n7zip/reader/get_archive_properties_worker.cpp",
+                "ext/n7zip/reader/get_entries_worker.cpp",
 
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",

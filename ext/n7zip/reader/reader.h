@@ -79,12 +79,15 @@ public:
   Napi::Value Close(const Napi::CallbackInfo& info);
   Napi::Value GetPropertyInfo(const Napi::CallbackInfo& info);
   Napi::Value GetArchiveProperties(const Napi::CallbackInfo& info);
+  Napi::Value Reader::GetEntries(const Napi::CallbackInfo& info);
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();
   std::unique_ptr<ReaderPropertyInfo> get_property_info();
   std::vector<EntryProperty> get_archive_properties(std::unique_ptr<std::vector<PROPID>>& prop_ids);
-  std::vector<Entry> get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids);
+  std::vector<Entry> get_entries(UInt32 start,
+                                 UInt32 end,
+                                 std::unique_ptr<std::vector<PROPID>>& prop_ids);
 };
 
 Napi::Object

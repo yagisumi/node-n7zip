@@ -4,6 +4,8 @@
 #include "close_worker.h"
 #include "get_property_info_worker.h"
 #include "get_archive_properties_worker.h"
+#include "get_entries_worker.h"
+#include "../canceler.h"
 
 namespace n7zip {
 
@@ -41,6 +43,7 @@ Reader::Init(Napi::Env env, Napi::Object exports)
       InstanceMethod("close", &Reader::Close),
       InstanceMethod("getPropertyInfo", &Reader::GetPropertyInfo),
       InstanceMethod("getArchiveProperties", &Reader::GetArchiveProperties),
+      InstanceMethod("getEntries", &Reader::GetEntries),
     });
 
   constructor = Napi::Persistent(func);
@@ -217,11 +220,100 @@ Reader::GetArchiveProperties(const Napi::CallbackInfo& info)
   auto prop_ary = opts.Get("propIDs");
   if (prop_ary.IsArray()) {
     prop_ids = get_prop_ids(prop_ary.As<Napi::Array>());
+    if (prop_ids->empty()) {
+      return ERR(env, "No valid value for 'propIDs'");
+    }
   }
 
   new GetArchivePropertiesWorker(env, callback, this, std::move(prop_ids));
 
   return OK(env);
+}
+
+Napi::Value
+Reader::GetEntries(const Napi::CallbackInfo& info)
+{
+  TRACE_THIS("[Reader::GetEntries]");
+  auto env = info.Env();
+
+  if (!m_archive) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (m_closed.load()) {
+    return ERR(env, "Reader is already closed");
+  }
+
+  if (info.Length() < 2) {
+    return ERR(env, "The arguments must be Object and callback function");
+  }
+
+  if (info[0].IsArray() || !info[0].IsObject()) {
+    return ERR(env, "The first arguments must be Object");
+  }
+
+  if (!info[1].IsFunction()) {
+    return ERR(env, "The second arguments must be callback function");
+  }
+
+  UInt32 limit = 100;
+  UInt32 start = 0;
+  UInt32 end = m_num_of_items;
+  std::unique_ptr<std::vector<PROPID>> prop_ids;
+  auto opts = info[0].ToObject();
+  auto callback = info[1].As<Napi::Function>();
+
+  auto prop_ary = opts.Get("propIDs");
+  if (prop_ary.IsArray()) {
+    prop_ids = get_prop_ids(prop_ary.As<Napi::Array>());
+    if (prop_ids->empty()) {
+      return ERR(env, "No valid value for 'propIDs'");
+    }
+  }
+
+  auto limit_v = opts.Get("limit");
+  if (limit_v.IsNumber()) {
+    auto limit_num = limit_v.ToNumber().Int32Value();
+    if (limit_num > 0) {
+      limit = limit_num;
+    }
+  }
+
+  auto start_v = opts.Get("start");
+  if (start_v.IsNumber()) {
+    auto start_num = start_v.ToNumber().Int32Value();
+    if (0 < start_num && (UInt32)start_num < m_num_of_items) {
+      start = start_num;
+    } else {
+      return ERR(env,
+                 "'start' value is out of range (start: %d, min: 0, max: %d)",
+                 start_num,
+                 m_num_of_items - 1);
+    }
+  }
+
+  auto end_v = opts.Get("end");
+  if (end_v.IsNumber()) {
+    auto end_num = end_v.ToNumber().Int32Value();
+    if (0 < end_num && (UInt32)end_num <= m_num_of_items) {
+      end = end_num;
+    } else {
+      return ERR(
+        env, "'end' value is out of range (end: %d, min: 1, max: %u)", end_num, m_num_of_items);
+    }
+  }
+
+  if (start >= end) {
+    return ERR(env, "'start' must be less than 'end' (start: %u, end: %u)", start, end);
+  }
+
+  auto canceler_v = Canceler::New(env, "getEntries");
+  auto canceler = Napi::ObjectWrap<Canceler>::Unwrap(canceler_v);
+
+  new GetEntriesWorker(
+    env, callback, this, GetEntriesWorkerArgs(limit, start, end, std::move(prop_ids)), canceler);
+
+  return OK(env, canceler_v);
 }
 
 std::unique_lock<std::recursive_mutex>
@@ -301,8 +393,9 @@ Reader::get_archive_properties(std::unique_ptr<std::vector<PROPID>>& prop_ids)
 }
 
 std::vector<Entry>
-Reader::get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids)
+Reader::get_entries(UInt32 start, UInt32 end, std::unique_ptr<std::vector<PROPID>>& prop_ids)
 {
+  TRACE_THIS("[Reader::get_entries] start: %u, end: %u, prop_ids: %d", start, end, !!prop_ids);
   std::vector<Entry> entries;
 
   auto locked = lock();
@@ -310,11 +403,22 @@ Reader::get_entries(UInt32 start, UInt32 end, std::vector<PROPID>& prop_ids)
     return entries;
   }
 
+  if (!prop_ids) {
+    prop_ids = std::make_unique<std::vector<PROPID>>();
+    prop_ids->resize(m_num_of_props);
+
+    for (UInt32 i = 0; i < m_num_of_props; i++) {
+      VARTYPE ver_type;
+      CMyComBSTR2 name;
+      m_archive->GetPropertyInfo(i, &name, &(*prop_ids)[i], &ver_type);
+    }
+  }
+
   for (UInt32 i = start; i < end; i++) {
-    std::vector<EntryProperty> props(prop_ids.size());
-    for (size_t pidx = 0; pidx < prop_ids.size(); pidx++) {
-      props[pidx].prop_id = prop_ids[pidx];
-      m_archive->GetProperty(i, prop_ids[pidx], &props[pidx].prop);
+    std::vector<EntryProperty> props(prop_ids->size());
+    for (size_t pidx = 0; pidx < prop_ids->size(); pidx++) {
+      props[pidx].prop_id = (*prop_ids)[pidx];
+      m_archive->GetProperty(i, (*prop_ids)[pidx], &props[pidx].prop);
     }
 
     entries.emplace_back(i, std::move(props));

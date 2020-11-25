@@ -17,7 +17,7 @@ public:
   GetArchivePropertiesWorker(Napi::Env env,
                              Napi::Function callback,
                              Reader* reader,
-                             std::unique_ptr<std::vector<PROPID>>&& prop_id);
+                             std::unique_ptr<std::vector<PROPID>>&& prop_ids);
   ~GetArchivePropertiesWorker();
 
   void execute();

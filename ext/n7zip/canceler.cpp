@@ -46,6 +46,7 @@ Canceler::~Canceler()
 Napi::Value
 Canceler::Cancel(const Napi::CallbackInfo& info)
 {
+  TRACE_THIS("[Canceler::Cancel]");
   m_canceled.store(true);
 
   return info.Env().Undefined();

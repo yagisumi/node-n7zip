@@ -6,9 +6,9 @@ GetArchivePropertiesWorker::GetArchivePropertiesWorker(
   Napi::Env env,
   Napi::Function callback,
   Reader* reader,
-  std::unique_ptr<std::vector<PROPID>>&& prop_id)
+  std::unique_ptr<std::vector<PROPID>>&& prop_ids)
   : m_reader(reader)
-  , m_prop_ids(std::move(prop_id))
+  , m_prop_ids(std::move(prop_ids))
 {
   TRACE_THIS("+ GetArchivePropertiesWorker");
   auto n = m_reader->Ref();

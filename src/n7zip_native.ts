@@ -62,6 +62,18 @@ type Prop = {
   value: number | string | boolean | undefined
 }
 
+type GetEntriesOptions = {
+  limit?: number
+  start?: number
+  end?: number
+  propIDs?: number[]
+}
+
+declare class Canceler {
+  cancel(): void
+  get taskName(): string
+}
+
 export declare class Reader {
   getNumberOfItems(): number
   getNumberOfArchiveProperties(): number
@@ -73,6 +85,10 @@ export declare class Reader {
     opts: { propIDs?: number[] },
     cb: (r: Result<Array<Prop>>) => void
   ): Result<undefined>
+  getEntries(
+    opts: GetEntriesOptions,
+    cb: (r: Result<{ done: boolean; entries: { index: number; props: Prop[] } }>) => void
+  ): Result<Canceler>
 }
 
 export interface n7zipNativeType {
