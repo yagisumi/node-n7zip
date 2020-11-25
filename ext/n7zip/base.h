@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
   #define _WINSOCKAPI_
+  #define NOMINMAX
 #else
   #include <include_windows/windows.h>
   #include <myWindows/StdAfx.h>
