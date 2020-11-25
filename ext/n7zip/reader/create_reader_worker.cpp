@@ -42,11 +42,13 @@ CreateReaderWorker::abort(std::unique_ptr<error>&& err)
 
 void
 CreateReaderWorker::finish(int fmt_index,
+                           std::string& fmt_name,
                            CMyComPtr<IInArchive>& archive,
                            CMyComPtr<IArchiveOpenCallback>& open_callback)
 {
   TRACE_THIS("[CreateReaderWorker::finish]");
   m_reader_args.fmt_index = fmt_index;
+  m_reader_args.fmt_name = fmt_name;
   m_reader_args.archive = archive;
   m_reader_args.open_callback = open_callback;
   auto r_status = m_tsfn.BlockingCall(this, CreateReaderWorker::InvokeCallback);
@@ -84,7 +86,8 @@ CreateReaderWorker::execute()
       auto r_open = archive->Open(first_stream, 0, open_callback);
       TRACE_THIS("r_open: %d", r_open);
       if (r_open == S_OK) {
-        finish(i, archive, open_callback);
+        auto& name = g_library_info->get_format_name(i);
+        finish(i, name, archive, open_callback);
         return;
       }
     }
@@ -114,6 +117,7 @@ CreateReaderWorker::InvokeCallback(Napi::Env env,
     } else {
       auto reader_obj = Reader::New(env,
                                     self->m_reader_args.fmt_index,
+                                    std::move(self->m_reader_args.fmt_name),
                                     self->m_reader_args.archive,
                                     self->m_reader_args.open_callback);
       jsCallback.Call({ OK(env, reader_obj) });

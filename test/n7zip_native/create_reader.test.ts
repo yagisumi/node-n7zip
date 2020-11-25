@@ -31,18 +31,18 @@ describe('n7zip_native/create_reader', function () {
         if (r.ok) {
           const reader = r.value
 
-          expect(reader.getNumberOfItems()).toBe(29)
+          expect(reader.numberOfEntries).toBe(29)
 
           if (process.platform === 'win32') {
-            expect(reader.getNumberOfArchiveProperties()).toBe(8)
+            expect(reader.numberOfArchiveProperties).toBe(8)
           } else {
-            expect(reader.getNumberOfArchiveProperties()).toBe(7)
+            expect(reader.numberOfArchiveProperties).toBe(7)
           }
 
           if (process.platform === 'win32') {
-            expect(reader.getNumberOfProperties()).toBe(17)
+            expect(reader.numberOfProperties).toBe(17)
           } else {
-            expect(reader.getNumberOfProperties()).toBe(15)
+            expect(reader.numberOfProperties).toBe(15)
           }
 
           expect(reader.isClosed()).toBe(false)

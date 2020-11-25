@@ -82,7 +82,7 @@ describe('n7zip_native/archives/pe', function () {
           }
 
           const reader = r_reader.value
-          console.log(reader.getNumberOfItems())
+          console.log(reader.numberOfEntries)
 
           const r_close1 = reader.close((r_close2) => {
             process.nextTick(() => {

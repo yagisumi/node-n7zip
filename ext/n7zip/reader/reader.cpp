@@ -36,9 +36,12 @@ Reader::Init(Napi::Env env, Napi::Object exports)
     env,
     "Reader",
     {
-      InstanceMethod("getNumberOfItems", &Reader::GetNumberOfItems),
-      InstanceMethod("getNumberOfArchiveProperties", &Reader::GetNumberOfArchiveProperties),
-      InstanceMethod("getNumberOfProperties", &Reader::GetNumberOfProperties),
+      InstanceAccessor("formatIndex", &Reader::GetFormatIndex, nullptr),
+      InstanceAccessor("formatName", &Reader::GetFormatName, nullptr),
+      InstanceAccessor("numberOfEntries", &Reader::GetNumberOfEntries, nullptr),
+      InstanceAccessor("numberOfArchiveProperties", &Reader::GetNumberOfArchiveProperties, nullptr),
+      InstanceAccessor("numberOfProperties", &Reader::GetNumberOfProperties, nullptr),
+
       InstanceMethod("isClosed", &Reader::IsClosed),
       InstanceMethod("close", &Reader::Close),
       InstanceMethod("getPropertyInfo", &Reader::GetPropertyInfo),
@@ -55,6 +58,7 @@ Reader::Init(Napi::Env env, Napi::Object exports)
 Napi::Object
 Reader::New(Napi::Env,
             int fmt_index,
+            std::string&& fmt_name,
             CMyComPtr<IInArchive>& archive,
             CMyComPtr<IArchiveOpenCallback>& open_callback)
 {
@@ -62,6 +66,7 @@ Reader::New(Napi::Env,
   auto self = Napi::ObjectWrap<Reader>::Unwrap(obj);
 
   self->m_fmt_index = fmt_index;
+  self->m_fmt_name = std::move(fmt_name);
   self->m_archive = archive;
   self->m_open_callback = open_callback;
 
@@ -85,9 +90,21 @@ Reader::~Reader()
 }
 
 Napi::Value
-Reader::GetNumberOfItems(const Napi::CallbackInfo& info)
+Reader::GetFormatIndex(const Napi::CallbackInfo& info)
 {
-  TRACE_THIS("[Reader::GetNumberOfItems]");
+  return Napi::Number::New(info.Env(), m_fmt_index);
+}
+
+Napi::Value
+Reader::GetFormatName(const Napi::CallbackInfo& info)
+{
+  return Napi::String::New(info.Env(), m_fmt_name.c_str());
+}
+
+Napi::Value
+Reader::GetNumberOfEntries(const Napi::CallbackInfo& info)
+{
+  TRACE_THIS("[Reader::GetNumberOfEntries]");
   auto env = info.Env();
   if (m_archive) {
     return Napi::Number::New(env, m_num_of_items);

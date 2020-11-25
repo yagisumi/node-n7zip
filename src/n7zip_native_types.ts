@@ -107,9 +107,11 @@ export declare class Canceler {
 }
 
 export declare class Reader {
-  getNumberOfItems(): number
-  getNumberOfArchiveProperties(): number
-  getNumberOfProperties(): number
+  get formatIndex(): number
+  get formatName(): string
+  get numberOfEntries(): number
+  get numberOfArchiveProperties(): number
+  get numberOfProperties(): number
   isClosed(): boolean
   close(cb: (r: Result<undefined>) => void): Result<undefined>
   getPropertyInfo(cb: (r: Result<ReaderPropertyInfo>) => void): Result<undefined>

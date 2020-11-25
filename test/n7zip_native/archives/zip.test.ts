@@ -14,8 +14,9 @@ const streams: InStreamArg[] = [
   },
 ]
 
+const fmt_name = 'zip'
 const all_formats = n7zip_native.getFormats()
-const target_format = all_formats.filter((fmt) => fmt.name === 'zip').map((fmt) => fmt.index)
+const target_format = all_formats.filter((fmt) => fmt.name === fmt_name).map((fmt) => fmt.index)
 const incorrect_format = all_formats.filter((fmt) => fmt.name === '7z').map((fmt) => fmt.index)
 const format_ext = 'zip'
 
@@ -83,7 +84,9 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
+          expect(reader.numberOfEntries).toBe(num_of_items)
+          expect(reader.formatName).toBe(fmt_name)
+          expect(reader.formatIndex).toBe(target_format[0])
 
           const r_close1 = reader.close((r_close2) => {
             process.nextTick(() => {
@@ -121,7 +124,7 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
+          expect(reader.numberOfEntries).toBe(num_of_items)
 
           const result1 = reader.getPropertyInfo((result2) => {
             process.nextTick(() => {
@@ -149,7 +152,7 @@ describe('n7zip_native/archives/zip', function () {
     expect(r_cr.ok).toBe(true)
   })
 
-  test.only('getEntries', function (this: Context, done) {
+  test('getEntries', function (this: Context, done) {
     TRACE(this)
 
     const r_cr = n7zip_native.createReader(
@@ -168,10 +171,10 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
+          expect(reader.numberOfEntries).toBe(num_of_items)
+          console.log({ index: reader.formatIndex, name: reader.formatName })
 
-          const canceler = new n7zip_native.Canceler()
-          const result1 = reader.getEntries({ limit: 1, canceler }, (result2) => {
+          const result1 = reader.getEntries({}, (result2) => {
             process.nextTick(() => {
               console.dir(result2, { depth: null })
 
@@ -188,10 +191,6 @@ describe('n7zip_native/archives/zip', function () {
               }
             })
           })
-          if (result1.ok) {
-            canceler.cancel()
-          }
-          console.log(result1)
           expect(result1.error).toBeUndefined()
           expect(result1.ok).toBe(true)
         })
@@ -221,7 +220,7 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.getNumberOfItems()).toBe(num_of_items)
+          expect(reader.numberOfEntries).toBe(num_of_items)
 
           const result1 = reader.getArchiveProperties({}, (result2) => {
             process.nextTick(() => {
@@ -238,7 +237,6 @@ describe('n7zip_native/archives/zip', function () {
               expect(r_close1.ok).toBe(true)
             })
           })
-          console.log(result1)
           expect(result1.error).toBeUndefined()
           expect(result1.ok).toBe(true)
         })

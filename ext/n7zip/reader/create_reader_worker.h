@@ -9,6 +9,7 @@ namespace n7zip {
 struct ReaderArgs
 {
   int fmt_index;
+  std::string fmt_name;
   CMyComPtr<IInArchive> archive;
   CMyComPtr<IArchiveOpenCallback> open_callback;
 };
@@ -29,6 +30,7 @@ public:
 
   void abort(std::unique_ptr<error>&& err);
   void finish(int fmt_index,
+              std::string& fmt_name,
               CMyComPtr<IInArchive>& archive,
               CMyComPtr<IArchiveOpenCallback>& open_callback);
   void execute();

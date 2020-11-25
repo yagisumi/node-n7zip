@@ -51,6 +51,7 @@ struct Entry
 class Reader : public Napi::ObjectWrap<Reader>
 {
   int m_fmt_index;
+  std::string m_fmt_name;
   CMyComPtr<IInArchive> m_archive;
   CMyComPtr<IArchiveOpenCallback> m_open_callback;
   std::recursive_mutex m_mutex;
@@ -69,11 +70,14 @@ public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   static Napi::Object New(Napi::Env,
                           int fmt_index,
+                          std::string&& fmt_name,
                           CMyComPtr<IInArchive>& archive,
                           CMyComPtr<IArchiveOpenCallback>& open_callback);
 
+  Napi::Value GetFormatIndex(const Napi::CallbackInfo& info);
+  Napi::Value GetFormatName(const Napi::CallbackInfo& info);
   Napi::Value IsClosed(const Napi::CallbackInfo& info);
-  Napi::Value GetNumberOfItems(const Napi::CallbackInfo& info);
+  Napi::Value GetNumberOfEntries(const Napi::CallbackInfo& info);
   Napi::Value GetNumberOfArchiveProperties(const Napi::CallbackInfo& info);
   Napi::Value GetNumberOfProperties(const Napi::CallbackInfo& info);
   Napi::Value Close(const Napi::CallbackInfo& info);
