@@ -1,4 +1,5 @@
-import { n7zip_native, InStreamArg } from '@/n7zip_native'
+import { n7zip_native } from '@/n7zip_native'
+import { InStreamArg } from '@/n7zip_native_types'
 import path from 'path'
 import { TRACE } from '?/utils'
 
@@ -169,7 +170,8 @@ describe('n7zip_native/archives/zip', function () {
           const reader = r_reader.value
           expect(reader.getNumberOfItems()).toBe(num_of_items)
 
-          const result1 = reader.getEntries({ limit: 1 }, (result2) => {
+          const canceler = new n7zip_native.Canceler()
+          const result1 = reader.getEntries({ limit: 1, canceler }, (result2) => {
             process.nextTick(() => {
               console.dir(result2, { depth: null })
 
@@ -187,8 +189,6 @@ describe('n7zip_native/archives/zip', function () {
             })
           })
           if (result1.ok) {
-            const canceler = result1.value
-            console.log(canceler.taskName)
             canceler.cancel()
           }
           console.log(result1)

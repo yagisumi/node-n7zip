@@ -1,6 +1,6 @@
 import path from 'path'
 import { n7zip_native } from './n7zip_native'
-import { Format, Codec } from './n7zip_types'
+import { Format, Codec } from './n7zip_native_types'
 
 let formats: Readonly<Array<Readonly<Format>>> = []
 let codecs: Readonly<Array<Readonly<Codec>>> = []

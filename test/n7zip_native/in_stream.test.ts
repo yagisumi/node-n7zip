@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import { n7zip } from '@/n7zip'
-import { n7zip_native, SeekOrigin, InStreamWrap } from '@/n7zip_native'
+import { n7zip_native } from '@/n7zip_native'
+import { SeekOrigin, InStreamWrap } from '@/n7zip_native_types'
 import { TRACE } from '?/utils'
 
 const file = path.resolve(__dirname, '../files/in_stream.txt')

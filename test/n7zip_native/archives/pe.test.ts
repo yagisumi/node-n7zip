@@ -1,4 +1,5 @@
-import { n7zip_native, InStreamArg } from '@/n7zip_native'
+import { n7zip_native } from '@/n7zip_native'
+import { InStreamArg } from '@/n7zip_native_types'
 import path from 'path'
 import { TRACE } from '?/utils'
 
