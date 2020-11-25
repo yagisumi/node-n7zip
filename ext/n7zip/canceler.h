@@ -17,6 +17,9 @@ public:
 
   Napi::Value Cancel(const Napi::CallbackInfo& info);
   Napi::Value TaskName(const Napi::CallbackInfo& info);
+
+  inline void cancel() { m_canceled.store(true); }
+  inline bool is_canceled() { return m_canceled.load(); }
 };
 
 } // namespace n7zip

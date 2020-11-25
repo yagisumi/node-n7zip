@@ -18,6 +18,8 @@ Canceler::Init(Napi::Env env, Napi::Object exports)
   constructor = Napi::Persistent(func);
   constructor.SuppressDestruct();
 
+  exports.Set("Canceler", func);
+
   return exports;
 }
 
@@ -36,6 +38,11 @@ Canceler::Canceler(const Napi::CallbackInfo& info)
 {
   TRACE_THIS("+ Canceler");
   m_canceled.store(false);
+
+  if (info.Length() > 0 && info[0].IsString()) {
+    auto name = info[0].ToString().Utf8Value();
+    m_task_name = name;
+  }
 }
 
 Canceler::~Canceler()
@@ -47,7 +54,7 @@ Napi::Value
 Canceler::Cancel(const Napi::CallbackInfo& info)
 {
   TRACE_THIS("[Canceler::Cancel]");
-  m_canceled.store(true);
+  cancel();
 
   return info.Env().Undefined();
 }
