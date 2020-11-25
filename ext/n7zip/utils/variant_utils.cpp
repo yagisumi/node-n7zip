@@ -66,6 +66,12 @@ ConvertPropVariant(Napi::Env env, NWindows::NCOM::CPropVariant& prop)
   switch (prop.vt) {
     case VT_BSTR:
       return ConvertBStrToNapiString(env, prop.bstrVal);
+    case VT_FILETIME:
+      LARGE_INTEGER date;
+      date.HighPart = prop.filetime.dwHighDateTime;
+      date.LowPart = prop.filetime.dwLowDateTime;
+      date.QuadPart -= 116444736000000000LL;
+      return Napi::Number::New(env, date.QuadPart / 10000);
     case VT_NULL:
       return env.Null();
     case VT_I2:
