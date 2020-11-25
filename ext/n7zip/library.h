@@ -122,6 +122,7 @@ public:
   size_t get_formats_length();
   const std::unique_ptr<Format>& get_format(size_t idx);
   HRESULT create_object(size_t fmt_index, const GUID* iid, void** outObject);
+  std::string& get_format_name(size_t fmt_index);
 
 private:
   void load_formats(std::unique_ptr<Library>& library);
