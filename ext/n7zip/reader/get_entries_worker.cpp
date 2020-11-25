@@ -7,16 +7,17 @@ namespace n7zip {
 GetEntriesWorker::GetEntriesWorker(Napi::Env env,
                                    Napi::Function callback,
                                    Reader* reader,
-                                   GetEntriesWorkerArgs&& args,
-                                   Canceler* canceler)
+                                   GetEntriesArgs&& args)
   : m_reader(reader)
   , m_args(std::move(args))
-  , m_canceler(canceler)
 {
   TRACE_THIS("+ GetEntriesWorker");
   auto n = m_reader->Ref();
   TRACE_THIS("m_reader->Ref(): %u", n);
-  m_canceler->Ref();
+
+  if (m_args.canceler) {
+    m_args.canceler->Ref();
+  }
 
   m_tsfn = Napi::ThreadSafeFunction::New( //
     env,
@@ -36,7 +37,11 @@ GetEntriesWorker::~GetEntriesWorker()
   TRACE_THIS("- GetEntriesWorker");
   auto n = m_reader->Unref();
   TRACE_THIS("m_reader->Unref(): %u", n);
-  m_canceler->Unref();
+
+  if (m_args.canceler) {
+    m_args.canceler->Unref();
+  }
+
   m_thread.join();
 }
 
@@ -47,8 +52,8 @@ GetEntriesWorker::execute()
   auto lock = m_reader->lock();
 
   for (UInt32 i = m_args.start; i < m_args.end; i += m_args.limit) {
-    if (m_canceler->m_canceled.load()) {
-      auto r_status = m_tsfn.BlockingCall(this, GetEntriesWorker::InvokeCallbackERR);
+    if (m_args.canceler && m_args.canceler->is_canceled()) {
+      auto r_status = m_tsfn.BlockingCall(this, GetEntriesWorker::InvokeCallbackOnError);
       TRACE_THIS("napi_status: %d", r_status);
       break;
     }
@@ -60,7 +65,7 @@ GetEntriesWorker::execute()
     auto message_ptr =
       new GetEntriesMessage(m_reader->get_entries(i, end, m_args.prop_ids), done, this);
 
-    auto r_status = m_tsfn.BlockingCall(message_ptr, GetEntriesWorker::InvokeCallbackOK);
+    auto r_status = m_tsfn.BlockingCall(message_ptr, GetEntriesWorker::InvokeCallbackOnOK);
     TRACE_THIS("napi_status: %d", r_status);
     if (r_status != napi_ok) {
       delete message_ptr;
@@ -78,9 +83,9 @@ GetEntriesWorker::Finalize(Napi::Env, void*, GetEntriesWorker* self)
 }
 
 void
-GetEntriesWorker::InvokeCallbackOK(Napi::Env env,
-                                   Napi::Function jsCallback,
-                                   GetEntriesMessage* message_ptr)
+GetEntriesWorker::InvokeCallbackOnOK(Napi::Env env,
+                                     Napi::Function jsCallback,
+                                     GetEntriesMessage* message_ptr)
 {
   std::unique_ptr<GetEntriesMessage> message(message_ptr);
   TRACE_PTR(message->worker, "[GetEntriesWorker::InvokeCallback]");
@@ -126,9 +131,9 @@ GetEntriesWorker::InvokeCallbackOK(Napi::Env env,
 }
 
 void
-GetEntriesWorker::InvokeCallbackERR(Napi::Env env,
-                                    Napi::Function jsCallback,
-                                    GetEntriesWorker* self)
+GetEntriesWorker::InvokeCallbackOnError(Napi::Env env,
+                                        Napi::Function jsCallback,
+                                        GetEntriesWorker* self)
 {
   TRACE_PTR(self, "GetEntriesWorker::InvokeCallbackERR");
   try {

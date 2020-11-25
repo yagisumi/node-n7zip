@@ -260,6 +260,7 @@ Reader::GetEntries(const Napi::CallbackInfo& info)
   UInt32 start = 0;
   UInt32 end = m_num_of_items;
   std::unique_ptr<std::vector<PROPID>> prop_ids;
+
   auto opts = info[0].ToObject();
   auto callback = info[1].As<Napi::Function>();
 
@@ -307,13 +308,19 @@ Reader::GetEntries(const Napi::CallbackInfo& info)
     return ERR(env, "'start' must be less than 'end' (start: %u, end: %u)", start, end);
   }
 
-  auto canceler_v = Canceler::New(env, "getEntries");
-  auto canceler = Napi::ObjectWrap<Canceler>::Unwrap(canceler_v);
+  Canceler* canceler = nullptr;
+  auto canceler_v = opts.Get("canceler");
+  if (canceler_v.IsObject()) {
+    auto canceler_obj = canceler_v.ToObject();
+    if (canceler_obj.InstanceOf(Canceler::constructor.Value())) {
+      canceler = Napi::ObjectWrap<Canceler>::Unwrap(canceler_obj);
+    }
+  }
 
   new GetEntriesWorker(
-    env, callback, this, GetEntriesWorkerArgs(limit, start, end, std::move(prop_ids)), canceler);
+    env, callback, this, GetEntriesArgs(limit, start, end, std::move(prop_ids), canceler));
 
-  return OK(env, canceler_v);
+  return OK(env);
 }
 
 std::unique_lock<std::recursive_mutex>
