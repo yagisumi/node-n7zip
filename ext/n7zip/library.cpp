@@ -364,12 +364,12 @@ LibraryInfo::create_object(size_t fmt_index, const GUID* iid, void** outObject)
 std::string&
 LibraryInfo::get_format_name(size_t fmt_index)
 {
-  static std::string default;
+  static std::string default_str;
   if (fmt_index < m_formats.size()) {
     auto& fmt = m_formats.at(fmt_index);
     return fmt->Name;
   } else {
-    return default;
+    return default_str;
   }
 }
 
