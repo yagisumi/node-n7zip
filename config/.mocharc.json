@@ -3,5 +3,6 @@
   "ui": "jest",
   "reporter": "list",
   "parallel": false,
-  "timeout": 30000
+  "timeout": 30000,
+  "gc-global": true
 }

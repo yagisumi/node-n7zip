@@ -6,6 +6,7 @@
 #include "get_archive_properties_worker.h"
 #include "get_entries_worker.h"
 #include "../canceler.h"
+#include "extract_worker.h"
 
 namespace n7zip {
 
@@ -47,6 +48,7 @@ Reader::Init(Napi::Env env, Napi::Object exports)
       InstanceMethod("getPropertyInfo", &Reader::GetPropertyInfo),
       InstanceMethod("getArchiveProperties", &Reader::GetArchiveProperties),
       InstanceMethod("getEntries", &Reader::GetEntries),
+      InstanceMethod("extract", &Reader::Extract),
     });
 
   constructor = Napi::Persistent(func);
@@ -340,6 +342,79 @@ Reader::GetEntries(const Napi::CallbackInfo& info)
   return OK(env);
 }
 
+Napi::Value
+Reader::Extract(const Napi::CallbackInfo& info)
+{
+  TRACE_THIS("[Reader::Extract]");
+  auto env = info.Env();
+
+  if (!m_archive) {
+    return ERR(env, "Uninitialized Reader");
+  }
+
+  if (m_closed.load()) {
+    return ERR(env, "Reader is already closed");
+  }
+
+  if (info.Length() < 2) {
+    return ERR(env, "The arguments must be Object and callback function");
+  }
+
+  if (info[0].IsArray() || !info[0].IsObject()) {
+    return ERR(env, "The first arguments must be Object");
+  }
+
+  if (!info[1].IsFunction()) {
+    return ERR(env, "The second arguments must be callback function");
+  }
+
+  auto opts = info[0].ToObject();
+  auto callback = info[1].As<Napi::Function>();
+
+  if (!opts.Has("index")) {
+    return ERR(env, "'index' value is not specified");
+  }
+
+  auto index_v = opts.Get("index");
+  if (!index_v.IsNumber()) {
+    return ERR(env, "'index' must be Number");
+  }
+
+  auto index_tmp = index_v.ToNumber().Int64Value();
+  if (index_tmp < 0) {
+    return ERR(env,
+               "'index' value is out of range (index: %lld, min: 0, max: %u)",
+               index_tmp,
+               m_num_of_items - 1);
+  }
+
+  auto index = index_v.ToNumber().Uint32Value();
+  if (index >= m_num_of_items) {
+    return ERR(
+      env, "'index' value is out of range (index: %u, min: 0, max: %u)", index, m_num_of_items - 1);
+  }
+
+  auto limit_v = opts.Get("limit");
+  UInt32 limit = 1048576;
+  if (!limit_v.IsUndefined()) {
+    if (!limit_v.IsNumber()) {
+      return ERR(env, "'limit' must be Number");
+    }
+
+    limit = std::max(1048576, limit_v.ToNumber().Int32Value());
+  }
+
+  bool test_mode = false;
+  auto test_mode_v = opts.Get("testMode");
+  if (test_mode_v.IsBoolean()) {
+    test_mode = test_mode_v.ToBoolean();
+  }
+
+  new ExtractWorker(env, callback, this, index, limit, test_mode);
+
+  return OK(env);
+}
+
 std::unique_lock<std::recursive_mutex>
 Reader::lock()
 {
@@ -449,6 +524,40 @@ Reader::get_entries(UInt32 start, UInt32 end, std::unique_ptr<std::vector<PROPID
   }
 
   return entries;
+}
+
+HRESULT
+Reader::extract(const UInt32* indices,
+                UInt32 numItems,
+                Int32 testMode,
+                IArchiveExtractCallback* extractCallback)
+{
+  auto locked = lock();
+  if (m_closed) {
+    return S_FALSE;
+  }
+  return m_archive->Extract(indices, numItems, testMode, extractCallback);
+}
+
+HRESULT
+Reader::is_dir(const UInt32 index, bool& result)
+{
+  auto locked = lock();
+  if (m_closed) {
+    return E_FAIL;
+  }
+  NWindows::NCOM::CPropVariant prop;
+  auto r = m_archive->GetProperty(index, kpidIsDir, &prop);
+  if (r != S_OK) {
+    return r;
+  } else if (prop.vt == VT_BOOL) {
+    result = prop.boolVal != VARIANT_FALSE;
+  } else if (prop.vt == VT_EMPTY) {
+    result = false;
+  } else {
+    return E_FAIL;
+  }
+  return S_OK;
 }
 
 static Napi::Object

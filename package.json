@@ -16,7 +16,7 @@
   "scripts": {
     "test": "run-s test:build prettier:check eslint:check mocha",
     "test:build": "node-gyp rebuild --debug",
-    "mocha": "cross-env TS_NODE_FILES=true TS_NODE_CACHE=false mocha --config config/.mocharc.json \"test/**/*.test.ts\"",
+    "mocha": "cross-env TS_NODE_FILES=true TS_NODE_CACHE=false mocha --expose-gc --config config/.mocharc.json \"test/**/*.test.ts\"",
     "install": "node-gyp rebuild --debug",
     "build": "run-s clean build:*",
     "clean": "rimraf lib coverage umd *.tgz .rpt2_cache",

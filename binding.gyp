@@ -63,11 +63,13 @@
                 "ext/n7zip/utils/variant_utils.cpp",
 
                 "ext/n7zip/callbacks/open_callback.cpp",
+                "ext/n7zip/callbacks/extract_callback.cpp",
 
                 "ext/n7zip/streams/fd_in_stream.cpp",
                 "ext/n7zip/streams/buffer_in_stream.cpp",
                 "ext/n7zip/streams/multi_in_stream.cpp",
                 "ext/n7zip/streams/in_streams.cpp",
+                "ext/n7zip/streams/out_stream.cpp",
 
                 "ext/n7zip/reader/create_reader_args.cpp",
                 "ext/n7zip/reader/create_reader_worker.cpp",
@@ -76,6 +78,7 @@
                 "ext/n7zip/reader/get_property_info_worker.cpp",
                 "ext/n7zip/reader/get_archive_properties_worker.cpp",
                 "ext/n7zip/reader/get_entries_worker.cpp",
+                "ext/n7zip/reader/extract_worker.cpp",
 
                 "ext/n7zip/tester/index.cpp",
                 "ext/n7zip/tester/shared_locker.cpp",

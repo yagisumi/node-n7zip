@@ -83,7 +83,8 @@ public:
   Napi::Value Close(const Napi::CallbackInfo& info);
   Napi::Value GetPropertyInfo(const Napi::CallbackInfo& info);
   Napi::Value GetArchiveProperties(const Napi::CallbackInfo& info);
-  Napi::Value Reader::GetEntries(const Napi::CallbackInfo& info);
+  Napi::Value GetEntries(const Napi::CallbackInfo& info);
+  Napi::Value Extract(const Napi::CallbackInfo& info);
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();
@@ -92,6 +93,11 @@ public:
   std::vector<Entry> get_entries(UInt32 start,
                                  UInt32 end,
                                  std::unique_ptr<std::vector<PROPID>>& prop_ids);
+  HRESULT extract(const UInt32* indices,
+                  UInt32 numItems,
+                  Int32 testMode,
+                  IArchiveExtractCallback* extractCallback);
+  HRESULT is_dir(const UInt32 index, bool& result);
 };
 
 Napi::Object

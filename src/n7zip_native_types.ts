@@ -106,6 +106,11 @@ export declare class Canceler {
   get taskName(): string
 }
 
+export type ExtractOptions = {
+  index: number
+  testMode?: boolean
+}
+
 export declare class Reader {
   get formatIndex(): number
   get formatName(): string
@@ -123,6 +128,7 @@ export declare class Reader {
     opts: GetEntriesOptions,
     cb: (r: Result<{ done: boolean; entries: { index: number; props: Prop[] } }>) => void
   ): Result<undefined>
+  extract(opts: ExtractOptions, cb: (r: Result<undefined>) => void): Result<undefined>
 }
 
 export interface n7zipNativeType {
