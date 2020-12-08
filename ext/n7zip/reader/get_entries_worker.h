@@ -76,9 +76,9 @@ public:
   static void InvokeCallbackOnOK(Napi::Env env,
                                  Napi::Function jsCallback,
                                  GetEntriesMessage* message_ptr);
-  static void GetEntriesWorker::InvokeCallbackOnError(Napi::Env env,
-                                                      Napi::Function jsCallback,
-                                                      GetEntriesWorker* message_ptr);
+  static void InvokeCallbackOnError(Napi::Env env,
+                                    Napi::Function jsCallback,
+                                    GetEntriesWorker* message_ptr);
 };
 
 } // namespace n7zip
