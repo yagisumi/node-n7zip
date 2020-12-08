@@ -1,5 +1,6 @@
 #include "variant_utils.h"
 #include "string_utils.h"
+#include "other_utils.h"
 
 /*
 enum VARENUM
@@ -67,7 +68,7 @@ ConvertPropVariant(Napi::Env env, NWindows::NCOM::CPropVariant& prop)
     case VT_BSTR:
       return ConvertBStrToNapiString(env, prop.bstrVal);
     case VT_FILETIME:
-      LARGE_INTEGER date;
+      N7ZIP_LARGE_INTEGER date;
       date.HighPart = prop.filetime.dwHighDateTime;
       date.LowPart = prop.filetime.dwLowDateTime;
       date.QuadPart -= 116444736000000000LL;
