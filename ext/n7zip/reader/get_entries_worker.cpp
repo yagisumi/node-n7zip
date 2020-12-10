@@ -53,7 +53,9 @@ GetEntriesWorker::execute()
 
   for (UInt32 i = m_args.start; i < m_args.end; i += m_args.limit) {
     if (m_args.canceler && m_args.canceler->is_canceled()) {
-      auto r_status = m_tsfn.BlockingCall(this, GetEntriesWorker::InvokeCallbackOnError);
+      auto r_status = m_tsfn.BlockingCall([this](Napi::Env env, Napi::Function jsCallback) {
+        postTypeOnly(env, jsCallback, "abort");
+      });
       TRACE_THIS("napi_status: %d", r_status);
       break;
     }
@@ -62,13 +64,22 @@ GetEntriesWorker::execute()
     TRACE_THIS("[GetEntriesWorker::execute] i: %u, end: %u", i, end);
 
     auto done = end == m_args.end;
-    auto message_ptr =
-      new GetEntriesMessage(m_reader->get_entries(i, end, m_args.prop_ids), done, this);
+    auto response_ptr = new EntriesResponse(m_reader->get_entries(i, end, m_args.prop_ids), done);
 
-    auto r_status = m_tsfn.BlockingCall(message_ptr, GetEntriesWorker::InvokeCallbackOnOK);
+    auto r_status = m_tsfn.BlockingCall(
+      response_ptr,
+      [this](Napi::Env env, Napi::Function jsCallback, EntriesResponse* response_ptr) {
+        postEntries(env, jsCallback, response_ptr);
+      });
     TRACE_THIS("napi_status: %d", r_status);
+
     if (r_status != napi_ok) {
-      delete message_ptr;
+      delete response_ptr;
+      auto r_err_status = m_tsfn.BlockingCall([this](Napi::Env env, Napi::Function jsCallback) {
+        postTypeOnly(env, jsCallback, "error");
+      });
+      TRACE_THIS("napi_status: %d", r_err_status);
+      break;
     }
   }
 
@@ -83,21 +94,33 @@ GetEntriesWorker::Finalize(Napi::Env, void*, GetEntriesWorker* self)
 }
 
 void
-GetEntriesWorker::InvokeCallbackOnOK(Napi::Env env,
-                                     Napi::Function jsCallback,
-                                     GetEntriesMessage* message_ptr)
+GetEntriesWorker::postTypeOnly(Napi::Env env, Napi::Function jsCallback, const char* type_name)
 {
-  std::unique_ptr<GetEntriesMessage> message(message_ptr);
-  TRACE_PTR(message->worker, "[GetEntriesWorker::InvokeCallback]");
+  TRACE_THIS("[GetEntriesWorker::postTypeOnly]");
+  try {
+    auto res = Napi::Object::New(env);
+    res.Set("type", Napi::String::New(env, type_name));
+    jsCallback.Call({ res });
+  } catch (...) {
+  }
+}
+
+void
+GetEntriesWorker::postEntries(Napi::Env env,
+                              Napi::Function jsCallback,
+                              EntriesResponse* response_ptr)
+{
+  std::unique_ptr<EntriesResponse> response(response_ptr);
+  TRACE_THIS("[GetEntriesWorker::postEntries]");
 #ifdef DEBUG
   auto start = std::chrono::system_clock::now();
 #endif
 
   try {
-    auto length = message->entries.size();
+    auto length = response->entries.size();
     auto entries = Napi::Array::New(env, length);
     for (size_t i = 0; i < length; i++) {
-      auto& entry = message->entries[i];
+      auto& entry = response->entries[i];
       auto entry_obj = Napi::Object::New(env);
 
       auto props = Napi::Array::New(env, entry.props.size());
@@ -116,30 +139,19 @@ GetEntriesWorker::InvokeCallbackOnOK(Napi::Env env,
       entries.Set(i, entry_obj);
     }
 
-    auto value = Napi::Object::New(env);
-    value.Set("done", Napi::Boolean::New(env, message->done));
-    value.Set("entries", entries);
-    jsCallback.Call({ OK(env, value) });
+    auto res = Napi::Object::New(env);
+    res.Set("type", Napi::String::New(env, "entries"));
+    res.Set("done", Napi::Boolean::New(env, response->done));
+    res.Set("entries", entries);
+    jsCallback.Call({ res });
   } catch (...) {
   }
 
 #ifdef DEBUG
   auto end = std::chrono::system_clock::now();
   auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  TRACE_PTR(message->worker, "elapsed time: %lld msec", elapsed);
+  TRACE_THIS("elapsed time: %lld msec", elapsed);
 #endif
-}
-
-void
-GetEntriesWorker::InvokeCallbackOnError(Napi::Env env,
-                                        Napi::Function jsCallback,
-                                        GetEntriesWorker* self)
-{
-  TRACE_PTR(self, "GetEntriesWorker::InvokeCallbackERR");
-  try {
-    jsCallback.Call({ ERR(env, "Task was canceled") });
-  } catch (...) {
-  }
 }
 
 } // namespace n7zip

@@ -100,6 +100,19 @@ export type GetEntriesOptions = {
   canceler?: Canceler
 }
 
+export type GetEntriesResponse =
+  | {
+      type: 'entries'
+      done: boolean
+      entries: { index: number; props: Prop[] }
+    }
+  | {
+      type: 'abort'
+    }
+  | {
+      type: 'error'
+    }
+
 export declare class Canceler {
   constructor(taskName?: string)
   cancel(): void
@@ -124,10 +137,7 @@ export declare class Reader {
     opts: GetArchivePropertiesOptions,
     cb: (r: Result<Array<Prop>>) => void
   ): Result<undefined>
-  getEntries(
-    opts: GetEntriesOptions,
-    cb: (r: Result<{ done: boolean; entries: { index: number; props: Prop[] } }>) => void
-  ): Result<undefined>
+  getEntries(opts: GetEntriesOptions, cb: (res: GetEntriesResponse) => void): Result<undefined>
   extract(opts: ExtractOptions, cb: (r: Result<undefined>) => void): Result<undefined>
 }
 

@@ -43,20 +43,18 @@ struct GetEntriesArgs
 
 class GetEntriesWorker;
 
-struct GetEntriesMessage
+struct EntriesResponse
 {
   std::vector<Entry> entries;
   bool done = false;
-  GetEntriesWorker* worker;
 
-  GetEntriesMessage(std::vector<Entry>&& entries, bool done, GetEntriesWorker* worker)
+  EntriesResponse(std::vector<Entry>&& entries, bool done)
     : entries(std::move(entries))
     , done(done)
-    , worker(worker)
   {
-    TRACE_THIS("+ GetEntriesMessage");
+    TRACE_THIS("+ EntriesResponse");
   }
-  ~GetEntriesMessage() { TRACE_THIS("- GetEntriesMessage"); }
+  ~EntriesResponse() { TRACE_THIS("- EntriesResponse"); }
 };
 
 class GetEntriesWorker
@@ -71,14 +69,10 @@ public:
   ~GetEntriesWorker();
 
   void execute();
+  void postTypeOnly(Napi::Env env, Napi::Function jsCallback, const char* type_name);
+  void postEntries(Napi::Env env, Napi::Function jsCallback, EntriesResponse* message_ptr);
 
   static void Finalize(Napi::Env, void*, GetEntriesWorker* self);
-  static void InvokeCallbackOnOK(Napi::Env env,
-                                 Napi::Function jsCallback,
-                                 GetEntriesMessage* message_ptr);
-  static void InvokeCallbackOnError(Napi::Env env,
-                                    Napi::Function jsCallback,
-                                    GetEntriesWorker* message_ptr);
 };
 
 } // namespace n7zip
