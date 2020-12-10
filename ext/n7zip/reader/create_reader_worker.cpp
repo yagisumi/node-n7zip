@@ -79,6 +79,7 @@ CreateReaderWorker::execute()
 
   for (auto i : m_arg->formats) {
     CMyComPtr<IInArchive> archive;
+    first_stream->Seek(0, STREAM_SEEK_SET, nullptr);
     auto r = g_library_info->create_object(i, &IID_IInArchive, (void**)&archive);
     TRACE_THIS("create_object > fmt: %d, r: %d", i, r);
     if (r == S_OK) {
