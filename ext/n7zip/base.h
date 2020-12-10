@@ -9,6 +9,7 @@
 #endif
 
 #include <Common/MyWindows.h>
+#include <Common/MyLinux.h>
 
 #include <7zip/Archive/IArchive.h>
 #include <7zip/IStream.h>

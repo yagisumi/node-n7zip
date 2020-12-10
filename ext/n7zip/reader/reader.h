@@ -98,6 +98,7 @@ public:
                   Int32 testMode,
                   IArchiveExtractCallback* extractCallback);
   HRESULT is_dir(const UInt32 index, bool& result);
+  bool Reader::is_link(const UInt32 index);
 };
 
 Napi::Object

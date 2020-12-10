@@ -543,9 +543,12 @@ HRESULT
 Reader::is_dir(const UInt32 index, bool& result)
 {
   auto locked = lock();
+  result = false;
+
   if (m_closed) {
     return E_FAIL;
   }
+
   NWindows::NCOM::CPropVariant prop;
   auto r = m_archive->GetProperty(index, kpidIsDir, &prop);
   if (r != S_OK) {
@@ -558,6 +561,37 @@ Reader::is_dir(const UInt32 index, bool& result)
     return E_FAIL;
   }
   return S_OK;
+}
+
+bool
+Reader::is_link(const UInt32 index)
+{
+  auto locked = lock();
+  if (m_closed) {
+    return false;
+  }
+
+  {
+    NWindows::NCOM::CPropVariant prop;
+    auto r = m_archive->GetProperty(index, kpidAttrib, &prop);
+    if (r == S_OK && prop.vt == VT_UI4) {
+      if (prop.vt == VT_UI4 && (prop.ulVal & FILE_ATTRIBUTE_REPARSE_POINT)) {
+        return true;
+      }
+    }
+  }
+
+  {
+    NWindows::NCOM::CPropVariant prop;
+    auto r = m_archive->GetProperty(index, kpidPosixAttrib, &prop);
+    if (r == S_OK && prop.vt == VT_UI4) {
+      if (prop.vt == VT_UI4 && (MY_LIN_S_ISLNK(prop.ulVal))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 static Napi::Object
