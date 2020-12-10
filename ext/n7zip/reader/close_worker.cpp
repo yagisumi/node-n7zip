@@ -33,8 +33,19 @@ CloseWorker::~CloseWorker()
 void
 CloseWorker::execute()
 {
-  m_result = m_reader->close();
-  auto r_status = m_tsfn.BlockingCall(this, CloseWorker::InvokeCallback);
+  TRACE_THIS("[CloseWorker::execute]");
+  auto result = m_reader->close();
+  auto r_status = m_tsfn.BlockingCall([this, result](Napi::Env env, Napi::Function jsCallback) {
+    TRACE_THIS("[CloseWorker::execute/postResult]");
+    try {
+      if (result == S_OK) {
+        jsCallback.Call({ OK(env) });
+      } else {
+        jsCallback.Call({ ERR(env, "Failed to close (HRESULT: %d)", result) });
+      }
+    } catch (...) {
+    }
+  });
   TRACE_THIS("napi_status: %d", r_status);
   m_tsfn.Release();
 }
@@ -44,20 +55,6 @@ CloseWorker::Finalize(Napi::Env, void*, CloseWorker* self)
 {
   TRACE_PTR(self, "[CloseWorker::Finalize]");
   delete self;
-}
-
-void
-CloseWorker::InvokeCallback(Napi::Env env, Napi::Function jsCallback, CloseWorker* self)
-{
-  TRACE_PTR(self, "[CloseWorker::InvokeCallback]");
-  try {
-    if (self->m_result == S_OK) {
-      jsCallback.Call({ OK(env) });
-    } else {
-      jsCallback.Call({ ERR(env, "Failed to close (HRESULT: %d)", self->m_result) });
-    }
-  } catch (...) {
-  }
 }
 
 } // namespace n7zip
