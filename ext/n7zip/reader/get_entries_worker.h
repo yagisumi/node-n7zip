@@ -41,8 +41,6 @@ struct GetEntriesArgs
   GetEntriesArgs& operator=(GetEntriesArgs&& rhs) = default;
 };
 
-class GetEntriesWorker;
-
 struct EntriesResponse
 {
   std::vector<Entry> entries;
