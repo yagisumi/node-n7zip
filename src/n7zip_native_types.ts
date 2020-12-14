@@ -115,8 +115,16 @@ export type GetEntriesResponse =
 
 export declare class Canceler {
   constructor(taskName?: string)
-  cancel(): void
   get taskName(): string
+  cancel(): void
+}
+
+export declare class Controller {
+  constructor(taskName?: string)
+  get taskName(): string
+  cancel(): void
+  _pause(): void
+  _resume(): void
 }
 
 export type ExtractOptions = {
@@ -157,6 +165,7 @@ export interface n7zipNativeType {
     cb: (r: Result<Reader>) => void
   ): Result<undefined>
   Canceler: typeof Canceler
+  Controller: typeof Controller
 
   tester?: {
     SharedLocker: typeof SharedLocker

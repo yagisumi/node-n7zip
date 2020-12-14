@@ -1,6 +1,7 @@
 #include "n7zip/common.h"
 #include "n7zip/library.h"
 #include "n7zip/canceler.h"
+#include "n7zip/controller.h"
 #include "n7zip/reader/reader.h"
 #ifdef DEBUG
   #include "n7zip/tester/index.h"
@@ -22,6 +23,7 @@ Init(Napi::Env env, Napi::Object exports)
   n7zip::InitLibrary(env, exports);
   n7zip::InitReader(env, exports);
   n7zip::Canceler::Init(env, exports);
+  n7zip::Controller::Init(env, exports);
 
   return exports;
 }
