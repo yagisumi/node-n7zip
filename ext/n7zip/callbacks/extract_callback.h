@@ -30,7 +30,7 @@ public:
 
   STDMETHOD(GetStream)(UInt32 index, ISequentialOutStream** outStream, Int32 askExtractMode);
   STDMETHOD(PrepareOperation)(Int32 askExtractMode);
-  STDMETHOD(SetOperationResult)(Int32 resultOperationResult);
+  STDMETHOD(SetOperationResult)(Int32 result);
 };
 
 } // namespace n7zip

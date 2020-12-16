@@ -130,7 +130,37 @@ export declare class Controller {
 export type ExtractOptions = {
   index: number
   testMode?: boolean
+  canceler?: Controller | Canceler
 }
+
+export type ExtractBufferResponse = {
+  type: 'buffer'
+  buffer: Buffer
+  index: number
+  offset: number
+  done: boolean
+  operationResult: number
+}
+
+export type ExtractErrorResponse = {
+  type: 'error'
+  message: ''
+}
+
+export type ExtractEndResponse =
+  | {
+      type: 'end'
+      skipExtraction: true
+      isDir: boolean
+      isLink: boolean
+    }
+  | {
+      type: 'end'
+      skipExtraction: false
+      extractResult: number
+    }
+
+export type ExtractResponse = ExtractBufferResponse | ExtractErrorResponse | ExtractEndResponse
 
 export declare class Reader {
   get formatIndex(): number
@@ -146,7 +176,7 @@ export declare class Reader {
     cb: (r: Result<Array<Prop>>) => void
   ): Result<undefined>
   getEntries(opts: GetEntriesOptions, cb: (res: GetEntriesResponse) => void): Result<undefined>
-  extract(opts: ExtractOptions, cb: (r: Result<undefined>) => void): Result<undefined>
+  extract(opts: ExtractOptions, cb: (r: ExtractEndResponse) => void): Result<undefined>
 }
 
 export interface n7zipNativeType {

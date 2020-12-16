@@ -33,6 +33,10 @@ ExtractCallback::SetCompleted(const UInt64* completeValue)
     TRACE_THIS("[ExtractCallback::SetCompleted] completeValue: -");
   }
 #endif
+  if (m_worker->is_canceled()) {
+    return E_ABORT;
+  }
+
   return S_OK;
 }
 
@@ -63,17 +67,16 @@ ExtractCallback::PrepareOperation(Int32 askExtractMode)
 }
 
 STDMETHODIMP
-ExtractCallback::SetOperationResult(Int32 resultOperationResult)
+ExtractCallback::SetOperationResult(Int32 result)
 {
-  TRACE_THIS("[ExtractCallback::SetOperationResult] resultOperationResult: %d",
-             resultOperationResult);
+  TRACE_THIS("[ExtractCallback::SetOperationResult] result: %d", result);
 
   if (m_current_stream) {
-    m_current_stream->set_done();
-    m_worker->postBuffer(m_current_stream->purge());
+    m_current_stream->set_done(result);
+    m_worker->post_buffer(m_current_stream->purge());
   }
 
-  if (resultOperationResult != NArchive::NExtract::NOperationResult::kOK) {
+  if (result != NArchive::NExtract::NOperationResult::kOK) {
     //
   }
   return S_OK;

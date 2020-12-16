@@ -49,7 +49,7 @@ void
 GetEntriesWorker::execute()
 {
   TRACE_THIS("[GetEntriesWorker::execute]");
-  auto lock = m_reader->lock();
+  auto lock = m_reader->acquire_lock();
 
   for (UInt32 i = m_args.start; i < m_args.end; i += m_args.limit) {
     if (m_args.canceler && m_args.canceler->is_canceled()) {

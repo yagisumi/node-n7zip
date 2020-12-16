@@ -1,28 +1,10 @@
 #pragma once
 
 #include "../common.h"
+#include "out_buffer_data.h"
 // #include "../reader/extract_worker.h"
 
 namespace n7zip {
-
-class OutBufferData
-{
-  UInt32 m_index;
-  UInt64 m_offset;
-  UInt32 m_length = 0;
-  std::vector<std::string> m_buffers;
-  bool m_done = false;
-
-public:
-  OutBufferData(UInt32 index, UInt64 offset);
-  ~OutBufferData();
-  Napi::Value createResult(Napi::Env env);
-  void append(const char* data, UInt32 size);
-  void set_done();
-
-private:
-  Napi::Buffer<char> createBuffer(Napi::Env env);
-};
 
 class ExtractWorker;
 
@@ -45,7 +27,7 @@ public:
   STDMETHOD(Write)(const void* data, UInt32 size, UInt32* processedSize);
 
   std::unique_ptr<OutBufferData> purge();
-  void set_done();
+  void set_done(Int32 result);
 };
 
 } // namespace n7zip
