@@ -6,6 +6,7 @@
 #include "get_archive_properties_worker.h"
 #include "get_entries_worker.h"
 #include "../canceler.h"
+#include "../controller.h"
 #include "extract_worker.h"
 
 namespace n7zip {
@@ -410,7 +411,16 @@ Reader::Extract(const Napi::CallbackInfo& info)
     test_mode = test_mode_v.ToBoolean();
   }
 
-  new ExtractWorker(env, callback, this, index, limit, test_mode);
+  Controller* controller = nullptr;
+  auto controller_v = opts.Get("canceler");
+  if (controller_v.IsObject()) {
+    auto controller_obj = controller_v.ToObject();
+    if (controller_obj.InstanceOf(Controller::constructor.Value())) {
+      controller = Napi::ObjectWrap<Controller>::Unwrap(controller_obj);
+    }
+  }
+
+  new ExtractWorker(env, callback, this, index, limit, test_mode, controller);
 
   return OK(env);
 }
