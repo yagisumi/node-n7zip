@@ -545,28 +545,24 @@ Reader::extract(const UInt32* indices,
   return m_archive->Extract(indices, numItems, testMode, extractCallback);
 }
 
-HRESULT
-Reader::is_dir(const UInt32 index, bool& result)
+bool
+Reader::is_dir(const UInt32 index)
 {
   auto locked = lock();
-  result = false;
 
   if (m_closed) {
-    return E_FAIL;
+    return false;
   }
 
   NWindows::NCOM::CPropVariant prop;
   auto r = m_archive->GetProperty(index, kpidIsDir, &prop);
   if (r != S_OK) {
-    return r;
+    return false;
   } else if (prop.vt == VT_BOOL) {
-    result = prop.boolVal != VARIANT_FALSE;
-  } else if (prop.vt == VT_EMPTY) {
-    result = false;
-  } else {
-    return E_FAIL;
+    return prop.boolVal != VARIANT_FALSE;
   }
-  return S_OK;
+
+  return false;
 }
 
 bool

@@ -98,7 +98,7 @@ public:
                   UInt32 numItems,
                   Int32 testMode,
                   IArchiveExtractCallback* extractCallback);
-  HRESULT is_dir(const UInt32 index, bool& result);
+  bool is_dir(const UInt32 index);
   bool Reader::is_link(const UInt32 index);
 };
 
