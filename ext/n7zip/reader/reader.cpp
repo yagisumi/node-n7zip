@@ -426,7 +426,7 @@ Reader::Extract(const Napi::CallbackInfo& info)
 }
 
 std::unique_lock<std::recursive_mutex>
-Reader::lock()
+Reader::acquire_lock() const
 {
   return std::unique_lock<std::recursive_mutex>(m_mutex);
 }
@@ -435,7 +435,7 @@ HRESULT
 Reader::close()
 {
   if (!m_closed) {
-    auto locked = lock();
+    auto lock = acquire_lock();
     auto r = m_archive->Close();
     if (r == S_OK) {
       m_closed.store(true);
@@ -455,7 +455,7 @@ Reader::is_closed() const
 std::unique_ptr<ReaderPropertyInfo>
 Reader::get_property_info()
 {
-  auto locked = lock();
+  auto lock = acquire_lock();
   if (m_closed) {
     return std::unique_ptr<ReaderPropertyInfo>();
   }
@@ -482,7 +482,7 @@ Reader::get_archive_properties(std::unique_ptr<std::vector<PROPID>>& prop_ids)
 {
   std::vector<EntryProperty> props;
 
-  auto locked = lock();
+  auto lock = acquire_lock();
   if (m_closed) {
     return props;
   }
@@ -513,7 +513,7 @@ Reader::get_entries(UInt32 start, UInt32 end, std::unique_ptr<std::vector<PROPID
   TRACE_THIS("[Reader::get_entries] start: %u, end: %u, prop_ids: %d", start, end, !!prop_ids);
   std::vector<Entry> entries;
 
-  auto locked = lock();
+  auto lock = acquire_lock();
   if (m_closed) {
     return entries;
   }
@@ -548,7 +548,7 @@ Reader::extract(const UInt32* indices,
                 Int32 testMode,
                 IArchiveExtractCallback* extractCallback)
 {
-  auto locked = lock();
+  auto lock = acquire_lock();
   if (m_closed) {
     return S_FALSE;
   }
@@ -558,7 +558,7 @@ Reader::extract(const UInt32* indices,
 bool
 Reader::is_dir(const UInt32 index)
 {
-  auto locked = lock();
+  auto lock = acquire_lock();
 
   if (m_closed) {
     return false;
@@ -578,7 +578,7 @@ Reader::is_dir(const UInt32 index)
 bool
 Reader::is_link(const UInt32 index)
 {
-  auto locked = lock();
+  auto lock = acquire_lock();
   if (m_closed) {
     return false;
   }

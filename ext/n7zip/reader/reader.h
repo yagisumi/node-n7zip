@@ -54,7 +54,7 @@ class Reader : public Napi::ObjectWrap<Reader>
   std::string m_fmt_name;
   CMyComPtr<IInArchive> m_archive;
   CMyComPtr<IArchiveOpenCallback> m_open_callback;
-  std::recursive_mutex m_mutex;
+  mutable std::recursive_mutex m_mutex;
 
 public:
   UInt32 m_num_of_items;
@@ -86,7 +86,7 @@ public:
   Napi::Value GetEntries(const Napi::CallbackInfo& info);
   Napi::Value Extract(const Napi::CallbackInfo& info);
 
-  std::unique_lock<std::recursive_mutex> lock();
+  std::unique_lock<std::recursive_mutex> acquire_lock() const;
   HRESULT close();
   bool is_closed() const;
   std::unique_ptr<ReaderPropertyInfo> get_property_info();
