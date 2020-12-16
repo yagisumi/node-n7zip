@@ -88,6 +88,7 @@ public:
 
   std::unique_lock<std::recursive_mutex> lock();
   HRESULT close();
+  bool is_closed() const;
   std::unique_ptr<ReaderPropertyInfo> get_property_info();
   std::vector<EntryProperty> get_archive_properties(std::unique_ptr<std::vector<PROPID>>& prop_ids);
   std::vector<Entry> get_entries(UInt32 start,

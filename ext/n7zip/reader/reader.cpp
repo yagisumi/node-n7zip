@@ -436,6 +436,12 @@ Reader::close()
   }
 }
 
+bool
+Reader::is_closed() const
+{
+  return m_closed;
+}
+
 std::unique_ptr<ReaderPropertyInfo>
 Reader::get_property_info()
 {
