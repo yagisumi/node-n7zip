@@ -21,6 +21,12 @@ const incorrect_format = all_formats.filter((fmt) => fmt.name === '7z').map((fmt
 const format_ext = 'zip'
 
 describe('n7zip_native/archives/zip', function () {
+  afterEach(() => {
+    if (global.gc !== undefined) {
+      global.gc()
+    }
+  })
+
   test('non-existent zip file', function (this: Context, done) {
     TRACE(this)
 
@@ -65,7 +71,7 @@ describe('n7zip_native/archives/zip', function () {
     expect(r_cr.ok).toBe(true)
   })
 
-  test('open and close', function (this: Context, done) {
+  test.only('open and close', function (this: Context, done) {
     TRACE(this)
 
     const r_cr = n7zip_native.createReader(
@@ -152,7 +158,7 @@ describe('n7zip_native/archives/zip', function () {
     expect(r_cr.ok).toBe(true)
   })
 
-  test('getEntries', function (this: Context, done) {
+  test.only('getEntries', function (this: Context, done) {
     TRACE(this)
 
     const r_cr = n7zip_native.createReader(
@@ -171,14 +177,12 @@ describe('n7zip_native/archives/zip', function () {
           }
 
           const reader = r_reader.value
-          expect(reader.numberOfEntries).toBe(num_of_items)
-          console.log({ index: reader.formatIndex, name: reader.formatName })
 
-          const result1 = reader.getEntries({}, (result2) => {
+          const result1 = reader.getEntries({}, (res) => {
             process.nextTick(() => {
-              console.dir(result2, { depth: null })
+              console.dir(res, { depth: null })
 
-              if (result2.error || result2.value.done) {
+              if (res.type === 'abort' || res.type === 'error' || res.done) {
                 const r_close1 = reader.close((r_close2) => {
                   process.nextTick(() => {
                     expect(r_close2.error).toBeUndefined()
@@ -189,6 +193,55 @@ describe('n7zip_native/archives/zip', function () {
                 expect(r_close1.error).toBeUndefined()
                 expect(r_close1.ok).toBe(true)
               }
+            })
+          })
+          expect(result1.error).toBeUndefined()
+          expect(result1.ok).toBe(true)
+        })
+      }
+    )
+
+    expect(r_cr.error).toBeUndefined()
+    expect(r_cr.ok).toBe(true)
+  })
+
+  test.only('extract', function (this: Context, done) {
+    TRACE(this)
+
+    const r_cr = n7zip_native.createReader(
+      {
+        streams, //
+        formats: target_format,
+      },
+      (r_reader) => {
+        process.nextTick(() => {
+          expect(r_reader.error).toBeUndefined()
+          expect(r_reader.ok).toBe(true)
+
+          if (r_reader.error) {
+            done()
+            return
+          }
+
+          const reader = r_reader.value
+
+          const result1 = reader.extract({ index: 27 }, (response) => {
+            process.nextTick(() => {
+              console.dir(response, { depth: null })
+              if (response.type === 'end' || response.type === 'error') {
+                const r_close1 = reader.close((r_close2) => {
+                  process.nextTick(() => {
+                    expect(r_close2.error).toBeUndefined()
+                    expect(r_close2.ok).toBe(true)
+                    done()
+                  })
+                })
+                expect(r_close1.error).toBeUndefined()
+                expect(r_close1.ok).toBe(true)
+              }
+
+              // if (result2.error || result2.value.done) {
+              // }
             })
           })
           expect(result1.error).toBeUndefined()

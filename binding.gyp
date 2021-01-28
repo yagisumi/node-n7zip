@@ -71,6 +71,7 @@
                 "ext/n7zip/streams/multi_in_stream.cpp",
                 "ext/n7zip/streams/in_streams.cpp",
                 "ext/n7zip/streams/out_stream.cpp",
+                "ext/n7zip/streams/out_buffer_data.cpp",
 
                 "ext/n7zip/reader/create_reader_args.cpp",
                 "ext/n7zip/reader/create_reader_worker.cpp",

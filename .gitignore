@@ -9,3 +9,4 @@ node_modules/
 *.tgz
 /ext/7z
 /build/
+/example

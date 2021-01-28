@@ -25,7 +25,8 @@
     "prettier:check": "prettier --check \"**/*.{ts,js,json}\"",
     "prettier:fix": "prettier --write \"**/*.{ts,js,json}\"",
     "eslint:check": "eslint \"{src,test}/**/*.{js,ts}\"",
-    "prepack": "run-s build test"
+    "prepack": "run-s build test",
+    "example": "cross-env TS_NODE_FILES=true TS_NODE_CACHE=false ts-node example/example.ts"
   },
   "author": "yagisumi",
   "repository": "github:yagisumi/node-n7zip",
